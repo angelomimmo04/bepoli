@@ -1,17 +1,24 @@
-<html>
+<!DOCTYPE html>
+<html lang="it">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
     }
     form {
       width: 500px;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
     }
     input {
       width: 100%;
@@ -19,12 +26,18 @@
       padding: 10px;
       box-sizing: border-box;
     }
+    #googleSignInButton {
+      margin-top: 10px;
+    }
   </style>
+
+  <!-- Script Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
 <header>
-  <img src="logobepoli.png" alt="Logo" class="logo">
+  <img src="logobepoli.png" alt="Logo" class="logo" />
 </header>
 
 <form id="loginForm">
@@ -37,11 +50,33 @@
     <span>Non hai un account?</span>
     <a href="register.html">Iscriviti</a>
   </div>
-
-  &nbsp;<!--<a href="register.html" class="register-link">Iscriviti</a>-->
 </form>
 
+<h1>Login con Google</h1>
+<div id="googleSignInButton"></div>
+
 <script>
+  // Funzione che gestisce la risposta di Google con il token
+  function handleCredentialResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+
+    // Manda il token al backend per la verifica e login
+    fetch('/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: response.credential })
+    }).then(res => {
+      if (res.ok) {
+        alert("Login effettuato con successo!");
+        // Qui puoi fare redirect a pagina protetta, ad esempio:
+        // window.location.href = "/dashboard";
+      } else {
+        alert("Errore durante il login con Google");
+      }
+    }).catch(() => alert("Errore di rete durante il login con Google"));
+  }
+
+  // Gestione login tradizionale
   document.getElementById("loginForm").addEventListener("submit", async function (event) {
     event.preventDefault();
     const username = document.getElementById("username").value;
@@ -57,11 +92,9 @@
       const data = await response.json();
 
       if (response.ok) {
-        // Login riuscito, puoi salvare qualche dato se vuoi
         alert("Login effettuato con successo!");
-        // Salvo utente in sessionStorage (opzionale)
         sessionStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "prova18.html"; // la pagina protetta
+        window.location.href = "prova17.html"; // pagina protetta
       } else {
         alert("Errore: " + data.message);
       }
@@ -69,6 +102,20 @@
       alert("Errore di rete");
     }
   });
+
+  // Inizializza Google Identity Services e mostra il bottone
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com',
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+            document.getElementById('googleSignInButton'),
+            { theme: 'outline', size: 'large' }
+    );
+    google.accounts.id.prompt(); // opzionale: mostra popup suggerimento login
+  };
 </script>
+
 </body>
 </html>
