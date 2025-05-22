@@ -1,3 +1,7 @@
+const { OAuth2Client } = require('google-auth-library');
+const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
+const client = new OAuth2Client(CLIENT_ID);
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -81,6 +85,49 @@ app.post("/register", async (req, res) => {
         res.status(500).json({ message: "Errore server" });
     }
 });
+
+app.post('/auth/google', async (req, res) => {
+    const { id_token } = req.body;
+    if (!id_token) return res.status(400).json({ message: 'Token mancante' });
+
+    try {
+        // Verifica il token ID ricevuto da Google
+        const ticket = await client.verifyIdToken({
+            idToken: id_token,
+            audience: CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        // payload contiene email, nome, sub (id google), ecc.
+
+        // Cerca utente nel DB con email (qui assumo username= email)
+        let utente = await Utente.findOne({ username: payload.email });
+
+        if (!utente) {
+            // Se non esiste, crealo automaticamente senza password (login solo con Google)
+            utente = new Utente({
+                nome: payload.name,
+                username: payload.email,
+                password: '', // o metti null, non serve password perché login Google
+            });
+            await utente.save();
+        }
+
+        // Login riuscito: ritorna dati utente
+        res.status(200).json({
+            message: 'Login Google effettuato con successo',
+            user: {
+                id: utente._id,
+                nome: utente.nome,
+                username: utente.username,
+            },
+        });
+    } catch (error) {
+        console.error('Errore verifica token Google:', error);
+        res.status(401).json({ message: 'Token Google non valido' });
+    }
+});
+
 
 // Avvio server
 const PORT = process.env.PORT || 3000;
