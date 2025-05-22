@@ -67,10 +67,11 @@
       body: JSON.stringify({ id_token: response.credential })
     }).then(res => {
       if (res.ok) {
+        console.log("Risposta dal backend:", res);
         alert("Login effettuato con successo!");
         // Qui puoi fare redirect a pagina protetta, ad esempio:
         // window.location.href = "/dashboard";
-        console.log("Risposta dal backend:", res);
+
       } else {
         alert("Errore durante il login con Google");
       }
