@@ -1,0 +1,81 @@
+<html>
+<head>
+  <title>Sign in</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    form {
+      width: 500px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="/public/logobepoli.png" alt="Logo" class="logo">
+</header>
+
+<form id="registerForm">
+  <h2 class="scritta">BePoli</h2>
+  <h3 class="scritta1">Iscriviti per poter vedere le foto dei tuoi colleghi!</h3>
+  <input type="text" id="name" placeholder="Name" required />
+  <input type="text" id="username" placeholder="Username" required />
+  <input type="password" id="password" placeholder="Password" required />
+  <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Confirm Password"
+          required
+  />
+  <button type="submit">Register</button>
+  &nbsp;<a href="login.html">Go to Login</a>
+</form>
+
+<script>
+  document.getElementById("registerForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch("register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome: name, username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Registration successful! Please login.");
+        window.location.href = "login.html";
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (error) {
+      alert("Network error");
+    }
+  });
+</script>
+</body>
+</html>
