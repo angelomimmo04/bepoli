@@ -56,8 +56,6 @@
 <div id="googleSignInButton"></div>
 
 <script>
-
-  
   // Funzione che gestisce la risposta di Google con il token
   function handleCredentialResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
@@ -94,8 +92,6 @@
       });
 
       const data = await response.json();
-
-     
 
       if (response.ok) {
         alert("Login effettuato con successo!");
