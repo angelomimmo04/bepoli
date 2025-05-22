@@ -1,6 +1,7 @@
 <html>
 <head>
-  <title>Register</title>
+  <title>Sign in</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
       display: flex;
@@ -21,8 +22,14 @@
   </style>
 </head>
 <body>
+
+<header>
+  <img src="/public/logobepoli.png" alt="Logo" class="logo">
+</header>
+
 <form id="registerForm">
-  <h2>Register</h2>
+  <h2 class="scritta">BePoli</h2>
+  <h3 class="scritta1">Iscriviti per poter vedere le foto dei tuoi colleghi!</h3>
   <input type="text" id="name" placeholder="Name" required />
   <input type="text" id="username" placeholder="Username" required />
   <input type="password" id="password" placeholder="Password" required />
@@ -51,7 +58,7 @@
     }
 
     try {
-      const response = await fetch("/register", {
+      const response = await fetch("register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome: name, username, password }),
@@ -72,4 +79,3 @@
 </script>
 </body>
 </html>
-
