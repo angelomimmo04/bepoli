@@ -24,7 +24,7 @@
 <body>
 
 <header>
-  <img src="/logobepoli.png" alt="Logo" class="logo">
+  <img src="logobepoli.png" alt="Logo" class="logo">
 </header>
 
 <form id="loginForm">
@@ -32,7 +32,13 @@
   <input type="text" id="username" placeholder="Username" required />
   <input type="password" id="password" placeholder="Password" required />
   <button type="submit">Login</button>
-  &nbsp;<a href="register.html">Iscriviti</a>
+
+  <div class="login-link">
+    <span>Non hai un account?</span>
+    <a href="register.html">Iscriviti</a>
+  </div>
+
+  &nbsp;<!--<a href="register.html" class="register-link">Iscriviti</a>-->
 </form>
 
 <script>
