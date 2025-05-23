@@ -35,10 +35,11 @@
 </head>
 <body>
 <script>
-  // Reindirizzamento automatico se già loggato
-  if (sessionStorage.getItem("user")) {
-    window.location.href = "prova18.html";
-  }
+  document.addEventListener("DOMContentLoaded", () => {
+    if (sessionStorage.getItem("user")) {
+      window.location.href = "prova18.html";
+    }
+  });
 </script>
 
 <header>
