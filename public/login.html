@@ -71,7 +71,8 @@
       console.log("✅ Login Google OK:", data);
       sessionStorage.setItem("user", JSON.stringify(data.user));
       alert("Login effettuato con successo!");
-      // window.location.href = "/home.html"; // opzionale
+      window.location.href = "prova18.html";
+      
     })
     .catch(err => {
       console.error("❌ Errore durante login con Google:", err);
@@ -97,7 +98,7 @@
       if (response.ok) {
         alert("Login effettuato con successo!");
         sessionStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "prova17.html";
+        window.location.href = "prova18.html";
       } else {
         alert("Errore: " + data.message);
       }
