@@ -19,9 +19,33 @@
       padding: 10px;
       box-sizing: border-box;
     }
+
+    #googleSignInButton {
+      margin-top: 10px;
+    }
   </style>
+  <!-- Script Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
+<script>
+  // Controlla se l'utente è già loggato
+  window.addEventListener("load", () => {
+    const user = sessionStorage.getItem("user");
+
+    try {
+      const parsedUser = JSON.parse(user);
+      if (parsedUser && parsedUser.email) {
+        // Se l'utente ha un campo valido (come email), reindirizza
+        window.location.href = "prova18.html";
+      }
+    } catch (e) {
+      // Il JSON è malformato o non c'è
+      console.log("Utente non loggato o sessione malformata");
+    }
+  });
+</script>
 
 <header>
   <img src="logobepoli.png" alt="Logo" class="logo">
@@ -48,6 +72,36 @@
   <!--&nbsp;<a href="login.html">Accedi</a>-->
 
 </form>
+
+  <span class="scritta3">oppure</span>
+<div id="googleSignInButton"></div>
+
+<script>
+  // Funzione che gestisce la risposta di Google
+  function handleCredentialResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+
+    fetch('/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: response.credential })
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Errore HTTP");
+              return res.json();
+            })
+            .then(data => {
+              console.log("✅ Login Google OK:", data);
+              sessionStorage.setItem("user", JSON.stringify(data.user));
+              alert("Login effettuato con successo!");
+              window.location.href = "prova18.html";
+
+            })
+            .catch(err => {
+              console.error("❌ Errore durante login con Google:", err);
+              alert("Errore di rete durante il login con Google");
+            });
+  }
 
 <script>
   document.getElementById("registerForm").addEventListener("submit", async function(event) {
