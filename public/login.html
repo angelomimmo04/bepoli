@@ -62,21 +62,27 @@
 
     // Manda il token al backend per la verifica e login
     fetch('/auth/google', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_token: response.credential })
-    }).then(res => {
-      if (res.ok) {
-        console.log("Risposta dal backend:", res);
-        alert("Login effettuato con successo!");
-        // Qui puoi fare redirect a pagina protetta, ad esempio:
-        // window.location.href = "/dashboard";
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id_token: response.credential })
+})
+  .then(res => {
+    if (!res.ok) {
+      throw new Error("Errore HTTP");
+    }
+    return res.json(); // <--- leggi il JSON
+  })
+  .then(data => {
+    console.log("✅ Login Google OK:", data);
+    sessionStorage.setItem("user", JSON.stringify(data.user));
+    alert("Login effettuato con successo!");
+    // window.location.href = "/home.html"; // Se vuoi reindirizzare
+  })
+  .catch(err => {
+    console.error("❌ Errore durante login con Google:", err);
+    alert("Errore di rete durante il login con Google");
+  });
 
-      } else {
-        alert("Errore durante il login con Google");
-      }
-    }).catch(() => alert("Errore di rete durante il login con Google"));
-  }
 
   // Gestione login tradizionale
   document.getElementById("loginForm").addEventListener("submit", async function (event) {
