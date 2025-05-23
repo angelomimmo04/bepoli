@@ -34,13 +34,25 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+  
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (sessionStorage.getItem("user")) {
-      window.location.href = "prova18.html";
+  // Controlla se l'utente è già loggato
+  window.addEventListener("load", () => {
+    const user = sessionStorage.getItem("user");
+
+    try {
+      const parsedUser = JSON.parse(user);
+      if (parsedUser && parsedUser.email) {
+        // Se l'utente ha un campo valido (come email), reindirizza
+        window.location.href = "prova18.html";
+      }
+    } catch (e) {
+      // Il JSON è malformato o non c'è
+      console.log("Utente non loggato o sessione malformata");
     }
   });
 </script>
+
 
 <header>
   <img src="logobepoli.png" alt="Logo" class="logo" />
