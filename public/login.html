@@ -34,7 +34,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  
+
 <script>
   // Controlla se l'utente è già loggato
   window.addEventListener("load", () => {
@@ -69,7 +69,7 @@
   </div>
 </form>
 
-<h1>Login con Google</h1>
+<span class="scritta3">oppure</span>
 <div id="googleSignInButton"></div>
 
 <script>
@@ -82,21 +82,21 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_token: response.credential })
     })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore HTTP");
-      return res.json();
-    })
-    .then(data => {
-      console.log("✅ Login Google OK:", data);
-      sessionStorage.setItem("user", JSON.stringify(data.user));
-      alert("Login effettuato con successo!");
-      window.location.href = "prova18.html";
-      
-    })
-    .catch(err => {
-      console.error("❌ Errore durante login con Google:", err);
-      alert("Errore di rete durante il login con Google");
-    });
+            .then(res => {
+              if (!res.ok) throw new Error("Errore HTTP");
+              return res.json();
+            })
+            .then(data => {
+              console.log("✅ Login Google OK:", data);
+              sessionStorage.setItem("user", JSON.stringify(data.user));
+              alert("Login effettuato con successo!");
+              window.location.href = "prova18.html";
+
+            })
+            .catch(err => {
+              console.error("❌ Errore durante login con Google:", err);
+              alert("Errore di rete durante il login con Google");
+            });
   }
 
   // Login tradizionale
@@ -133,8 +133,8 @@
       callback: handleCredentialResponse
     });
     google.accounts.id.renderButton(
-      document.getElementById('googleSignInButton'),
-      { theme: 'outline', size: 'large' }
+            document.getElementById('googleSignInButton'),
+            { theme: 'outline', size: 'large' }
     );
     google.accounts.id.prompt(); // opzionale
   };
