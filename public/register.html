@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sign in</title>
   <link rel="stylesheet" href="style.css">
   <style>
@@ -11,13 +12,16 @@
       align-items: center;
       min-height: 100vh;
       flex-direction: column;
+
     }
+
     form {
       width: 500px;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
+
     input {
       width: 100%;
       margin: 10px 0;
@@ -97,20 +101,20 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_token: response.credential })
     })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore HTTP");
-      return res.json();
-    })
-    .then(data => {
-      console.log("✅ Login Google OK:", data);
-      sessionStorage.setItem("user", JSON.stringify(data.user));
-      alert("Login effettuato con successo!");
-      window.location.href = "prova18.html";
-    })
-    .catch(err => {
-      console.error("❌ Errore durante login con Google:", err);
-      alert("Errore durante il login con Google");
-    });
+            .then(res => {
+              if (!res.ok) throw new Error("Errore HTTP");
+              return res.json();
+            })
+            .then(data => {
+              console.log("✅ Login Google OK:", data);
+              sessionStorage.setItem("user", JSON.stringify(data.user));
+              alert("Login effettuato con successo!");
+              window.location.href = "prova18.html";
+            })
+            .catch(err => {
+              console.error("❌ Errore durante login con Google:", err);
+              alert("Errore durante il login con Google");
+            });
   }
 
   // Inizializza Google Identity Services
@@ -120,8 +124,8 @@
       callback: handleCredentialResponse
     });
     google.accounts.id.renderButton(
-      document.getElementById('googleSignInButton'),
-      { theme: 'outline', size: 'large' }
+            document.getElementById('googleSignInButton'),
+            { theme: 'outline', size: 'large' }
     );
     google.accounts.id.prompt();
   };
@@ -129,4 +133,3 @@
 
 </body>
 </html>
-
