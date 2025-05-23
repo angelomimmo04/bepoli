@@ -34,6 +34,12 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+<script>
+  // Reindirizzamento automatico se già loggato
+  if (sessionStorage.getItem("user")) {
+    window.location.href = "prova18.html";
+  }
+</script>
 
 <header>
   <img src="logobepoli.png" alt="Logo" class="logo" />
