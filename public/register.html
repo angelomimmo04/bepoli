@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html>
+<html lang="it">
 <head>
+  <meta charset="UTF-8" />
   <title>Sign in</title>
   <link rel="stylesheet" href="style.css">
   <style>
@@ -7,11 +9,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
     }
     form {
       width: 500px;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
     }
     input {
       width: 100%;
@@ -19,7 +24,11 @@
       padding: 10px;
       box-sizing: border-box;
     }
+    #googleSignInButton {
+      margin-top: 10px;
+    }
   </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -33,23 +42,19 @@
   <input type="text" id="name" placeholder="Name" required />
   <input type="text" id="username" placeholder="Username" required />
   <input type="password" id="password" placeholder="Password" required />
-  <input
-          type="password"
-          id="confirmPassword"
-          placeholder="Confirm Password"
-          required
-  />
+  <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
   <button type="submit">Register</button>
   <div class="login-link">
-    <span>Sei gia' iscritto?</span>
+    <span>Sei già iscritto?</span>
     <a href="login.html">Accedi</a>
   </div>
-
-  <!--&nbsp;<a href="login.html">Accedi</a>-->
-
 </form>
 
+<span class="scritta3">oppure</span>
+<div id="googleSignInButton"></div>
+
 <script>
+  // Registrazione tradizionale
   document.getElementById("registerForm").addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -59,7 +64,7 @@
     const confirmPassword = document.getElementById("confirmPassword").value;
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      alert("Le password non coincidono");
       return;
     }
 
@@ -73,15 +78,55 @@
       const data = await response.json();
 
       if (response.ok) {
-        alert("Registration successful! Please login.");
+        alert("Registrazione completata! Effettua il login.");
         window.location.href = "login.html";
       } else {
-        alert("Error: " + data.message);
+        alert("Errore: " + data.message);
       }
     } catch (error) {
-      alert("Network error");
+      alert("Errore di rete");
     }
   });
+
+  // Funzione login con Google
+  function handleCredentialResponse(response) {
+    console.log("Google ID Token:", response.credential);
+
+    fetch('/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: response.credential })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Errore HTTP");
+      return res.json();
+    })
+    .then(data => {
+      console.log("✅ Login Google OK:", data);
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+      alert("Login effettuato con successo!");
+      window.location.href = "prova18.html";
+    })
+    .catch(err => {
+      console.error("❌ Errore durante login con Google:", err);
+      alert("Errore durante il login con Google");
+    });
+  }
+
+  // Inizializza Google Identity Services
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com',
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('googleSignInButton'),
+      { theme: 'outline', size: 'large' }
+    );
+    google.accounts.id.prompt();
+  };
 </script>
+
 </body>
 </html>
+
