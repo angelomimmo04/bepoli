@@ -127,15 +127,18 @@ margin-bottom: -3px;
 
 
 @media (max-width: 768px){ /*serve a dire che in particolati condizioni magari alcune cose non si devono vedere*/
-    .logo{
+  
+    register-page .logo{
         height: 15vh;
         width: auto;
         margin-left: 7.4rem;
-        
-    }
-    register-page .logo{
         margin-top: 0.3rem;
         opacity: 0.8;
+    }
+    login-page .logo{
+        height: 15vh;
+        width: auto;
+        margin-left: 7.4rem;
     }
 
     #loginForm{
