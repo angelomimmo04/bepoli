@@ -10,19 +10,20 @@
 <body>
 <script>
 
-  // Recupera l'utente dal sessionStorage
-  const user = JSON.parse(sessionStorage.getItem("user"));
+    window.onload = function () { //fa caricare prima la pagina e poi esegue questo
+        // Recupera l'utente dal sessionStorage
+        const user = JSON.parse(sessionStorage.getItem("user"));
 
 
-  if (user) {
-    document.title = user.username + "'s profile";
-      document.getElementById("name").textContent = user.nome;
-      document.getElementById("username").textContent = user.username;
-  } else {
-    //alert("Devi prima effettuare il login.");
-    //window.location.href = "login.html";
-  }
-
+        if (user) {
+            document.title = user.username + "'s profile";
+            document.getElementById("name").textContent = user.nome;
+            document.getElementById("username").textContent = user.username;
+        } else {
+            //alert("Devi prima effettuare il login.");
+            //window.location.href = "login.html";
+        }
+    };
 
 
 </script>
