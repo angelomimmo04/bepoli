@@ -131,11 +131,11 @@ margin-bottom: -3px;
         height: 15vh;
         width: auto;
         margin-left: 7.4rem;
-        margin-top: 0.4rem;
-        /*opacity: 0.6;*/
         
-
-
+    }
+    register-page .logo{
+        margin-top: 0.3rem;
+        opacity: 0.8;
     }
 
     #loginForm{
