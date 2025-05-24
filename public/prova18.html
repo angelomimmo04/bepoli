@@ -41,6 +41,29 @@
     <img id="locationImage" src="" alt="Foto del luogo">
 </div>
 
+
+
+
+<script>
+    // Recupera l'utente dal sessionStorage
+    const user = JSON.parse(sessionStorage.getItem("user"));
+
+    if (user) {
+        console.log("Utente loggato:", user);
+        // Ad esempio:
+        document.getElementById("username").textContent = user.username;
+        console.log(user.username + " si nu trmaun");
+        // o qualsiasi altra proprietà come user.email, user.id, ecc.
+    } else {
+        // Se non c'è utente salvato, magari rimanda al login
+        alert("Devi prima effettuare il login.");
+        window.location.href = "login.html";
+    }
+</script>
+
+
+    
+
 <script>
     const zones = [
         // Le tue zone come da codice originale, le ho omesse per brevità
