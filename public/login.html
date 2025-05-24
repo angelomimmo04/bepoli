@@ -29,30 +29,43 @@
     #googleSignInButton {
       margin-top: 10px;
     }
+
+    /* ANIMAZIONE LOGO */
+    .logo-transition {
+      animation: rotateAndSlide 1.2s forwards;
+    }
+
+    @keyframes rotateAndSlide {
+      0% {
+        transform: rotate(0deg) translateX(0);
+      }
+      50% {
+        transform: rotate(360deg) translateX(0);
+      }
+      100% {
+        transform: rotate(720deg) translateX(120vw);
+      }
+    }
   </style>
-  <!-- Script Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body class="login-page">
 
 <script>
-  // Controlla se l'utente è già loggato
+  // Se l'utente è già loggato, lo reindirizza
   window.addEventListener("load", () => {
     const user = sessionStorage.getItem("user");
-
     try {
       const parsedUser = JSON.parse(user);
       if (parsedUser && parsedUser.email) {
-        // Se l'utente ha un campo valido (come email), reindirizza
         window.location.href = "prova18.html";
       }
     } catch (e) {
-      // Il JSON è malformato o non c'è
       console.log("Utente non loggato o sessione malformata");
     }
   });
 </script>
-
 
 <header>
   <img src="logobepoli.png" alt="Logo" class="logo" />
@@ -73,30 +86,38 @@
 <div id="googleSignInButton"></div>
 
 <script>
-  // Funzione che gestisce la risposta di Google
-  function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
+  // Funzione animazione + redirect
+  function startLogoTransition(redirectUrl) {
+    const logo = document.querySelector(".logo");
+    if (logo) {
+      logo.classList.add("logo-transition");
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1200); // Durata dell'animazione
+    } else {
+      window.location.href = redirectUrl;
+    }
+  }
 
+  // Login con Google
+  function handleCredentialResponse(response) {
     fetch('/auth/google', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_token: response.credential })
     })
-            .then(res => {
-              if (!res.ok) throw new Error("Errore HTTP");
-              return res.json();
-            })
-            .then(data => {
-              console.log("✅ Login Google OK:", data);
-              sessionStorage.setItem("user", JSON.stringify(data.user));
-              alert("Login effettuato con successo!");
-              window.location.href = "prova18.html";
-
-            })
-            .catch(err => {
-              console.error("❌ Errore durante login con Google:", err);
-              alert("Errore di rete durante il login con Google");
-            });
+    .then(res => {
+      if (!res.ok) throw new Error("Errore HTTP");
+      return res.json();
+    })
+    .then(data => {
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+      startLogoTransition("prova18.html");
+    })
+    .catch(err => {
+      console.error("Errore Google login:", err);
+      alert("Errore durante il login con Google");
+    });
   }
 
   // Login tradizionale
@@ -115,9 +136,8 @@
       const data = await response.json();
 
       if (response.ok) {
-        alert("Login effettuato con successo!");
         sessionStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "prova18.html";
+        startLogoTransition("prova18.html");
       } else {
         alert("Errore: " + data.message);
       }
@@ -133,10 +153,10 @@
       callback: handleCredentialResponse
     });
     google.accounts.id.renderButton(
-            document.getElementById('googleSignInButton'),
-            { theme: 'outline', size: 'large' }
+      document.getElementById('googleSignInButton'),
+      { theme: 'outline', size: 'large' }
     );
-    google.accounts.id.prompt(); // opzionale
+    google.accounts.id.prompt();
   };
 </script>
 
