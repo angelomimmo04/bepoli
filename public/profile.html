@@ -9,8 +9,7 @@
 </head>
 <body>
 <script>
-// Esegui dopo che la pagina è caricata
-    window.onload = function () {
+
   // Recupera l'utente dal sessionStorage
   const user = JSON.parse(sessionStorage.getItem("user"));
 
@@ -18,11 +17,12 @@
   if (user) {
     document.title = user.username + "'s profile";
       document.getElementById("name").textContent = user.nome;
+      document.getElementById("username").textContent = user.username;
   } else {
     //alert("Devi prima effettuare il login.");
     //window.location.href = "login.html";
   }
-    };
+
 
 
 </script>
@@ -55,7 +55,8 @@
 
         <img src="images/io.jpeg" alt="Profilo utente" id="profile">
         <div id="gigi">
-            <p id="name">nome utente</p>
+            <p id="username">loading...</p>
+            <h1 id="name">nome utente</h1>
 
             <div id="social">
                 <div>
