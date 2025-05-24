@@ -59,6 +59,7 @@
     try {
       const parsedUser = JSON.parse(user);
       if (parsedUser && parsedUser.email) {
+        sessionStorage.setItem("playLogoAnimation", "true");
         window.location.href = "prova18.html";
       }
     } catch (e) {
@@ -112,6 +113,8 @@
     })
     .then(data => {
       sessionStorage.setItem("user", JSON.stringify(data.user));
+      sessionStorage.setItem("playLogoAnimation", "true");
+
       startLogoTransition("prova18.html");
     })
     .catch(err => {
@@ -137,6 +140,7 @@
 
       if (response.ok) {
         sessionStorage.setItem("user", JSON.stringify(data.user));
+        sessionStorage.setItem("playLogoAnimation", "true");
         startLogoTransition("prova18.html");
       } else {
         alert("Errore: " + data.message);
