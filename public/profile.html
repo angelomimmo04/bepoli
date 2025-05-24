@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>profilo utente</title>
+</head>
+<body>
+<script>
+
+  // Recupera l'utente dal sessionStorage
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
+
+  if (user) {
+    document.title = user.username + " profile";
+  } else {
+    alert("Devi prima effettuare il login.");
+    window.location.href = "login.html";
+  }
+
+
+
+</script>
+
+<header>
+  <a href="prova18.html">
+    <img src="logobepoli.png" alt="Logo" id="logo">
+  </a>
+</header>
+
+
+<nav class="leftnav" id="mainnav">
+  <ul>  <!-- ul sta per unordered list-->
+    <li> <a href="prova18.html">home</a> </li>  <!-- creo un elemento della lista con attributo che è a cosa punta il link e poi il nome che viene visualizzato-->
+    <li> <a href="">messaggi</a></li>
+    <li> <a href="">notifiche</a></li>
+    <li> <a href="">esplora</a></li>
+    <li> <a href="profile.html">profilo</a></li>
+    <li> <a href=>crea</a></li>
+
+
+  </ul>
+
+</nav>
+
+
+
+
+
+
+</body>
+</html>
