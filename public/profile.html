@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="style-profilo.css" rel="stylesheet">  <!--serve per collegare lo stile alla pagina e poi la relazione-->
 
     <title>profilo utente</title>
 </head>
@@ -14,10 +15,11 @@
 
 
   if (user) {
-    document.title = user.username + " profile";
+    document.title = user.username + "'s profile";
+      document.getElementById("name").textContent = user.nome;
   } else {
-    alert("Devi prima effettuare il login.");
-    window.location.href = "login.html";
+    //alert("Devi prima effettuare il login.");
+    //window.location.href = "login.html";
   }
 
 
@@ -44,6 +46,38 @@
   </ul>
 
 </nav>
+
+<div id="info">
+    <div id="base">
+
+
+
+        <img src="images/io.jpeg" alt="Profilo utente" id="profile">
+        <div id="gigi">
+            <p id="name">nome utente</p>
+
+            <div id="social">
+                <div>
+                    <p>9</p>
+                    <p>post</p>
+                </div>
+                <div>
+                    <p>1000</p>
+                    <p>follower</p>
+                </div>
+                <div>
+                    <p>0</p>
+                    <p>seguiti</p>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
 
 
 

@@ -1,0 +1,142 @@
+body {
+    display: grid; /*dico il tipo di display che voglio*/
+    grid-template-columns: 20vw 70vw 10vw;
+    grid-template-rows: 10vh 10vh 10vh 10vh 10vh 10vh 10vh 30vh;  /*dico il numero di colonne e righe che voglio e dico quanto devono essere grandi e la somma deve fare 100*/
+
+}
+
+header{
+    grid-column: 1;
+    grid-row: 1; /*qui gli sto dicendo che parte dall'inizio della riga1 fino all'inizio della terza (quindi la fine della2)*/
+    text-align: center;  /*qui dico dove voglio che sia l'elemento header*/
+
+}
+
+#logo{
+    height: 25vh;
+    width: auto;  /*metto auto perchè visto che scelgo l'altezza non modifico le proporzioni dell'immagine*/
+    margin-top: 0rem;
+    margin-right:  4rem;
+}
+#mainnav{
+    grid-column:1;
+    grid-row:3/6;
+    margin-top: 4rem;
+    margin-left: 2rem;
+}
+
+#info{
+
+    overflow-x: auto; /*gestisce il fatto che va oltre la parte sua*/
+
+    display: flow;
+
+    /*gap: 1vw; la distanza tra le varie cose dentro*/
+
+    grid-column: 2;
+    grid-row: 1/4;
+    margin-top: 0.5rem;
+    margin-left: 10rem;
+}
+#base{
+    overflow-x: auto;
+
+
+    display: flex;
+    align-items: center;
+    gap: 1vW; /*la distanza tra le varie cose dentro*/
+
+}
+#social{
+    overflow-x: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 1rem; /*la distanza tra le varie cose dentro*/
+    margin-left: 1.5rem;
+
+
+}
+#profile{
+
+    height: 25vh;
+    width: auto;
+    border-radius: 50%; /*per fargli mettere le immagini tonde*/
+    object-fit:  cover; /*ci fa ritagliare l'immagine mantenendo le proporzioni e in maniera che occupi l'intereo contenitore*/
+    border:  2px black;
+}
+#name{
+    margin-left: 1rem;
+    font-size: 2rem;
+
+
+
+}
+main{
+    grid-column:2;
+    grid-row:4/9;
+
+
+
+
+}
+#gigi{
+    display: flow;
+
+}
+
+
+
+.horizontal_scroll { /* . è l'identidicativo delle classi*/
+
+    height: 8rem;
+    display: flex;
+    align-items: center;
+    gap: 1vW; /*la distanza tra le varie cose dentro*/
+    grid-column: 2;
+    grid-row: 4/5;
+    margin-top: -2rem;
+    margin-left: 25rem;
+
+}
+
+.story img{ /*significa tutte le img delle story*/
+    height: 10vh;
+    width: 5vW;
+    border-radius: 50%; /*per fargli mettere le immagini tonde*/
+    object-fit:  cover; /*ci fa ritagliare l'immagine mantenendo le proporzioni e in maniera che occupi l'intereo contenitore*/
+    border:  2px solid cornflowerblue;
+}
+.story p{
+    font-size: 0.9rem;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+.story{
+    height: 5vh;
+    width: 6vW;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+    /*serve a dire che in particolati condizioni magari alcune cose non si devono vedere*/
+    header,
+    nav{
+        display: none;
+    }
+}
+
+@media (max-width: 768px){
+    #info,.horizontal_scroll,main{
+        grid-column: 1/3;
+    }
+}
+@media (max-width: 768px){
+    #info{
+        margin-left: 2rem;
+    }
+    .horizontal_scroll{
+        margin-left: 13rem;
+    }
+}
