@@ -43,7 +43,6 @@
 
 
 
-
         
     </style>
 </head>
@@ -460,16 +459,17 @@
 </script>
 
 <script>
-    window.addEventListener("DOMContentLoaded", () => {
-        const playAnimation = sessionStorage.getItem("playLogoAnimation");
+  window.addEventListener("DOMContentLoaded", () => {
+    const playAnimation = sessionStorage.getItem("playLogoAnimation");
 
-        if (playAnimation === "true") {
-            const logo = document.getElementById("logo");
-            logo.classList.add("logo-entrance");
-            sessionStorage.removeItem("playLogoAnimation");
-        }
-    });
+    if (playAnimation === "true") {
+      const logo = document.getElementById("logo");
+      logo.classList.add("logo-entrance");
+      sessionStorage.removeItem("playLogoAnimation");
+    }
+  });
 </script>
+
 
 
 </body>
