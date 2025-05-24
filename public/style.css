@@ -131,7 +131,8 @@ margin-bottom: -3px;
         height: 15vh;
         width: auto;
         margin-left: 7.4rem;
-        opacity: 0.6;
+        margin-top: 2rem;
+        /*opacity: 0.6;*/
         
 
 
@@ -159,7 +160,7 @@ margin-bottom: -3px;
         overflow: hidden;
     }*/
     .scritta1{
-        font-size: 16px;
+        font-size: 17px;
     }
     
 
