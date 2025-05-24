@@ -28,10 +28,13 @@
 </head>
 <body>
 
-<h1>
-  <a href="profile.html">Rilevamento posizione</a>
-</h1>
+<header>
+    <a href="prova18.html">
+        <img src="logobepoli.png" alt="Logo" class="logo" id="logo">
+    </a>
+</header>
 
+<h1>Rilevamento posizione</h1>
 <button onclick="startTracking()">Avvia Monitoraggio</button>
 <button onclick="stopTracking()">Ferma Monitoraggio</button>
 
@@ -47,6 +50,7 @@
 
 
 
+
 <script>
     // Recupera l'utente dal sessionStorage
     const user = JSON.parse(sessionStorage.getItem("user"));
@@ -54,7 +58,6 @@
     if (user) {
         console.log("Utente loggato:", user);
         // Ad esempio:
-        
         console.log(user.username, " si nu trmaun");
         // o qualsiasi altra proprietà come user.email, user.id, ecc.
     } else {
@@ -65,7 +68,11 @@
 </script>
 
 
-    
+
+
+
+
+
 
 <script>
     const zones = [
@@ -242,7 +249,7 @@
             ]
         }
     ];
-        
+
 
     const zoneImages = {
         // Puoi aggiungere immagini associate alle zone così:
@@ -430,5 +437,19 @@
         }
     }
 </script>
+
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const playAnimation = sessionStorage.getItem("playLogoAnimation");
+
+        if (playAnimation === "true") {
+            const logo = document.getElementById("logo");
+            logo.classList.add("logo-entrance");
+            sessionStorage.removeItem("playLogoAnimation");
+        }
+    });
+</script>
+
+
 </body>
 </html>
