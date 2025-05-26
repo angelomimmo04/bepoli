@@ -176,10 +176,11 @@ app.post("/api/update-profile", upload.single("profilePic"), async (req, res) =>
 
     try {
         const updatedUser = await Utente.findByIdAndUpdate(
-            Types.ObjectId(userId),
-            { $set: updateData },
-            { new: true }
-        );
+    new Types.ObjectId(userId),
+    { $set: updateData },
+    { new: true }
+);
+
         if (!updatedUser) {
             return res.status(404).send("Utente non trovato");
         }
