@@ -18,6 +18,7 @@ const fs = require("fs");
 
 const storage = multer.memoryStorage(); // salva in RAM, non su disco
 const upload = multer({ storage: storage });
+const session = require('express-session');
 
 
 // Servi i file statici dalla cartella 'public'
@@ -45,6 +46,22 @@ const Utente = mongoose.model("Utente", utenteSchema);
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public/login.html"));
 });
+
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'una-secret-key-molto-segreta', // cambia in produzione!
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24, // 1 giorno di durata della sessione
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // solo su HTTPS in produzione
+  }
+}));
+
+
+
 
 // Login endpoint
 app.post("/login", async (req, res) => {
