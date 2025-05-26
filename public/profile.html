@@ -31,6 +31,12 @@
         document.getElementById("name").textContent = freshUser.nome;
         document.getElementById("username").textContent = freshUser.username;
         document.getElementById("bio").textContent = freshUser.bio;
+        const profileImg = document.getElementById("profile");
+profileImg.src = `/api/user-photo/${freshUser._id}`;
+
+        profileImg.onerror = function () {
+    profileImg.src = "fotoprofilo.png"; // immagine di default
+};
 
         // Se vuoi aggiornare sessionStorage anche qui:
         sessionStorage.setItem("user", JSON.stringify(freshUser));
