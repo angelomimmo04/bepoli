@@ -13,6 +13,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const multer = require("multer");
+const fs = require("fs");
+
+const storage = multer.memoryStorage(); // salva in RAM, non su disco
+const upload = multer({ storage: storage });
+
+
 // Servi i file statici dalla cartella 'public'
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -131,13 +138,25 @@ app.post('/auth/google', async (req, res) => {
 
 
 
-app.post('/api/update-profile', async (req, res) => {
-    const { userId, newBio, newProfilePic } = req.body;
+app.post("/api/update-profile", upload.single("profilePic"), async (req, res) => {
+    const { userId, bio } = req.body;
+    const profilePic = req.file; // se presente
+
+    const updateData = {
+        bio: bio,
+    };
+
+    if (profilePic) {
+        updateData.profilePic = {
+            data: profilePic.buffer,
+            contentType: profilePic.mimetype,
+        };
+    }
 
     try {
-        await db.collection('users').updateOne(
+        await db.collection("users").updateOne(
             { _id: new ObjectId(userId) },
-            { $set: { bio: newBio, profilePic: newProfilePic } }
+            { $set: updateData }
         );
         res.sendStatus(200);
     } catch (err) {
@@ -145,6 +164,19 @@ app.post('/api/update-profile', async (req, res) => {
         res.status(500).send("Errore nel salvataggio");
     }
 });
+
+app.get("/api/user-photo/:userId", async (req, res) => {
+    const { userId } = req.params;
+
+    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+    if (user && user.profilePic) {
+        res.contentType(user.profilePic.contentType);
+        res.send(user.profilePic.data.buffer);
+    } else {
+        res.status(404).send("Foto non trovata");
+    }
+});
+
 
 
 
