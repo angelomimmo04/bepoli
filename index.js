@@ -175,7 +175,6 @@ app.post("/api/update-profile", upload.single("profilePic"), async (req, res) =>
     }
 });
 
-
 app.get("/api/user-photo/:userId", async (req, res) => {
     const { userId } = req.params;
 
@@ -192,10 +191,6 @@ app.get("/api/user-photo/:userId", async (req, res) => {
         res.status(500).send("Errore server");
     }
 });
-
-
-
-
 
 
 
