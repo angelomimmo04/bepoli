@@ -18,39 +18,32 @@
 </form>
 
 <script>
-  // Prima prendi user
-  const user = JSON.parse(sessionStorage.getItem("user"));
-  if (!user || !user.id) {
-    alert("Utente non loggato");
-    window.location.href = "/";
-  }
+  
 
-  // Poi assegna userId
-  document.getElementById("userId").value = user.id;
 
   document.getElementById("updateForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const formData = new FormData();
-    const bio = document.getElementById("bioInput").value;
-    const file = document.getElementById("profilePicInput").files[0];
+  const formData = new FormData();
+  const bio = document.getElementById("bioInput").value;
+  const file = document.getElementById("profilePicInput").files[0];
 
-    formData.append("userId", user.id); // usa `id`, non `_id`
-    formData.append("bio", bio);
-    if (file) formData.append("profilePic", file);
+  // Non serve inviare userId, il server lo prende dalla sessione
+  formData.append("bio", bio);
+  if (file) formData.append("profilePic", file);
 
-    const response = await fetch("/api/update-profile", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (response.ok) {
-      alert("Profilo aggiornato con successo!");
-      window.location.href = "profile.html";
-    } else {
-      alert("Errore durante il salvataggio.");
-    }
+  const response = await fetch("/api/update-profile", {
+    method: "POST",
+    body: formData,
   });
+
+  if (response.ok) {
+    alert("Profilo aggiornato con successo!");
+    window.location.href = "profile.html";
+  } else {
+    alert("Errore durante il salvataggio.");
+  }
+});
 </script>
 
 
