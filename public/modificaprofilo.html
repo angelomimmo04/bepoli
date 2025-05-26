@@ -19,6 +19,8 @@
 
 
 <script>
+    document.getElementById("userId").value = user._id;
+
   document.getElementById("updateForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -26,6 +28,7 @@
     const user = JSON.parse(sessionStorage.getItem("user"));
     const bio = document.getElementById("bioInput").value;
     const file = document.getElementById("profilePicInput").files[0];
+
 
     formData.append("userId", user._id);
     formData.append("bio", bio);
