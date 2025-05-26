@@ -66,7 +66,6 @@ app.use(session({
 // Login endpoint
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
-
     if (!username || !password)
         return res.status(400).json({ message: "Dati mancanti" });
 
@@ -79,19 +78,22 @@ app.post("/login", async (req, res) => {
         if (!validPassword)
             return res.status(400).json({ message: "Username o password errati" });
 
-        // Login OK
+        // Login OK: salva dati utente in sessione
+        req.session.user = {
+            id: utente._id,
+            nome: utente.nome,
+            username: utente.username
+        };
+
         res.status(200).json({
             message: "Login effettuato con successo",
-            user: {
-                id: utente._id,
-                nome: utente.nome,
-                username: utente.username,
-            },
+            user: req.session.user
         });
     } catch (err) {
         res.status(500).json({ message: "Errore server" });
     }
 });
+
 
 // Registrazione endpoint
 app.post("/register", async (req, res) => {
@@ -226,20 +228,31 @@ app.get("/api/user-photo/:userId", async (req, res) => {
     }
 });
 
-app.get("/api/user/:id", async (req, res) => {
-    const { id } = req.params;
+app.get("/api/user", async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
     try {
-        const user = await Utente.findById(id).select("nome username bio");
-        if (!user) {
-            return res.status(404).send("Utente non trovato");
-        }
+        const user = await Utente.findById(req.session.user.id);
+        if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
         res.json(user);
     } catch (err) {
-        console.error("❌ Errore nel recupero utente:", err);
-        res.status(500).send("Errore server");
+        res.status(500).json({ message: "Errore server" });
     }
+});
+
+
+
+
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ message: 'Errore durante il logout' });
+        }
+        res.clearCookie('connect.sid'); // nome cookie sessione di default
+        res.status(200).json({ message: 'Logout effettuato' });
+    });
 });
 
 
