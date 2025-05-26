@@ -67,11 +67,17 @@ header{
 }
 #name{
     margin-left: 1rem;
-    font-size: 2rem;
-
-
+    font-size: 1rem;
 
 }
+#username{
+    margin-left: 1rem;
+}
+#bio{
+    margin-left: 1rem;
+}
+
+
 main{
     grid-column:2;
     grid-row:4/9;

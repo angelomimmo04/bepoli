@@ -28,6 +28,40 @@
 
 </script>
 
+<script>
+    document.getElementById("editBtn").addEventListener("click", () => {
+        document.getElementById("editForm").style.display = "block";
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+        const newBio = document.getElementById("bioInput").value;
+        const newProfilePic = document.getElementById("profilePicInput").value;
+
+        const user = JSON.parse(sessionStorage.getItem("user"));
+        if (!user) return alert("Utente non trovato!");
+
+        const response = await fetch("/api/update-profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId: user._id,
+                newBio: newBio,
+                newProfilePic: newProfilePic
+            })
+        });
+
+        if (response.ok) {
+            document.getElementById("bio").textContent = newBio;
+            document.getElementById("profile").src = newProfilePic;
+            document.getElementById("editForm").style.display = "none";
+        } else {
+            alert("Errore durante il salvataggio.");
+        }
+    });
+</script>
+
+
+
 <header>
   <a href="prova18.html">
     <img src="logobepoli.png" alt="Logo" id="logo">
@@ -54,26 +88,44 @@
 
 
 
-        <img src="images/io.jpeg" alt="Profilo utente" id="profile">
+        <img src="fotoprofilo.png" alt="Profilo utente" id="profile">
         <div id="gigi">
             <p id="username">loading...</p>
-            <h1 id="name">nome utente</h1>
+
 
             <div id="social">
                 <div>
-                    <p>9</p>
+
                     <p>post</p>
                 </div>
                 <div>
-                    <p>1000</p>
+
                     <p>follower</p>
                 </div>
                 <div>
-                    <p>0</p>
+
                     <p>seguiti</p>
                 </div>
 
+                <button id="editBtn">Modifica profilo</button>
+
+                <div id="editForm" style="display: none;">
+                    <label>Nuova bio:</label><br>
+                    <textarea id="bioInput"></textarea><br>
+
+                    <label>Nuova immagine profilo (URL):</label><br>
+                    <input type="text" id="profilePicInput"><br>
+
+                    <button id="saveBtn">Salva</button>
+                </div>
+
             </div>
+            <h1 id="name">nome utente</h1>
+
+
+            <p id="bio">Bio utente</p>
+
+
         </div>
 
 
