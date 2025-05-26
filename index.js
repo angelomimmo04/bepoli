@@ -175,40 +175,43 @@ app.post('/auth/google', async (req, res) => {
 
 const { Types } = require("mongoose");
 
-app.post("/api/update-profile", upload.single("profilePic"), async (req, res) => {
-    console.log("📥 Ricevuta richiesta aggiornamento profilo");
-    console.log("userId:", req.body.userId);
-    console.log("bio:", req.body.bio);
-    console.log("file:", req.file);
+app.post('/api/update-profile', upload.single('profilePic'), async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
-    const { userId, bio } = req.body;
-    const profilePic = req.file;
+  const userId = req.session.user.id;
+  const bio = req.body.bio;
+  const profilePic = req.file;
 
-    const updateData = {};
-    if (bio) updateData.bio = bio;
-    if (profilePic) {
-        updateData.profilePic = {
-            data: profilePic.buffer,
-            contentType: profilePic.mimetype,
-        };
+  const updateData = {};
+  if (bio) updateData.bio = bio;
+  if (profilePic) {
+    updateData.profilePic = {
+      data: profilePic.buffer,
+      contentType: profilePic.mimetype,
+    };
+  }
+
+  try {
+    const updatedUser = await Utente.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Utente non trovato" });
     }
 
-    try {
-        const updatedUser = await Utente.findByIdAndUpdate(
-    new Types.ObjectId(userId),
-    { $set: updateData },
-    { new: true }
-);
+    // (Opzionale) Aggiorna i dati della sessione se vuoi mantenerli aggiornati
+    req.session.user.bio = updatedUser.bio;
 
-        if (!updatedUser) {
-            return res.status(404).send("Utente non trovato");
-        }
-        res.sendStatus(200);
-    } catch (err) {
-        console.error("❌ Errore nel salvataggio profilo:", err);
-        res.status(500).send("Errore nel salvataggio");
-    }
+    return res.status(200).json({ message: "Profilo aggiornato con successo" });
+  } catch (err) {
+    console.error("Errore aggiornamento profilo:", err);
+    return res.status(500).json({ message: "Errore nel salvataggio" });
+  }
 });
+
 
 
 app.get("/api/user-photo/:userId", async (req, res) => {
