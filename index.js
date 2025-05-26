@@ -129,6 +129,29 @@ app.post('/auth/google', async (req, res) => {
 });
 
 
+
+
+app.post('/api/update-profile', async (req, res) => {
+    const { userId, newBio, newProfilePic } = req.body;
+
+    try {
+        await db.collection('users').updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { bio: newBio, profilePic: newProfilePic } }
+        );
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Errore nel salvataggio");
+    }
+});
+
+
+
+
+
+
+
 // Avvio server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server in ascolto su porta ${PORT}`));
