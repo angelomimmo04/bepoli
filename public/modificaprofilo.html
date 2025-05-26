@@ -7,49 +7,54 @@
 <body>
 <form id="updateForm" enctype="multipart/form-data">
     <input type="hidden" name="userId" id="userId">
-  <label for="bioInput">Bio:</label>
-  <textarea name="bio" id="bioInput"></textarea><br>
 
-  <label for="profilePicInput">Carica immagine profilo:</label><br>
-  <input type="file" id="profilePicInput" name="profilePic" accept="image/*">
+    <label for="bioInput">Bio:</label>
+    <textarea name="bio" id="bioInput"></textarea><br>
 
+    <label for="profilePicInput">Carica immagine profilo:</label><br>
+    <input type="file" id="profilePicInput" name="profilePic" accept="image/*"><br><br>
 
-  <button type="submit">Salva</button>
+    <button type="submit">Salva</button>
 </form>
 
-
 <script>
+  // Recupera l'utente dalla sessione
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
+  // Solo se esiste, imposta userId
+  if (user && user._id) {
     document.getElementById("userId").value = user._id;
+  }
 
   document.getElementById("updateForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const formData = new FormData();
-    const user = JSON.parse(sessionStorage.getItem("user"));
     const bio = document.getElementById("bioInput").value;
     const file = document.getElementById("profilePicInput").files[0];
-
 
     formData.append("userId", user._id);
     formData.append("bio", bio);
     if (file) formData.append("profilePic", file);
 
-    const response = await fetch("/api/update-profile", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("/api/update-profile", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (response.ok) {
-      alert("Profilo aggiornato con successo!");
-      window.location.href = "profile.html";
-    } else {
-      alert("Errore durante il salvataggio.");
+      if (response.ok) {
+        alert("Profilo aggiornato con successo!");
+        window.location.href = "profile.html";
+      } else {
+        alert("Errore durante il salvataggio.");
+      }
+    } catch (err) {
+      alert("Errore di rete o del server.");
+      console.error(err);
     }
   });
 </script>
-
-
-
 
 </body>
 </html>
