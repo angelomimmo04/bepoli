@@ -31,6 +31,12 @@ const utenteSchema = new mongoose.Schema({
     nome: String,
     username: { type: String, unique: true },
     password: String, // password hashed
+    bio: String, // aggiunto campo bio
+    profilePic: {
+        data: Buffer,
+        contentType: String,
+    },
+
 });
 
 const Utente = mongoose.model("Utente", utenteSchema);
@@ -138,14 +144,14 @@ app.post('/auth/google', async (req, res) => {
 
 
 
+const { Types } = require("mongoose");
+
 app.post("/api/update-profile", upload.single("profilePic"), async (req, res) => {
     const { userId, bio } = req.body;
-    const profilePic = req.file; // se presente
+    const profilePic = req.file;
 
-    const updateData = {
-        bio: bio,
-    };
-
+    const updateData = {};
+    if (bio) updateData.bio = bio;
     if (profilePic) {
         updateData.profilePic = {
             data: profilePic.buffer,
@@ -154,28 +160,40 @@ app.post("/api/update-profile", upload.single("profilePic"), async (req, res) =>
     }
 
     try {
-        await db.collection("users").updateOne(
-            { _id: new ObjectId(userId) },
-            { $set: updateData }
+        const updatedUser = await Utente.findByIdAndUpdate(
+            Types.ObjectId(userId),
+            { $set: updateData },
+            { new: true }
         );
+        if (!updatedUser) {
+            return res.status(404).send("Utente non trovato");
+        }
         res.sendStatus(200);
     } catch (err) {
-        console.error(err);
+        console.error("❌ Errore nel salvataggio profilo:", err);
         res.status(500).send("Errore nel salvataggio");
     }
 });
 
+
 app.get("/api/user-photo/:userId", async (req, res) => {
     const { userId } = req.params;
 
-    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
-    if (user && user.profilePic) {
-        res.contentType(user.profilePic.contentType);
-        res.send(user.profilePic.data.buffer);
-    } else {
-        res.status(404).send("Foto non trovata");
+    try {
+        const user = await Utente.findById(userId);
+        if (user && user.profilePic && user.profilePic.data) {
+            res.contentType(user.profilePic.contentType);
+            res.send(user.profilePic.data);
+        } else {
+            res.status(404).send("Foto non trovata");
+        }
+    } catch (err) {
+        console.error("Errore recupero immagine:", err);
+        res.status(500).send("Errore server");
     }
 });
+
+
 
 
 
