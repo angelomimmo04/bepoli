@@ -12,14 +12,16 @@
 <body>
 <script>
 window.onload = async function () {
-    const response = await fetch('/api/user');
-    if (!response.ok) {
-        alert("Devi prima effettuare il login.");
-        window.location.href = "login.html";
-        return;
-    }
-    const user = await response.json();
+  const response = await fetch('/api/user', {
+    credentials: 'include'
+  });
 
+  if (!response.ok) {
+      alert("Devi prima effettuare il login.");
+      window.location.href = "login.html";
+      return;
+  }
+  const user = await response.json();
     document.title = user.username + "'s profile";
     document.getElementById("name").textContent = user.nome;
     document.getElementById("username").textContent = user.username;
