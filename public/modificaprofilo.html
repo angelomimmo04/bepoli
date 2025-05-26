@@ -18,13 +18,16 @@
 </form>
 
 <script>
-  // Recupera l'utente dalla sessione
+<script>
+  // Prima prendi user
   const user = JSON.parse(sessionStorage.getItem("user"));
-
-  // Solo se esiste, imposta userId
-  if (user && user._id) {
-    document.getElementById("userId").value = user._id;
+  if (!user || !user.id) {
+    alert("Utente non loggato");
+    window.location.href = "/";
   }
+
+  // Poi assegna userId
+  document.getElementById("userId").value = user.id;
 
   document.getElementById("updateForm").addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -33,28 +36,24 @@
     const bio = document.getElementById("bioInput").value;
     const file = document.getElementById("profilePicInput").files[0];
 
-    formData.append("userId", user._id);
+    formData.append("userId", user.id); // usa `id`, non `_id`
     formData.append("bio", bio);
     if (file) formData.append("profilePic", file);
 
-    try {
-      const response = await fetch("/api/update-profile", {
-        method: "POST",
-        body: formData,
-      });
+    const response = await fetch("/api/update-profile", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (response.ok) {
-        alert("Profilo aggiornato con successo!");
-        window.location.href = "profile.html";
-      } else {
-        alert("Errore durante il salvataggio.");
-      }
-    } catch (err) {
-      alert("Errore di rete o del server.");
-      console.error(err);
+    if (response.ok) {
+      alert("Profilo aggiornato con successo!");
+      window.location.href = "profile.html";
+    } else {
+      alert("Errore durante il salvataggio.");
     }
   });
 </script>
+
 
 </body>
 </html>
