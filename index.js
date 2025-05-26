@@ -138,42 +138,46 @@ app.post('/auth/google', async (req, res) => {
     if (!id_token) return res.status(400).json({ message: 'Token mancante' });
 
     try {
-        // Verifica il token ID ricevuto da Google
         const ticket = await client.verifyIdToken({
             idToken: id_token,
             audience: CLIENT_ID,
         });
 
         const payload = ticket.getPayload();
-        // payload contiene email, nome, sub (id google), ecc.
 
-        // Cerca utente nel DB con email (qui assumo username= email)
         let utente = await Utente.findOne({ username: payload.email });
 
         if (!utente) {
-            // Se non esiste, crealo automaticamente senza password (login solo con Google)
             utente = new Utente({
                 nome: payload.name,
                 username: payload.email,
-                password: '', // o metti null, non serve password perché login Google
+                password: '', // login solo con Google
+                bio: "",
+                profilePic: {
+                    data: null,
+                    contentType: null
+                }
             });
             await utente.save();
         }
 
-        // Login riuscito: ritorna dati utente
+        // Salva l’utente nella sessione come nel login normale
+        req.session.user = {
+            id: utente._id,
+            nome: utente.nome,
+            username: utente.username
+        };
+
         res.status(200).json({
             message: 'Login Google effettuato con successo',
-            user: {
-                id: utente._id,
-                nome: utente.nome,
-                username: utente.username,
-            },
+            user: req.session.user
         });
     } catch (error) {
         console.error('Errore verifica token Google:', error);
         res.status(401).json({ message: 'Token Google non valido' });
     }
 });
+
 
 
 
