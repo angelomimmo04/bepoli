@@ -57,8 +57,9 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  rolling: true,  // rinnova il cookie ad ogni richiesta
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24, // 1 giorno di durata della sessione
+    maxAge: 1000 * 60 * 30,  // 30 minuti
     httpOnly: true,
     secure: process.env.NODE_ENV === true,
   }
