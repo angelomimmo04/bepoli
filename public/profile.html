@@ -12,30 +12,24 @@
 <body>
 <script>
     window.onload = async function () {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        if (!user || !user.id) {
-            alert("Devi prima effettuare il login.");
-            window.location.href = "login.html";
-            return;
-        }
+    const response = await fetch('/api/user');
+    if (!response.ok) {
+        alert("Devi prima effettuare il login.");
+        window.location.href = "login.html";
+        return;
+    }
+    const user = await response.json();
 
-        const response = await fetch(`/api/user/${user.id}`);
-        if (!response.ok) {
-            alert("Errore nel caricamento profilo");
-            return;
-        }
+    document.title = user.username + "'s profile";
+    document.getElementById("name").textContent = user.nome;
+    document.getElementById("username").textContent = user.username;
+    document.getElementById("bio").textContent = user.bio;
+    const profileImg = document.getElementById("profile");
+    profileImg.src = `/api/user-photo/${user._id}`;
 
-        const freshUser = await response.json();
-
-        document.title = freshUser.username + "'s profile";
-        document.getElementById("name").textContent = freshUser.nome;
-        document.getElementById("username").textContent = freshUser.username;
-        document.getElementById("bio").textContent = freshUser.bio;
-        const profileImg = document.getElementById("profile");
-profileImg.src = `/api/user-photo/${freshUser._id}`;
-
-        profileImg.onerror = function () {
-    profileImg.src = "fotoprofilo.png"; // immagine di default
+    profileImg.onerror = function () {
+        profileImg.src = "fotoprofilo.png";
+    };
 };
 
         // Se vuoi aggiornare sessionStorage anche qui:
