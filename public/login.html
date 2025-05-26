@@ -104,6 +104,7 @@
   function handleCredentialResponse(response) {
     fetch('/auth/google', {
       method: 'POST',
+      credentials: 'include'
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_token: response.credential })
     })
