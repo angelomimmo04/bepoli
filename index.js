@@ -90,7 +90,17 @@ app.post("/register", async (req, res) => {
         }
 
         const hash = await bcrypt.hash(password, 10);
-        const nuovoUtente = new Utente({ nome, username, password: hash });
+        const nuovoUtente = new Utente({ 
+    nome, 
+    username, 
+    password: hash,
+    bio: "",  // bio vuota di default
+    profilePic: { 
+        data: null,        // nessuna immagine iniziale
+        contentType: null
+    }
+});
+
 
         await nuovoUtente.save();
         res.status(201).json({ message: "Utente registrato con successo" });
