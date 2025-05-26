@@ -209,6 +209,23 @@ app.get("/api/user-photo/:userId", async (req, res) => {
     }
 });
 
+app.get("/api/user/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await Utente.findById(id).select("nome username bio");
+        if (!user) {
+            return res.status(404).send("Utente non trovato");
+        }
+
+        res.json(user);
+    } catch (err) {
+        console.error("❌ Errore nel recupero utente:", err);
+        res.status(500).send("Errore server");
+    }
+});
+
+
 
 
 
