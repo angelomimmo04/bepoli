@@ -157,6 +157,11 @@ app.post('/auth/google', async (req, res) => {
 const { Types } = require("mongoose");
 
 app.post("/api/update-profile", upload.single("profilePic"), async (req, res) => {
+    console.log("📥 Ricevuta richiesta aggiornamento profilo");
+    console.log("userId:", req.body.userId);
+    console.log("bio:", req.body.bio);
+    console.log("file:", req.file);
+
     const { userId, bio } = req.body;
     const profilePic = req.file;
 
@@ -184,6 +189,7 @@ app.post("/api/update-profile", upload.single("profilePic"), async (req, res) =>
         res.status(500).send("Errore nel salvataggio");
     }
 });
+
 
 app.get("/api/user-photo/:userId", async (req, res) => {
     const { userId } = req.params;
