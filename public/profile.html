@@ -28,37 +28,7 @@
 
 </script>
 
-<script>
-    document.getElementById("editBtn").addEventListener("click", () => {
-        document.getElementById("editForm").style.display = "block";
-    });
 
-    document.getElementById("saveBtn").addEventListener("click", async () => {
-        const newBio = document.getElementById("bioInput").value;
-        const newProfilePic = document.getElementById("profilePicInput").value;
-
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        if (!user) return alert("Utente non trovato!");
-
-        const response = await fetch("/api/update-profile", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: user._id,
-                newBio: newBio,
-                newProfilePic: newProfilePic
-            })
-        });
-
-        if (response.ok) {
-            document.getElementById("bio").textContent = newBio;
-            document.getElementById("profile").src = newProfilePic;
-            document.getElementById("editForm").style.display = "none";
-        } else {
-            alert("Errore durante il salvataggio.");
-        }
-    });
-</script>
 
 
 
@@ -136,7 +106,37 @@
 
 
 
+<script>
+    document.getElementById("editBtn").addEventListener("click", () => {
+        document.getElementById("editForm").style.display = "block";
+    });
 
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+        const newBio = document.getElementById("bioInput").value;
+        const newProfilePic = document.getElementById("profilePicInput").value;
+
+        const user = JSON.parse(sessionStorage.getItem("user"));
+        if (!user) return alert("Utente non trovato!");
+
+        const response = await fetch("/api/update-profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId: user._id,
+                newBio: newBio,
+                newProfilePic: newProfilePic
+            })
+        });
+
+        if (response.ok) {
+            document.getElementById("bio").textContent = newBio;
+            document.getElementById("profile").src = newProfilePic;
+            document.getElementById("editForm").style.display = "none";
+        } else {
+            alert("Errore durante il salvataggio.");
+        }
+    });
+</script>
 
 
 </body>
