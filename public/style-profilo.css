@@ -57,13 +57,14 @@ header{
 
 
 }
-#profile{
-
+#profile {
     height: 25vh;
-    width: auto;
-    border-radius: 50%; /*per fargli mettere le immagini tonde*/
-    object-fit:  cover; /*ci fa ritagliare l'immagine mantenendo le proporzioni e in maniera che occupi l'intereo contenitore*/
-    border:  2px black;
+    width: 25vh; /* ora altezza e larghezza sono uguali */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid black; /* aggiungi solid per avere un bordo visibile */
+}
+
 }
 #name{
     margin-left: 1rem;
