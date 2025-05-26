@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
 
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'una-secret-key-molto-segreta', // cambia in produzione!
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
