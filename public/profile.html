@@ -11,29 +11,30 @@
 </head>
 <body>
 <script>
-
-    window.onload = function () { //fa caricare prima la pagina e poi esegue questo
-        // Recupera l'utente dal sessionStorage
+    window.onload = async function () {
         const user = JSON.parse(sessionStorage.getItem("user"));
-
-
-
-        if (user) {
-            document.title = user.username + "'s profile";
-            document.getElementById("name").textContent = user.nome;
-            document.getElementById("username").textContent = user.username;
-        
-            document.getElementById("bio").textContent = user.bio;
-            
-            
-
-        } else {
-            //alert("Devi prima effettuare il login.");
-            //window.location.href = "login.html";
+        if (!user || !user.id) {
+            alert("Devi prima effettuare il login.");
+            window.location.href = "login.html";
+            return;
         }
+
+        const response = await fetch(`/api/user/${user.id}`);
+        if (!response.ok) {
+            alert("Errore nel caricamento profilo");
+            return;
+        }
+
+        const freshUser = await response.json();
+
+        document.title = freshUser.username + "'s profile";
+        document.getElementById("name").textContent = freshUser.nome;
+        document.getElementById("username").textContent = freshUser.username;
+        document.getElementById("bio").textContent = freshUser.bio;
+
+        // Se vuoi aggiornare sessionStorage anche qui:
+        sessionStorage.setItem("user", JSON.stringify(freshUser));
     };
-
-
 </script>
 
 
