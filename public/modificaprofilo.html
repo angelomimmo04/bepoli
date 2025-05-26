@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifica profilo</title>
+</head>
+<body>
+<form id="updateForm" enctype="multipart/form-data">
+  <label for="bioInput">Bio:</label>
+  <textarea name="bio" id="bioInput"></textarea><br>
+
+  <label for="profilePicInput">Carica immagine profilo:</label><br>
+  <input type="file" id="profilePicInput" name="profilePic" accept="image/*">
+
+
+  <button type="submit">Salva</button>
+</form>
+
+
+<script>
+  document.getElementById("updateForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    const bio = document.getElementById("bioInput").value;
+    const file = document.getElementById("profilePicInput").files[0];
+
+    formData.append("userId", user._id);
+    formData.append("bio", bio);
+    if (file) formData.append("profilePic", file);
+
+    const response = await fetch("/api/update-profile", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert("Profilo aggiornato con successo!");
+      window.location.href = "profile.html";
+    } else {
+      alert("Errore durante il salvataggio.");
+    }
+  });
+</script>
+
+
+
+
+</body>
+</html>
