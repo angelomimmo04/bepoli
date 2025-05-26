@@ -22,7 +22,14 @@
             document.title = user.username + "'s profile";
             document.getElementById("name").textContent = user.nome;
             document.getElementById("username").textContent = user.username;
-            document.getElementById("profile").src = `/api/user-photo/${user._id}`;
+        
+            document.getElementById("bio").textContent = user.bio;
+            const foto = `/api/user-photo/${user._id}`;
+            if (foto=== null){
+
+            } else {
+                document.getElementById("profile").src = `/api/user-photo/${user._id}`;
+            }
 
         } else {
             //alert("Devi prima effettuare il login.");
