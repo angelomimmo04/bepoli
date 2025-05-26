@@ -11,7 +11,7 @@
 </head>
 <body>
 <script>
-    window.onload = async function () {
+window.onload = async function () {
     const response = await fetch('/api/user');
     if (!response.ok) {
         alert("Devi prima effettuare il login.");
@@ -30,12 +30,12 @@
     profileImg.onerror = function () {
         profileImg.src = "fotoprofilo.png";
     };
-};
 
-        // Se vuoi aggiornare sessionStorage anche qui:
-        sessionStorage.setItem("user", JSON.stringify(freshUser));
-    
+    // Ora aggiorni sessionStorage con i dati dell’utente
+    sessionStorage.setItem("user", JSON.stringify(user));
+};
 </script>
+
 
 
 
