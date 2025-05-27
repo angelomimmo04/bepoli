@@ -75,16 +75,14 @@ header{
 }
 #bio{
     margin-left: 1rem;
-    width: 100%;
-    max-width: 600px;        /* Limite visivo massimo */
-    min-height: 120px;
+
     resize: vertical;        /* Solo ridimensionamento verticale */
-    overflow-wrap: break-word; /* ✅ Per spezzare parole lunghissime */
-    word-break: break-word;     /* ✅ Fall-back per vecchi browser */
+    overflow-wrap: break-word; /*  Per spezzare parole lunghissime */
+    word-break: break-word;     /*  Fall-back per vecchi browser */
     font-family: sans-serif;
-    line-height: 1.4;
+    /*line-height: 1.4;
     padding: 10px;
-    box-sizing: border-box;
+    box-sizing: border-box;*/
     white-space: pre-wrap;   /* Mantiene gli a capo dell’utente */
 }
 

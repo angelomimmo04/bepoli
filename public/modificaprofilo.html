@@ -25,8 +25,8 @@
     <input type="hidden" name="userId" id="userId">
 
     <label for="bioInput" class="testo">Bio:</label>
-    <textarea name="bio" id="bioInput" maxlength="300"></textarea>
-    <div id="charCount">0 / 300</div>
+    <textarea name="bio" id="bioInput" maxlength="150"></textarea>
+    <div id="charCount">0/150</div>
 
 
 
@@ -100,7 +100,13 @@
         updateCharCount(); // aggiornamento immediato
 
         //  aggiorna in tempo reale mentre si scrive
-        bioInput.addEventListener("input", updateCharCount);
+        bioInput.addEventListener("input", function () {
+            if (bioInput.value.length > maxLength) {
+                bioInput.value = bioInput.value.substring(0, maxLength);
+            }
+            updateCharCount();
+        });
+        updateCharCount();
 
         const profileImg = document.getElementById("profile");
         profileImg.src = `/api/user-photo/${user._id}`;
