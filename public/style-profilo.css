@@ -76,7 +76,7 @@ header{
 #bio{
     margin-left: 1rem;
 
-    resize: vertical;        /* Solo ridimensionamento verticale */
+    /*resize: vertical;  */      /* Solo ridimensionamento verticale */
     overflow-wrap: break-word; /*  Per spezzare parole lunghissime */
     word-break: break-word;     /*  Fall-back per vecchi browser */
     font-family: sans-serif;
