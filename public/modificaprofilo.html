@@ -40,9 +40,7 @@
     window.onload = async function () {
         // Prendi il token CSRF
         try {
-            const csrfResponse = await fetch('/api/csrf-token', {
-                credentials: 'include'
-            });
+            const res = await fetch('/csrf-token', { credentials: 'include' });
             if (csrfResponse.ok) {
                 const csrfData = await csrfResponse.json();
                 csrfToken = csrfData.csrfToken;
