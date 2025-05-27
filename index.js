@@ -15,6 +15,7 @@ const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleuserc
 const client = new OAuth2Client(CLIENT_ID);
 
 const app = express();
+app.set('trust proxy', 1); // <-- questo dice a Express che è dietro un proxy (come Render)
 
 // --- MIDDLEWARES ---
 
