@@ -47,6 +47,8 @@
   <input type="text" id="username" placeholder="Username" required />
   <input type="password" id="password" placeholder="Password" required />
   <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+  <!-- campo nascosto per token CSRF -->
+  <input type="hidden" id="csrfToken" name="_csrf" value="" />
   <button type="submit">Sign in</button>
   <div class="login-link">
     <span>Sei già iscritto?</span>
@@ -58,6 +60,23 @@
 <div id="googleSignInButton"></div>
 
 <script>
+  // Carica il token CSRF dal server e lo mette nel form
+  async function loadCsrfToken() {
+    try {
+      const res = await fetch('/api/csrf-token', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('csrfToken').value = data.csrfToken;
+      } else {
+        console.error("Impossibile caricare token CSRF");
+      }
+    } catch (err) {
+      console.error("Errore caricamento token CSRF:", err);
+    }
+  }
+
+  loadCsrfToken();
+
   // Registrazione tradizionale
   document.getElementById("registerForm").addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -66,6 +85,7 @@
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const csrfToken = document.getElementById("csrfToken").value;
 
     if (password !== confirmPassword) {
       alert("Le password non coincidono");
@@ -75,8 +95,9 @@
     try {
       const response = await fetch("register", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: name, username, password }),
+        body: JSON.stringify({ nome: name, username, password, _csrf: csrfToken }),
       });
 
       const data = await response.json();
@@ -101,20 +122,20 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_token: response.credential })
     })
-            .then(res => {
-              if (!res.ok) throw new Error("Errore HTTP");
-              return res.json();
-            })
-            .then(data => {
-              console.log("✅ Login Google OK:", data);
-              sessionStorage.setItem("user", JSON.stringify(data.user));
-              alert("Login effettuato con successo!");
-              window.location.href = "prova18.html";
-            })
-            .catch(err => {
-              console.error("❌ Errore durante login con Google:", err);
-              alert("Errore durante il login con Google");
-            });
+      .then(res => {
+        if (!res.ok) throw new Error("Errore HTTP");
+        return res.json();
+      })
+      .then(data => {
+        console.log("✅ Login Google OK:", data);
+        sessionStorage.setItem("user", JSON.stringify(data.user));
+        alert("Login effettuato con successo!");
+        window.location.href = "prova18.html";
+      })
+      .catch(err => {
+        console.error("❌ Errore durante login con Google:", err);
+        alert("Errore durante il login con Google");
+      });
   }
 
   // Inizializza Google Identity Services
@@ -124,8 +145,8 @@
       callback: handleCredentialResponse
     });
     google.accounts.id.renderButton(
-            document.getElementById('googleSignInButton'),
-            { theme: 'outline', size: 'large' }
+      document.getElementById('googleSignInButton'),
+      { theme: 'outline', size: 'large' }
     );
     google.accounts.id.prompt();
   };
