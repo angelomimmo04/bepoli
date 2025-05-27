@@ -7,6 +7,7 @@ const path = require("path");
 const multer = require("multer");
 const session = require("express-session");
 const csrf = require("csurf");
+const cookieParser = require("cookie-parser"); // ✅
 const { OAuth2Client } = require("google-auth-library");
 
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
@@ -19,13 +20,13 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(cookieParser()); // ✅ Necessario per CSRF con sessione
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, "public")));
 
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ Connesso a MongoDB Atlas"))
-    .catch((err) => console.error("❌ Errore di connessione:", err));
+  .then(() => console.log("✅ Connesso a MongoDB Atlas"))
+  .catch((err) => console.error("❌ Errore di connessione:", err));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -39,7 +40,9 @@ app.use(session({
   }
 }));
 
-const csrfProtection = csrf({ cookie: false });
+const csrfProtection = csrf(); // ✅ Dopo sessione e cookie-parser
+
+app.get('/favicon.ico', (req, res) => res.status(204).end()); // ✅ Evita errore 404 favicon
 
 app.get("/csrf-token", csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -65,7 +68,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
 
-// Login (con CSRF)
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -93,7 +95,6 @@ app.post("/login", csrfProtection, async (req, res) => {
   }
 });
 
-// Registrazione (con CSRF)
 app.post("/register", csrfProtection, async (req, res) => {
   const { nome, username, password } = req.body;
   if (!nome || !username || !password)
@@ -119,7 +120,6 @@ app.post("/register", csrfProtection, async (req, res) => {
   }
 });
 
-// Login con Google (NO CSRF qui)
 app.post('/auth/google', async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: 'Token mancante' });
@@ -157,7 +157,6 @@ app.post('/auth/google', async (req, res) => {
   }
 });
 
-// Aggiorna profilo (protetto)
 app.post('/api/update-profile', csrfProtection, upload.single('profilePic'), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -225,4 +224,4 @@ app.post('/logout', csrfProtection, (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server in ascolto su porta ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server in ascolto su porta ${PORT}`));
