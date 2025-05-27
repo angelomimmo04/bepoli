@@ -75,6 +75,15 @@ header{
 }
 #bio {
     margin-left: 1rem;
+    width: 100%;
+    max-width: 150ch;
+    min-height: 120px;
+    resize: vertical;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    font-family: sans-serif;
+    box-sizing: border-box;
 }
 
 
