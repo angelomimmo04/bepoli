@@ -87,19 +87,19 @@
 
         const bioInput = document.getElementById("bioInput");
         const charCount = document.getElementById("charCount");
-        const maxLength = 300;
+        const maxLength = 150;
 
-        // ✅ funzione per aggiornare il contatore
+        // funzione per aggiornare il contatore
         function updateCharCount() {
             const remaining = maxLength - bioInput.value.length;
-            charCount.textContent = `Restano ${remaining} caratteri`;
+            charCount.textContent = `${remaining}/150`;
         }
 
-        // ✅ imposta la bio e aggiorna il contatore subito dopo
+        // imposta la bio e aggiorna il contatore subito dopo
         bioInput.value = user.bio || "";
         updateCharCount(); // aggiornamento immediato
 
-        // ✅ aggiorna in tempo reale mentre si scrive
+        //  aggiorna in tempo reale mentre si scrive
         bioInput.addEventListener("input", updateCharCount);
 
         const profileImg = document.getElementById("profile");
