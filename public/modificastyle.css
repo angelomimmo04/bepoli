@@ -92,3 +92,15 @@ header {
     top: 10px; /* Spinge l'immagine verso il basso */
     z-index: 3;
 }
+
+@media (max-width: 768px){
+    .profile-container{
+        height: 80%;
+        width: 80%;
+    }
+    #logo{
+        height: 8vh;
+        margin-bottom: 2px;
+        margin-right:  2px;
+    }
+}
