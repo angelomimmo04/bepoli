@@ -283,5 +283,6 @@ app.post('/logout', checkFingerprint, csrfProtection, (req, res) => {
 // --- SERVER ---
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(🚀 Server in ascolto su porta ${PORT}));
+console.log(`🚀 Server in ascolto su porta ${PORT}`);
+
 
