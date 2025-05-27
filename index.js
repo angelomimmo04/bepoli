@@ -15,7 +15,36 @@ const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleuserc
 const client = new OAuth2Client(CLIENT_ID);
 
 const app = express();
-app.set('trust proxy', 1); // <-- questo dice a Express che è dietro un proxy (come Render)
+app.set('trust proxy', 1); // dietro proxy (Render, Heroku etc)
+
+// --- Funzione fingerprint ---
+function getFingerprint(req) {
+  const ip = req.ip || req.connection.remoteAddress || '';
+  const ua = req.headers['user-agent'] || '';
+  return `${ip}|${ua}`;
+}
+
+// --- Middleware fingerprint ---
+function checkFingerprint(req, res, next) {
+  if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
+
+  const currentFp = getFingerprint(req);
+  const savedFp = req.session.fingerprint;
+
+  if (!savedFp) {
+    req.session.fingerprint = currentFp;
+    return next();
+  }
+
+  if (savedFp !== currentFp) {
+    req.session.destroy(err => {
+      if (err) console.error('Errore distruggendo sessione:', err);
+      return res.status(403).json({ message: "Sessione invalida, effettua di nuovo il login." });
+    });
+  } else {
+    next();
+  }
+}
 
 // --- MIDDLEWARES ---
 
@@ -105,6 +134,7 @@ app.post("/login", csrfProtection, async (req, res) => {
       nome: utente.nome,
       username: utente.username
     };
+    req.session.fingerprint = getFingerprint(req);
 
     res.status(200).json({
       message: "Login effettuato con successo",
@@ -168,6 +198,7 @@ app.post('/auth/google', async (req, res) => {
       nome: utente.nome,
       username: utente.username
     };
+    req.session.fingerprint = getFingerprint(req);
 
     res.status(200).json({
       message: 'Login Google effettuato con successo',
@@ -180,7 +211,7 @@ app.post('/auth/google', async (req, res) => {
 });
 
 // ✏️ Aggiornamento profilo
-app.post('/api/update-profile', csrfProtection, upload.single('profilePic'), async (req, res) => {
+app.post('/api/update-profile', checkFingerprint, csrfProtection, upload.single('profilePic'), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
   const userId = req.session.user.id;
@@ -227,7 +258,7 @@ app.get("/api/user-photo/:userId", async (req, res) => {
 });
 
 // 🙋‍♂️ Recupera dati utente autenticato
-app.get("/api/user", async (req, res) => {
+app.get("/api/user", checkFingerprint, async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
   try {
@@ -241,16 +272,16 @@ app.get("/api/user", async (req, res) => {
 });
 
 // 🚪 Logout
-app.post('/logout', csrfProtection, (req, res) => {
+app.post('/logout', checkFingerprint, csrfProtection, (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).json({ message: 'Errore durante il logout' });
     res.clearCookie('connect.sid');
     res.status(200).json({ message: 'Logout effettuato' });
-  });
+});
 });
 
 // --- SERVER ---
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server in ascolto su porta ${PORT}`));
+app.listen(PORT, () => console.log(🚀 Server in ascolto su porta ${PORT}));
 
