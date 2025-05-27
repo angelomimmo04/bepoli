@@ -5,7 +5,6 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const path = require("path");
 const multer = require("multer");
-const fs = require("fs");
 const session = require("express-session");
 const csrf = require("csurf");
 const { OAuth2Client } = require("google-auth-library");
@@ -22,7 +21,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// Servi i file statici dalla cartella 'public'
 app.use(express.static(path.join(__dirname, "public")));
 
 mongoose.connect(process.env.MONGO_URI)
@@ -35,16 +33,14 @@ app.use(session({
   saveUninitialized: false,
   rolling: true,
   cookie: {
-    maxAge: 1000 * 60 * 30, // 30 minuti
+    maxAge: 1000 * 60 * 30,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production'
   }
 }));
 
-// Middleware CSRF (dopo la sessione)
 const csrfProtection = csrf({ cookie: false });
 
-// Per ottenere il token CSRF (da chiamare nel frontend prima delle POST protette)
 app.get("/csrf-token", csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
@@ -69,7 +65,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
 
-// Login
+// Login (con CSRF)
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -97,7 +93,7 @@ app.post("/login", csrfProtection, async (req, res) => {
   }
 });
 
-// Registrazione
+// Registrazione (con CSRF)
 app.post("/register", csrfProtection, async (req, res) => {
   const { nome, username, password } = req.body;
   if (!nome || !username || !password)
@@ -123,8 +119,8 @@ app.post("/register", csrfProtection, async (req, res) => {
   }
 });
 
-// Login con Google
-app.post('/auth/google', csrfProtection, async (req, res) => {
+// Login con Google (NO CSRF qui)
+app.post('/auth/google', async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: 'Token mancante' });
 
@@ -228,7 +224,5 @@ app.post('/logout', csrfProtection, (req, res) => {
   });
 });
 
-// Avvio server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server in ascolto su porta ${PORT}`));
-
