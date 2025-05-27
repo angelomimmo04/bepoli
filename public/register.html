@@ -63,7 +63,7 @@
   // Carica il token CSRF dal server e lo mette nel form
   async function loadCsrfToken() {
     try {
-      const res = await fetch('/api/csrf-token', { credentials: 'include' });
+      const res = await fetch('/csrf-token', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         document.getElementById('csrfToken').value = data.csrfToken;
