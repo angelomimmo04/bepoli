@@ -41,7 +41,7 @@
         // Prendi il token CSRF
         try {
             const res = await fetch('/csrf-token', { credentials: 'include' });
-            if (csrfResponse.ok) {
+            if (res.ok) {
                 const csrfData = await csrfResponse.json();
                 csrfToken = csrfData.csrfToken;
             } else {
