@@ -8,7 +8,7 @@ const path = require("path");
 const multer = require("multer");
 const session = require("express-session");
 const csrf = require("csurf");
-const cookieParser = require("cookie-parser"); // ✅
+const cookieParser = require("cookie-parser");
 const { OAuth2Client } = require("google-auth-library");
 
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
@@ -18,16 +18,13 @@ const app = express();
 
 // --- MIDDLEWARES ---
 
-// CORS con credenziali per il dominio frontend
 app.use(cors({
   origin: 'https://bepoli.onrender.com',
   credentials: true
 }));
 
-// Cookie parser necessario per gestire i cookie (CSRF e sessione)
 app.use(cookieParser());
 
-// Sessione: deve venire dopo cookieParser
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -36,18 +33,15 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 30, // 30 minuti
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production' // solo HTTPS in prod
   }
 }));
 
-// Body parser JSON (per leggere req.body)
 app.use(express.json());
-
-// Middleware per servire file statici dalla cartella 'public'
 app.use(express.static(path.join(__dirname, "public")));
 
-// Middleware CSRF: deve venire dopo session e cookie-parser
-const csrfProtection = csrf();
+// Middleware CSRF (configurato dopo sessione e cookieParser)
+const csrfProtection = csrf({ cookie: false });
 
 // --- DATABASE ---
 
@@ -55,7 +49,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connesso a MongoDB Atlas"))
   .catch((err) => console.error("❌ Errore di connessione:", err));
 
-// --- SCHEMI MONGOOSE ---
+// --- SCHEMA UTENTE ---
 
 const utenteSchema = new mongoose.Schema({
   nome: String,
@@ -70,27 +64,28 @@ const utenteSchema = new mongoose.Schema({
 
 const Utente = mongoose.model("Utente", utenteSchema);
 
-// --- MULTER SETUP (upload immagini in memoria) ---
+// --- MULTER SETUP ---
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// --- ROUTE ---
+// --- ROTTE ---
 
-// Evita 404 favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-// Endpoint per ottenere token CSRF
-app.get("/csrf-token", csrfProtection, (req, res) => {
+// 🔒 Inizializza sessione e restituisci il token CSRF
+app.get("/csrf-token", (req, res, next) => {
+  req.session.touch(); // Forza la creazione della sessione
+  next();
+}, csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-// Pagina login
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
 
-// Login con username e password
+// 🔐 Login
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -118,7 +113,7 @@ app.post("/login", csrfProtection, async (req, res) => {
   }
 });
 
-// Registrazione nuovo utente
+// 📝 Registrazione
 app.post("/register", csrfProtection, async (req, res) => {
   const { nome, username, password } = req.body;
   if (!nome || !username || !password)
@@ -144,7 +139,7 @@ app.post("/register", csrfProtection, async (req, res) => {
   }
 });
 
-// Login tramite Google OAuth
+// 🔐 Login con Google
 app.post('/auth/google', async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: 'Token mancante' });
@@ -182,7 +177,7 @@ app.post('/auth/google', async (req, res) => {
   }
 });
 
-// Aggiorna profilo utente (bio e immagine)
+// ✏️ Aggiornamento profilo
 app.post('/api/update-profile', csrfProtection, upload.single('profilePic'), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -212,7 +207,7 @@ app.post('/api/update-profile', csrfProtection, upload.single('profilePic'), asy
   }
 });
 
-// Recupera foto profilo utente
+// 📷 Recupera immagine profilo
 app.get("/api/user-photo/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
@@ -229,7 +224,7 @@ app.get("/api/user-photo/:userId", async (req, res) => {
   }
 });
 
-// Recupera dati utente autenticato
+// 🙋‍♂️ Recupera dati utente autenticato
 app.get("/api/user", async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -243,7 +238,7 @@ app.get("/api/user", async (req, res) => {
   }
 });
 
-// Logout
+// 🚪 Logout
 app.post('/logout', csrfProtection, (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).json({ message: 'Errore durante il logout' });
@@ -252,7 +247,8 @@ app.post('/logout', csrfProtection, (req, res) => {
   });
 });
 
-// --- AVVIO SERVER ---
+// --- SERVER ---
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server in ascolto su porta ${PORT}`));
+
