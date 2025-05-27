@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -15,41 +16,46 @@ const client = new OAuth2Client(CLIENT_ID);
 
 const app = express();
 
+// --- MIDDLEWARES ---
+
+// CORS con credenziali per il dominio frontend
 app.use(cors({
   origin: 'https://bepoli.onrender.com',
   credentials: true
 }));
 
-app.use(cookieParser()); // ✅ Necessario per CSRF con sessione
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+// Cookie parser necessario per gestire i cookie (CSRF e sessione)
+app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connesso a MongoDB Atlas"))
-  .catch((err) => console.error("❌ Errore di connessione:", err));
-
+// Sessione: deve venire dopo cookieParser
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true,
   cookie: {
-    maxAge: 1000 * 60 * 30,
+    maxAge: 1000 * 60 * 30, // 30 minuti
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production'
   }
 }));
 
-const csrfProtection = csrf(); // ✅ Dopo sessione e cookie-parser
+// Body parser JSON (per leggere req.body)
+app.use(express.json());
 
-app.get('/favicon.ico', (req, res) => res.status(204).end()); // ✅ Evita errore 404 favicon
+// Middleware per servire file statici dalla cartella 'public'
+app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/csrf-token", csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
+// Middleware CSRF: deve venire dopo session e cookie-parser
+const csrfProtection = csrf();
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// --- DATABASE ---
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ Connesso a MongoDB Atlas"))
+  .catch((err) => console.error("❌ Errore di connessione:", err));
+
+// --- SCHEMI MONGOOSE ---
 
 const utenteSchema = new mongoose.Schema({
   nome: String,
@@ -64,10 +70,27 @@ const utenteSchema = new mongoose.Schema({
 
 const Utente = mongoose.model("Utente", utenteSchema);
 
+// --- MULTER SETUP (upload immagini in memoria) ---
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// --- ROUTE ---
+
+// Evita 404 favicon
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// Endpoint per ottenere token CSRF
+app.get("/csrf-token", csrfProtection, (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+// Pagina login
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
 
+// Login con username e password
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -95,6 +118,7 @@ app.post("/login", csrfProtection, async (req, res) => {
   }
 });
 
+// Registrazione nuovo utente
 app.post("/register", csrfProtection, async (req, res) => {
   const { nome, username, password } = req.body;
   if (!nome || !username || !password)
@@ -120,6 +144,7 @@ app.post("/register", csrfProtection, async (req, res) => {
   }
 });
 
+// Login tramite Google OAuth
 app.post('/auth/google', async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: 'Token mancante' });
@@ -157,6 +182,7 @@ app.post('/auth/google', async (req, res) => {
   }
 });
 
+// Aggiorna profilo utente (bio e immagine)
 app.post('/api/update-profile', csrfProtection, upload.single('profilePic'), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -186,6 +212,7 @@ app.post('/api/update-profile', csrfProtection, upload.single('profilePic'), asy
   }
 });
 
+// Recupera foto profilo utente
 app.get("/api/user-photo/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
@@ -202,6 +229,7 @@ app.get("/api/user-photo/:userId", async (req, res) => {
   }
 });
 
+// Recupera dati utente autenticato
 app.get("/api/user", async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -215,6 +243,7 @@ app.get("/api/user", async (req, res) => {
   }
 });
 
+// Logout
 app.post('/logout', csrfProtection, (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).json({ message: 'Errore durante il logout' });
@@ -222,6 +251,8 @@ app.post('/logout', csrfProtection, (req, res) => {
     res.status(200).json({ message: 'Logout effettuato' });
   });
 });
+
+// --- AVVIO SERVER ---
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server in ascolto su porta ${PORT}`));
