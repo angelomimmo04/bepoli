@@ -76,8 +76,8 @@ header{
 #bio {
     margin-left: 1rem;
     width: 100%;
-    max-width: 120ch;
-    min-height: 40px;
+    max-width: 100ch;
+    min-height: 36px;
     resize: vertical;
     overflow-wrap: break-word;
     word-break: break-word;
