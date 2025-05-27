@@ -91,9 +91,10 @@
 
         // funzione per aggiornare il contatore
         function updateCharCount() {
-            const remaining = maxLength - bioInput.value.length;
-            charCount.textContent = `${remaining}/150`;
-        }
+    const current = bioInput.value.length;
+    charCount.textContent = `${current}/150`;
+}
+
 
         // imposta la bio e aggiorna il contatore subito dopo
         bioInput.value = user.bio || "";
