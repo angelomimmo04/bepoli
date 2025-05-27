@@ -60,7 +60,7 @@ header{
 #profile{
 
     height: 25vh;
-    width: auto;
+    width: 25vh;
     border-radius: 50%; /*per fargli mettere le immagini tonde*/
     object-fit:  cover; /*ci fa ritagliare l'immagine mantenendo le proporzioni e in maniera che occupi l'intereo contenitore*/
     border:  2px black;
