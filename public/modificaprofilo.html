@@ -7,16 +7,21 @@
 
     <title>Modifica profilo</title>
 </head>
+
+
+
+
 <body>
 
+<div class="profile-container">
 
-
-
-
-
+<header>
+    <img src="fotoprofilo.png" alt="Profilo utente" id="profile">
+</header>
 
 
 <form id="updateForm" enctype="multipart/form-data">
+
     <input type="hidden" name="userId" id="userId">
 
     <label for="bioInput" class="testo">Bio:</label>
@@ -28,6 +33,7 @@
     <button type="submit">Salva</button>
 </form>
 
+</div>
 
 <footer>
     <a href="prova18.html">
@@ -85,12 +91,12 @@
         //document.getElementById("name").textContent = user.nome;
         //document.getElementById("username").textContent = user.username;
         document.getElementById("bioInput").value = user.bio || "";
-        //const profileImg = document.getElementById("profile");
-        //profileImg.src = `/api/user-photo/${user._id}`;
+        const profileImg = document.getElementById("profile");
+        profileImg.src = `/api/user-photo/${user._id}`;
 
-        //profileImg.onerror = function () {
-        //    profileImg.src = "fotoprofilo.png";
-        //};
+        profileImg.onerror = function () {
+            profileImg.src = "fotoprofilo.png";
+        };
 
         sessionStorage.setItem("user", JSON.stringify(user));
     };
