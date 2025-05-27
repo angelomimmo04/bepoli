@@ -93,6 +93,11 @@ header {
     z-index: 3;
 }
 
+#charCount{
+    opacity: 50%;
+    font-size: 1.5vh;
+}
+
 @media (max-width: 768px){
     .profile-container{
         height: 80%;
