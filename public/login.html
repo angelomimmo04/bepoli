@@ -76,6 +76,8 @@
   <h2 class="scritta2">BePoli</h2>
   <input type="text" id="username" placeholder="Username" required />
   <input type="password" id="password" placeholder="Password" required />
+  <!-- campo nascosto per token CSRF -->
+  <input type="hidden" id="csrfToken" name="_csrf" value="" />
   <button type="submit">Login</button>
   <div class="login-link">
     <span>Non hai un account?</span>
@@ -87,6 +89,25 @@
 <div id="googleSignInButton"></div>
 
 <script>
+  // Carica il token CSRF dal server e lo mette nel form
+  async function loadCsrfToken() {
+    try {
+      const res = await fetch('/api/csrf-token', {
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('csrfToken').value = data.csrfToken;
+      } else {
+        console.error("Impossibile caricare token CSRF");
+      }
+    } catch (err) {
+      console.error("Errore caricamento token CSRF:", err);
+    }
+  }
+
+  loadCsrfToken();
+
   // Funzione animazione + redirect
   function startLogoTransition(redirectUrl) {
     const logo = document.querySelector(".logo");
@@ -100,7 +121,7 @@
     }
   }
 
-  // Login con Google
+  // Login con Google (non necessita CSRF, perché è login)
   function handleCredentialResponse(response) {
     fetch('/auth/google', {
       method: 'POST',
@@ -124,17 +145,19 @@
     });
   }
 
-  // Login tradizionale
+  // Login tradizionale (manda anche il token CSRF)
   document.getElementById("loginForm").addEventListener("submit", async function (event) {
     event.preventDefault();
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
+    const csrfToken = document.getElementById("csrfToken").value;
 
     try {
       const response = await fetch("/login", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, _csrf: csrfToken }),
       });
 
       const data = await response.json();
