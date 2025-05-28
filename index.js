@@ -14,9 +14,9 @@ const morgan = require("morgan");
 const { OAuth2Client } = require("google-auth-library");
 
 // Rotte modulari
-const userRoute = require("public/routes/users");
-const authRoute = require("public/routes/auth");
-const postRoute = require("public/routes/posts");
+const userRoute = require("./public/routes/users");
+const authRoute = require("./public/routes/auth");
+const postRoute = require("./public/routes/posts");
 
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
