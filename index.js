@@ -26,6 +26,12 @@ function getFingerprint(req) {
 
 // --- Middleware fingerprint ---
 function checkFingerprint(req, res, next) {
+
+console.log("User agent:", req.headers['user-agent']);
+  console.log("Session fingerprint:", req.session.fingerprint);
+  console.log("Session user:", req.session.user);
+
+  
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
   const currentFp = getFingerprint(req);
