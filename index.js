@@ -287,4 +287,3 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server in ascolto su porta ${PORT}`);
 });
 
-alleggerisci il fingerprint usando user agent
