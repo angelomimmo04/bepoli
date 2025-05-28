@@ -15,13 +15,14 @@ const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleuserc
 const client = new OAuth2Client(CLIENT_ID);
 
 const app = express();
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // dietro proxy (Render, Heroku etc)
 
-// --- Funzione fingerprint alleggerita ---
+// --- Funzione fingerprint ---
 function getFingerprint(req) {
-  // Solo user-agent per ridurre falsi positivi
-  return req.headers['user-agent'] || '';
+  const ua = req.headers['user-agent'] || '';
+  return ua;
 }
+
 
 // --- Middleware fingerprint ---
 function checkFingerprint(req, res, next) {
@@ -62,14 +63,15 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 30, // 30 minuti
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    secure: process.env.NODE_ENV === 'production', // solo HTTPS in prod
+    sameSite: 'lax'                   // oppure 'strict' per maggiore sicurezza
   }
 }));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Middleware CSRF (configurato dopo sessione e cookieParser)
 const csrfProtection = csrf({ cookie: false });
 
 // --- DATABASE ---
@@ -102,8 +104,9 @@ const upload = multer({ storage: storage });
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
+// 🔒 Inizializza sessione e restituisci il token CSRF
 app.get("/csrf-token", (req, res, next) => {
-  req.session.touch();
+  req.session.touch(); // Forza la creazione della sessione
   next();
 }, csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -274,9 +277,8 @@ app.post('/logout', checkFingerprint, csrfProtection, (req, res) => {
     if (err) return res.status(500).json({ message: 'Errore durante il logout' });
     res.clearCookie('connect.sid');
     res.status(200).json({ message: 'Logout effettuato' });
-  });
 });
-
+});
 
 // --- SERVER ---
 
@@ -285,3 +287,4 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server in ascolto su porta ${PORT}`);
 });
 
+alleggerisci il fingerprint usando user agent
