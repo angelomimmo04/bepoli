@@ -15,13 +15,12 @@ const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleuserc
 const client = new OAuth2Client(CLIENT_ID);
 
 const app = express();
-app.set('trust proxy', 1); // dietro proxy (Render, Heroku etc)
+app.set('trust proxy', 1);
 
-// --- Funzione fingerprint ---
+// --- Funzione fingerprint alleggerita ---
 function getFingerprint(req) {
-  const ip = req.ip || req.connection.remoteAddress || '';
-  const ua = req.headers['user-agent'] || '';
-  return `${ip}|${ua}`;
+  // Solo user-agent per ridurre falsi positivi
+  return req.headers['user-agent'] || '';
 }
 
 // --- Middleware fingerprint ---
@@ -63,15 +62,14 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 30, // 30 minuti
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // solo HTTPS in prod
-    sameSite: 'lax'                   // oppure 'strict' per maggiore sicurezza
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
   }
 }));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Middleware CSRF (configurato dopo sessione e cookieParser)
 const csrfProtection = csrf({ cookie: false });
 
 // --- DATABASE ---
@@ -104,9 +102,8 @@ const upload = multer({ storage: storage });
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-// 🔒 Inizializza sessione e restituisci il token CSRF
 app.get("/csrf-token", (req, res, next) => {
-  req.session.touch(); // Forza la creazione della sessione
+  req.session.touch();
   next();
 }, csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -277,8 +274,9 @@ app.post('/logout', checkFingerprint, csrfProtection, (req, res) => {
     if (err) return res.status(500).json({ message: 'Errore durante il logout' });
     res.clearCookie('connect.sid');
     res.status(200).json({ message: 'Logout effettuato' });
+  });
 });
-});
+
 
 // --- SERVER ---
 
