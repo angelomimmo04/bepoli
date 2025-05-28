@@ -53,42 +53,6 @@
 <body class="login-page">
 
 <script>
-  // Se l'utente è già loggato, lo reindirizza
-  window.addEventListener("load", () => {
-    const user = sessionStorage.getItem("user");
-    try {
-      const parsedUser = JSON.parse(user);
-      if (parsedUser && parsedUser.email) {
-        sessionStorage.setItem("playLogoAnimation", "true");
-        window.location.href = "prova18.html";
-      }
-    } catch (e) {
-      console.log("Utente non loggato o sessione malformata");
-    }
-  });
-</script>
-
-<header>
-  <img src="logobepoli.png" alt="Logo" class="logo" />
-</header>
-
-<form id="loginForm">
-  <h2 class="scritta2">BePoli</h2>
-  <input type="text" id="username" placeholder="Username" required />
-  <input type="password" id="password" placeholder="Password" required />
-  <!-- campo nascosto per token CSRF -->
-  <input type="hidden" id="csrfToken" name="_csrf" value="" />
-  <button type="submit">Login</button>
-  <div class="login-link">
-    <span>Non hai un account?</span>
-    <a href="register.html">Iscriviti</a>
-  </div>
-</form>
-
-<span class="scritta3">oppure</span>
-<div id="googleSignInButton"></div>
-
-<script>
   // Carica il token CSRF dal server e lo mette nel form
   async function loadCsrfToken() {
     try {
@@ -106,44 +70,19 @@
 
   loadCsrfToken();
 
-  // Funzione animazione + redirect
   function startLogoTransition(redirectUrl) {
     const logo = document.querySelector(".logo");
     if (logo) {
       logo.classList.add("logo-transition");
       setTimeout(() => {
         window.location.href = redirectUrl;
-      }, 1200); // Durata dell'animazione
+      }, 1200);
     } else {
       window.location.href = redirectUrl;
     }
   }
 
-  // Login con Google (non necessita CSRF, perché è login)
-  function handleCredentialResponse(response) {
-    fetch('/auth/google', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_token: response.credential })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore HTTP");
-      return res.json();
-    })
-    .then(data => {
-      sessionStorage.setItem("user", JSON.stringify(data.user));
-      sessionStorage.setItem("playLogoAnimation", "true");
-
-      startLogoTransition("prova18.html");
-    })
-    .catch(err => {
-      console.error("Errore Google login:", err);
-      alert("Errore durante il login con Google");
-    });
-  }
-
-  // Login tradizionale (manda anche il token CSRF)
+  // Login tradizionale (usa il token CSRF nell'header)
   document.getElementById("loginForm").addEventListener("submit", async function (event) {
     event.preventDefault();
     const username = document.getElementById("username").value;
@@ -154,8 +93,11 @@
       const response = await fetch("/login", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, _csrf: csrfToken }),
+        headers: {
+          "Content-Type": "application/json",
+          "CSRF-Token": csrfToken // ✅ INVIO CORRETTO DEL TOKEN
+        },
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -184,7 +126,30 @@
     );
     google.accounts.id.prompt();
   };
+
+  function handleCredentialResponse(response) {
+    fetch('/auth/google', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: response.credential })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Errore HTTP");
+      return res.json();
+    })
+    .then(data => {
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+      sessionStorage.setItem("playLogoAnimation", "true");
+      startLogoTransition("prova18.html");
+    })
+    .catch(err => {
+      console.error("Errore Google login:", err);
+      alert("Errore durante il login con Google");
+    });
+  }
 </script>
+
 
 </body>
 </html>
