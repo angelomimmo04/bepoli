@@ -9,22 +9,55 @@ const multer = require("multer");
 const session = require("express-session");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const morgan = require("morgan");
 const { OAuth2Client } = require("google-auth-library");
+
+// Rotte modulari
+const userRoute = require("./routes/users");
+const authRoute = require("./routes/auth");
+const postRoute = require("./routes/posts");
 
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
 
 const app = express();
-app.set('trust proxy', 1); // dietro proxy (Render, Heroku etc)
+app.set('trust proxy', 1);
 
-// --- Funzione fingerprint ---
+// 📦 Middleware comuni
+app.use(helmet());
+app.use(morgan("common"));
+app.use(cors({
+  origin: 'https://bepoli.onrender.com',
+  credentials: true
+}));
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🍪 Sessione + CSRF
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  rolling: true,
+  cookie: {
+    maxAge: 1000 * 60 * 30,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
+}));
+
+const csrfProtection = csrf({ cookie: false });
+
+// 🔐 Fingerprint
 function getFingerprint(req) {
   const ip = req.ip || req.connection.remoteAddress || '';
   const ua = req.headers['user-agent'] || '';
   return `${ip}|${ua}`;
 }
 
-// --- Middleware fingerprint ---
 function checkFingerprint(req, res, next) {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -46,42 +79,24 @@ function checkFingerprint(req, res, next) {
   }
 }
 
-// --- MIDDLEWARES ---
+// 🛢️ Connessioni multiple a DB
+const mainDb = mongoose.createConnection(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
-app.use(cors({
-  origin: 'https://bepoli.onrender.com',
-  credentials: true
-}));
+const socialDb = mongoose.createConnection(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
-app.use(cookieParser());
+mainDb.once('open', () => console.log("✅ Connesso a DB principale"));
+socialDb.once('open', () => console.log("✅ Connesso a DB social"));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  rolling: true,
-  cookie: {
-    maxAge: 1000 * 60 * 30, // 30 minuti
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // solo HTTPS in prod
-    sameSite: 'lax'                   // oppure 'strict' per maggiore sicurezza
-  }
-}));
+mainDb.on('error', err => console.error("❌ Errore DB principale:", err));
+socialDb.on('error', err => console.error("❌ Errore DB social:", err));
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-
-// Middleware CSRF (configurato dopo sessione e cookieParser)
-const csrfProtection = csrf({ cookie: false });
-
-// --- DATABASE ---
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connesso a MongoDB Atlas"))
-  .catch((err) => console.error("❌ Errore di connessione:", err));
-
-// --- SCHEMA UTENTE ---
-
+// 👤 Schema Utente (DB principale)
 const utenteSchema = new mongoose.Schema({
   nome: String,
   username: { type: String, unique: true },
@@ -93,25 +108,21 @@ const utenteSchema = new mongoose.Schema({
   },
 });
 
-const Utente = mongoose.model("Utente", utenteSchema);
+const Utente = mainDb.model("Utente", utenteSchema);
 
-// --- MULTER SETUP ---
-
+// 📷 Multer upload
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// --- ROTTE ---
-
-app.get('/favicon.ico', (req, res) => res.status(204).end());
-
-// 🔒 Inizializza sessione e restituisci il token CSRF
+// 🔒 CSRF token init
 app.get("/csrf-token", (req, res, next) => {
-  req.session.touch(); // Forza la creazione della sessione
+  req.session.touch();
   next();
 }, csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
+// 🌐 Pagine statiche
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
@@ -136,10 +147,7 @@ app.post("/login", csrfProtection, async (req, res) => {
     };
     req.session.fingerprint = getFingerprint(req);
 
-    res.status(200).json({
-      message: "Login effettuato con successo",
-      user: req.session.user
-    });
+    res.status(200).json({ message: "Login effettuato", user: req.session.user });
   } catch (err) {
     res.status(500).json({ message: "Errore server" });
   }
@@ -171,7 +179,7 @@ app.post("/register", csrfProtection, async (req, res) => {
   }
 });
 
-// 🔐 Login con Google
+// 🔐 Google login
 app.post('/auth/google', async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: 'Token mancante' });
@@ -200,17 +208,14 @@ app.post('/auth/google', async (req, res) => {
     };
     req.session.fingerprint = getFingerprint(req);
 
-    res.status(200).json({
-      message: 'Login Google effettuato con successo',
-      user: req.session.user
-    });
+    res.status(200).json({ message: 'Login Google effettuato', user: req.session.user });
   } catch (error) {
     console.error('Errore verifica token Google:', error);
     res.status(401).json({ message: 'Token Google non valido' });
   }
 });
 
-// ✏️ Aggiornamento profilo
+// ✏️ Aggiorna profilo
 app.post('/api/update-profile', checkFingerprint, csrfProtection, upload.single('profilePic'), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -232,7 +237,6 @@ app.post('/api/update-profile', checkFingerprint, csrfProtection, upload.single(
     if (!updatedUser) return res.status(404).json({ message: "Utente non trovato" });
 
     req.session.user.bio = updatedUser.bio;
-
     return res.status(200).json({ message: "Profilo aggiornato con successo" });
   } catch (err) {
     console.error("Errore aggiornamento profilo:", err);
@@ -252,12 +256,11 @@ app.get("/api/user-photo/:userId", async (req, res) => {
       res.status(404).send("Foto non trovata");
     }
   } catch (err) {
-    console.error("Errore recupero immagine:", err);
     res.status(500).send("Errore server");
   }
 });
 
-// 🙋‍♂️ Recupera dati utente autenticato
+// 🙋‍♂️ Dati utente autenticato
 app.get("/api/user", checkFingerprint, async (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -277,8 +280,20 @@ app.post('/logout', checkFingerprint, csrfProtection, (req, res) => {
     if (err) return res.status(500).json({ message: 'Errore durante il logout' });
     res.clearCookie('connect.sid');
     res.status(200).json({ message: 'Logout effettuato' });
+  });
 });
+
+// 🔗 Monta rotte social col db secondario
+app.use("/api/users", userRoute(socialDb));
+app.use("/api/auth", authRoute(socialDb));
+app.use("/api/posts", postRoute(socialDb));
+
+// 🚀 Avvio server
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server in ascolto su porta ${PORT}`);
 });
+
 
 // --- SERVER ---
 
