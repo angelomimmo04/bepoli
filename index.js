@@ -20,8 +20,10 @@ app.set('trust proxy', 1); // dietro proxy (Render, Heroku etc)
 // --- Funzione fingerprint ---
 function getFingerprint(req) {
   const ua = req.headers['user-agent'] || '';
-  return ua;
+  const ip = req.ip || req.connection.remoteAddress || '';
+  return `${ua}-${ip}`;
 }
+
 
 
 // --- Middleware fingerprint ---
