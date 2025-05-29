@@ -157,6 +157,28 @@ app.get('/api/search-users', checkFingerprint, async (req, res) => {
 
 
 
+// 👤 Profilo pubblico
+app.get("/api/user-public/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await Utente.findById(id, 'username nome bio _id');
+    if (!user) return res.status(404).json({ error: "Utente non trovato" });
+
+    res.json({
+      id: user._id,
+      username: user.username,
+      nome: user.nome,
+      bio: user.bio
+    });
+  } catch (err) {
+    console.error("Errore profilo pubblico:", err);
+    res.status(500).json({ error: "Errore server" });
+  }
+});
+
+
+
+
 
 // 🔐 Login
 app.post("/login", csrfProtection, async (req, res) => {
