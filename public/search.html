@@ -59,7 +59,7 @@
             <small>${user.nome}</small>
           </div>
         `;
-        div.onclick = () => window.location.href = `/profilo.html?id=${user.id}`;
+        div.onclick = () => window.location.href = `/profile.html?id=${user.id}`;
         recentiDiv.appendChild(div);
       });
     }
@@ -87,7 +87,7 @@
             `;
             div.onclick = () => {
               salvaInCronologia(user);
-              window.location.href = `/profilo.html?id=${user.id}`;
+              window.location.href = `/profile.html?id=${user.id}`;
             };
             risultatiDiv.appendChild(div);
           });
@@ -106,3 +106,4 @@
   </script>
 </body>
 </html>
+
