@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="style-profilo.css" rel="stylesheet">  <!--serve per collegare lo stile alla pagina e poi la relazione-->
-
+    <link href="style-profilo.css" rel="stylesheet">
     <title>profilo utente</title>
-
-
 </head>
 <body>
+
 <script>
 window.onload = async function () {
     const params = new URLSearchParams(window.location.search);
@@ -28,9 +26,9 @@ window.onload = async function () {
         } else {
             // Profilo personale
             const res = await fetch('/api/user', {
-              credentials: 'include',
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' }
+                credentials: 'include',
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             });
             if (!res.ok) throw new Error("Non autenticato");
             user = await res.json();
@@ -48,100 +46,54 @@ window.onload = async function () {
     document.getElementById("bio").textContent = user.bio || "Nessuna bio";
 
     const profileImg = document.getElementById("profile");
-    profileImg.src = `/api/user-photo/${user.id || user._id}`;
+    profileImg.src = `/api/user-photo/${user._id || user.id}`;
     profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
 
-    // Nascondi bottone modifica se non è il proprio profilo
     if (!isOwnProfile) {
         document.getElementById("editBtn").style.display = "none";
     }
 
-    sessionStorage.setItem("user", JSON.stringify(user));
+    // ✅ Salva solo i dati leggeri nel sessionStorage
+    const { _id, nome, username, bio } = user;
+    sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 };
 </script>
 
-
-
-
-
-
-
-
 <header>
-  <a href="prova18.html">
-    <img src="logobepoli.png" alt="Logo" id="logo">
-  </a>
+    <a href="prova18.html">
+        <img src="logobepoli.png" alt="Logo" id="logo">
+    </a>
 </header>
 
-
 <nav class="leftnav" id="mainnav">
-  <ul>  <!-- ul sta per unordered list-->
-    <li> <a href="prova18.html">home</a> </li>  <!-- creo un elemento della lista con attributo che è a cosa punta il link e poi il nome che viene visualizzato-->
-    <li> <a href="">messaggi</a></li>
-    <li> <a href="">notifiche</a></li>
-    <li> <a href="">esplora</a></li>
-    <li> <a href="profile.html">profilo</a></li>
-    <li> <a href=>crea</a></li>
-
-
-  </ul>
-
+    <ul>
+        <li><a href="prova18.html">home</a></li>
+        <li><a href="">messaggi</a></li>
+        <li><a href="">notifiche</a></li>
+        <li><a href="">esplora</a></li>
+        <li><a href="profile.html">profilo</a></li>
+        <li><a href="">crea</a></li>
+    </ul>
 </nav>
 
 <div id="info">
     <div id="base">
-
-
-
         <img src="fotoprofilo.png" alt="Profilo utente" id="profile">
         <div id="gigi">
             <p id="username">loading...</p>
 
-
             <div id="social">
-                <div>
-
-                    <p>post</p>
-                </div>
-                <div>
-
-                    <p>follower</p>
-                </div>
-                <div>
-
-                    <p>seguiti</p>
-                </div>
-
+                <div><p>post</p></div>
+                <div><p>follower</p></div>
+                <div><p>seguiti</p></div>
                 <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
-
-
-
-
             </div>
+
             <h1 id="name">nome utente</h1>
-
-
             <p id="bio">Bio utente</p>
-
-
         </div>
-
-
     </div>
-
-
 </div>
-
-
-
-
-
-
-
-
-
-
-
 
 </body>
 </html>
