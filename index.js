@@ -124,6 +124,40 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
 
+
+
+
+// 🔍 Ricerca utenti per username (parziale)
+app.get('/api/search-users', checkFingerprint, async (req, res) => {
+  const query = req.query.q;
+
+  if (!query || query.trim().length === 0) {
+    return res.status(400).json({ message: "Query mancante" });
+  }
+
+  try {
+    const utenti = await Utente.find(
+      { username: { $regex: query, $options: 'i' } },
+      { username: 1, nome: 1, _id: 1 }
+    ).limit(10);
+
+    const utentiConFoto = utenti.map(utente => ({
+      id: utente._id,
+      username: utente.username,
+      nome: utente.nome,
+      profilePicUrl: `/api/user-photo/${utente._id}`
+    }));
+
+    res.json(utentiConFoto);
+  } catch (err) {
+    console.error("Errore nella ricerca utenti:", err);
+    res.status(500).json({ message: "Errore nella ricerca" });
+  }
+});
+
+
+
+
 // 🔐 Login
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
