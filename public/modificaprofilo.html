@@ -38,62 +38,65 @@
     let csrfToken = "";
 
     window.onload = async function () {
-    try {
-        // 1. Verifica utente loggato e inizializza la sessione
-        const userRes = await fetch('https://bepoli.onrender.com/api/user', {
-            credentials: 'include'
-        });
+        let user = null; // ✅ Definita visibile a tutto il blocco
 
-        if (!userRes.ok) {
-            alert("Devi prima effettuare il login.");
-            window.location.href = "login.html";
-            return;
-        }
+        try {
+            // 1. Verifica utente loggato
+            const userRes = await fetch('https://bepoli.onrender.com/api/user', {
+                credentials: 'include'
+            });
 
-        // Elimina i dati pesanti prima di salvare nel sessionStorage
-const { _id, nome, username, bio } = user;
-sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
-
-        // 2. Solo dopo, recupera il CSRF token
-        const csrfRes = await fetch('https://bepoli.onrender.com/csrf-token', {
-            credentials: 'include'
-        });
-
-        if (csrfRes.ok) {
-            const csrfData = await csrfRes.json();
-            csrfToken = csrfData.csrfToken;
-        } else {
-            console.warn('CSRF token non ricevuto');
-        }
-
-        // 3. Setup form
-        const bioInput = document.getElementById("bioInput");
-        const charCount = document.getElementById("charCount");
-        const maxLength = 150;
-
-        function updateCharCount() {
-            charCount.textContent = `${bioInput.value.length}/150`;
-        }
-
-        bioInput.value = user.bio || "";
-        updateCharCount();
-
-        bioInput.addEventListener("input", function () {
-            if (bioInput.value.length > maxLength) {
-                bioInput.value = bioInput.value.substring(0, maxLength);
+            if (!userRes.ok) {
+                alert("Devi prima effettuare il login.");
+                window.location.href = "login.html";
+                return;
             }
+
+            user = await userRes.json();
+
+            // Salva solo i dati leggeri
+            const { _id, nome, username, bio } = user;
+            sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
+
+            // 2. Recupera CSRF token
+            const csrfRes = await fetch('https://bepoli.onrender.com/csrf-token', {
+                credentials: 'include'
+            });
+
+            if (csrfRes.ok) {
+                const csrfData = await csrfRes.json();
+                csrfToken = csrfData.csrfToken;
+            } else {
+                console.warn('CSRF token non ricevuto');
+            }
+
+            // 3. Setup form
+            const bioInput = document.getElementById("bioInput");
+            const charCount = document.getElementById("charCount");
+            const maxLength = 150;
+
+            function updateCharCount() {
+                charCount.textContent = `${bioInput.value.length}/150`;
+            }
+
+            bioInput.value = user.bio || "";
             updateCharCount();
-        });
 
-        const profileImg = document.getElementById("profile");
-        profileImg.src = `https://bepoli.onrender.com/api/user-photo/${user._id}`;
-        profileImg.onerror = () => profileImg.src = "fotoprofilo.png";
+            bioInput.addEventListener("input", function () {
+                if (bioInput.value.length > maxLength) {
+                    bioInput.value = bioInput.value.substring(0, maxLength);
+                }
+                updateCharCount();
+            });
 
-    } catch (err) {
-        console.error("Errore durante l'inizializzazione:", err);
-    }
-};
+            const profileImg = document.getElementById("profile");
+            profileImg.src = `https://bepoli.onrender.com/api/user-photo/${user._id}`;
+            profileImg.onerror = () => profileImg.src = "fotoprofilo.png";
 
+        } catch (err) {
+            console.error("Errore durante l'inizializzazione:", err);
+        }
+    };
 
     document.getElementById("updateForm").addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -130,3 +133,4 @@ sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 
 </body>
 </html>
+
