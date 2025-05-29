@@ -50,8 +50,9 @@
             return;
         }
 
-        const user = await userRes.json();
-        sessionStorage.setItem("user", JSON.stringify(user));
+        // Elimina i dati pesanti prima di salvare nel sessionStorage
+const { _id, nome, username, bio } = user;
+sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 
         // 2. Solo dopo, recupera il CSRF token
         const csrfRes = await fetch('https://bepoli.onrender.com/csrf-token', {
