@@ -88,6 +88,7 @@
           const div = document.createElement('div');
           div.innerHTML = `
             <img src="${user.profilePicUrl}" width="40" height="40">
+            profilePicUrl.onerror = () => { profilePicUrl.src = "fotoprofilo.png"; };
             <div>
               <strong>${user.username}</strong><br>
               <small>${user.nome}</small>
