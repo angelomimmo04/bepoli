@@ -286,9 +286,21 @@ app.get("/api/recent-users", checkFingerprint, async (req, res) => {
 
 // 🔽 Lista dei follower
 app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   try {
-    const user = await Utente.findById(req.params.id).populate("followers", "nome username _id");
+    const user = await Utente.findById(req.params.id)
+      .populate({
+        path: "followers",
+        select: "nome username _id",
+        options: { skip, limit }
+      });
+
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
+
+    const total = user.followers.length;
 
     const list = user.followers.map(u => ({
       id: u._id,
@@ -297,17 +309,35 @@ app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
       profilePicUrl: `/api/user-photo/${u._id}`
     }));
 
-    res.json(list);
+    res.json({
+      total,
+      page,
+      limit,
+      followers: list
+    });
   } catch {
     res.status(500).json({ message: "Errore nel recupero follower" });
   }
 });
 
+
 // 🔼 Lista dei seguiti
 app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   try {
-    const user = await Utente.findById(req.params.id).populate("following", "nome username _id");
+    const user = await Utente.findById(req.params.id)
+      .populate({
+        path: "following",
+        select: "nome username _id",
+        options: { skip, limit }
+      });
+
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
+
+    const total = user.following.length;
 
     const list = user.following.map(u => ({
       id: u._id,
@@ -316,7 +346,12 @@ app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
       profilePicUrl: `/api/user-photo/${u._id}`
     }));
 
-    res.json(list);
+    res.json({
+      total,
+      page,
+      limit,
+      following: list
+    });
   } catch {
     res.status(500).json({ message: "Errore nel recupero following" });
   }
