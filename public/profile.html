@@ -291,8 +291,13 @@
           li.appendChild(link);
 
           if (u._id === loggedUser._id) {
-            // Utente è se stesso, non mostriamo il bottone segui/smetti
-            // (eventualmente si potrebbe aggiungere il bottone Modifica profilo qui se serve)
+            // Bottone Modifica profilo
+            const editBtn = document.createElement("a");
+            editBtn.href = "modificaprofilo.html";
+            editBtn.textContent = "Modifica profilo";
+            editBtn.className = "btn";
+            editBtn.style.marginLeft = "auto";
+            li.appendChild(editBtn);
           } else {
             // Bottone Segui/Smetti di seguire
             const followBtn = document.createElement("button");
@@ -355,7 +360,7 @@
       }
     };
   };
-  </script>
+</script>
 
 </body>
 </html>
