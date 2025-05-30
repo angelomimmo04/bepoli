@@ -159,6 +159,23 @@ document.getElementById("followingCount").textContent = user.followingCount || 0
     
     const { _id, nome, username, bio } = user;
     sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
+
+  async function apriListaFollow(tipo, userId) {
+  const endpoint = tipo === "followers"
+    ? `/api/user/${userId}/followers`
+    : `/api/user/${userId}/following`;
+
+  const res = await fetch(endpoint, { credentials: "include" });
+  if (!res.ok) {
+    alert("Errore caricando la lista.");
+    return;
+  }
+  const users = await res.json();
+
+  // esempio semplice: alert elenco utenti (meglio creare un modal)
+  alert(users.map(u => `${u.nome} (@${u.username})`).join("\n"));
+}
+
 }; 
 
 </script>
