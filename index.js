@@ -99,6 +99,8 @@ const utenteSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }]
 });
 
 const Utente = mongoose.model("Utente", utenteSchema);
@@ -175,6 +177,77 @@ app.get("/api/user-public/:id", async (req, res) => {
     res.status(500).json({ error: "Errore server" });
   }
 });
+
+
+//seguire/smetteere di seguire
+
+app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
+  const followerId = req.session.user.id;
+  const followingId = req.params.id;
+
+  if (followerId === followingId) {
+    return res.status(400).json({ message: "Non puoi seguire te stesso" });
+  }
+
+  try {
+    const follower = await Utente.findById(followerId);
+    const target = await Utente.findById(followingId);
+
+    if (!follower || !target) {
+      return res.status(404).json({ message: "Utente non trovato" });
+    }
+
+    const isFollowing = follower.following.includes(target._id);
+
+    if (isFollowing) {
+      // Unfollow
+      follower.following.pull(target._id);
+      target.followers.pull(follower._id);
+    } else {
+      // Follow
+      follower.following.push(target._id);
+      target.followers.push(follower._id);
+    }
+
+    await follower.save();
+    await target.save();
+
+    res.json({
+      following: !isFollowing,
+      followersCount: target.followers.length,
+      followingCount: follower.following.length
+    });
+  } catch (err) {
+    console.error("Errore follow/unfollow:", err);
+    res.status(500).json({ message: "Errore server" });
+  }
+});
+
+
+//numeri aggiornati chi segui
+
+app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
+  const viewerId = req.session.user.id;
+  const targetId = req.params.id;
+
+  try {
+    const target = await Utente.findById(targetId);
+    if (!target) return res.status(404).json({ message: "Utente non trovato" });
+
+    const isFollowing = target.followers.includes(viewerId);
+
+    res.json({
+      followersCount: target.followers.length,
+      followingCount: target.following.length,
+      isFollowing
+    });
+  } catch (err) {
+    console.error("Errore follow-info:", err);
+    res.status(500).json({ message: "Errore server" });
+  }
+});
+
+
 
 
 
