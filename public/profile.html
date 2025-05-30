@@ -47,11 +47,11 @@
 
     #modalList li a {
       text-decoration: none;
-      color: #0077cc;
+      color: black;
     }
 
     #modalList li a:hover {
-      text-decoration: underline;
+      text-decoration: none;
     }
   </style>
 </head>
@@ -234,6 +234,7 @@ window.onload = async function () {
     img.style.width = "32px";
     img.style.height = "32px";
     img.style.borderRadius = "50%";
+    img.style.object-fit:  cover;          
     img.onerror = () => { img.src = "fotoprofilo.png"; };
 
     const link = document.createElement("a");
