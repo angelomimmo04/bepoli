@@ -55,13 +55,11 @@ window.onload = async function () {
 
     try {
         if (id) {
-            // Profilo pubblico
             const res = await fetch(`/api/user-public/${id}`);
             if (!res.ok) throw new Error("Utente non trovato");
             user = await res.json();
             isOwnProfile = false;
         } else {
-            // Profilo personale
             const res = await fetch('/api/user', {
                 credentials: 'include',
                 method: 'GET',
@@ -91,51 +89,50 @@ window.onload = async function () {
     } else {
         document.getElementById("editBtn").style.display = "none";
 
-        // 🔁 Aggiungi bottone "Segui/Smetti di seguire"
-        // Dentro else (profilo di un altro utente)
-const followBtn = document.createElement("button");
-followBtn.id = "followBtn";
-followBtn.className = "btn";
-followBtn.textContent = "Caricamento...";
-document.getElementById("social").appendChild(followBtn);
+        const followBtn = document.createElement("button");
+        followBtn.id = "followBtn";
+        followBtn.className = "btn";
+        followBtn.textContent = "Caricamento...";
+        document.getElementById("social").appendChild(followBtn);
 
-try {
-    const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
-        credentials: 'include'
-    });
-    if (!followRes.ok) throw new Error("Errore fetching follow info");
-    const followData = await followRes.json();
+        try {
+            const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
+                credentials: 'include'
+            });
+            if (!followRes.ok) throw new Error("Errore fetching follow info");
+            const followData = await followRes.json();
 
-    followBtn.textContent = followData.isFollowing ? "Smetti di seguire" : "Segui";
+            followBtn.textContent = followData.isFollowing ? "Smetti di seguire" : "Segui";
 
-    followBtn.onclick = async () => {
-        const res = await fetch(`/api/follow/${user._id || user.id}`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+            followBtn.onclick = async () => {
+                const res = await fetch(`/api/follow/${user._id || user.id}`, {
+                    method: "POST",
+                    credentials: 'include',
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
 
-        const result = await res.json();
-        if (res.ok) {
-            followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-            document.getElementById("followerCount").textContent = result.followersCount;
-            document.getElementById("followingCount").textContent = result.followingCount;
-        } else {
-            alert("Errore: " + result.message);
+                const result = await res.json();
+                if (res.ok) {
+                    followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
+                    document.getElementById("followerCount").textContent = result.followersCount;
+                    document.getElementById("followingCount").textContent = result.followingCount;
+                } else {
+                    alert("Errore: " + result.message);
+                }
+            };
+        } catch (error) {
+            console.error("Errore stato follow", error);
+            followBtn.textContent = "Errore";
         }
-    };
-} catch (error) {
-    console.error("Errore stato follow", error);
-    followBtn.textContent = "Errore";
-}
+    }
 
-
-    // ✅ Salva solo i dati leggeri nel sessionStorage
+    // ⬇️ QUESTO BLOCCO DEVE ESSERE DENTRO LA FUNZIONE
     const { _id, nome, username, bio } = user;
     sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
-};
+}; // ⬅️ CHIUSURA CORRETTA DELLA FUNZIONE
+
 </script>
 
 
