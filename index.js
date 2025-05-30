@@ -83,7 +83,8 @@ const utenteSchema = new mongoose.Schema({
     contentType: String
   },
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }]
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
+  utentiRecenti: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }]
 });
 const Utente = mongoose.model("Utente", utenteSchema);
 
@@ -234,6 +235,55 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
     res.status(500).json({ message: "Errore ricerca" });
   }
 });
+
+//salva utente come visto
+
+app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
+  const userId = req.session.user.id;
+  const visitedId = req.params.id;
+
+  if (userId === visitedId) return res.status(400).json({ message: "Non puoi visitare te stesso" });
+
+  try {
+    const utente = await Utente.findById(userId);
+    if (!utente) return res.status(404).json({ message: "Utente non trovato" });
+
+    // Rimuovi se già presente e metti in cima
+    utente.utentiRecenti = utente.utentiRecenti.filter(id => id.toString() !== visitedId);
+    utente.utentiRecenti.unshift(visitedId);
+
+    // Limita a 5
+    utente.utentiRecenti = utente.utentiRecenti.slice(0, 5);
+
+    await utente.save();
+    res.json({ message: "Utente salvato come visitato" });
+  } catch (err) {
+    console.error("Errore salvataggio visitato:", err);
+    res.status(500).json({ message: "Errore server" });
+  }
+});
+
+//ottieni utenti visti
+app.get("/api/recent-users", checkFingerprint, async (req, res) => {
+  try {
+    const utente = await Utente.findById(req.session.user.id)
+      .populate("utentiRecenti", "username nome _id")
+      .exec();
+
+    const recenti = utente.utentiRecenti.map(u => ({
+      id: u._id,
+      username: u.username,
+      nome: u.nome,
+      profilePicUrl: `/api/user-photo/${u._id}`
+    }));
+
+    res.json(recenti);
+  } catch {
+    res.status(500).json({ message: "Errore caricamento recenti" });
+  }
+});
+
+
 
 // 👤 Profilo pubblico
 app.get("/api/user-public/:id", async (req, res) => {
