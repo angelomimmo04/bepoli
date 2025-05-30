@@ -238,14 +238,22 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
 // 👤 Profilo pubblico
 app.get("/api/user-public/:id", async (req, res) => {
   try {
-    const user = await Utente.findById(req.params.id, 'username nome bio');
+    const user = await Utente.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
-    res.json(user);
+    res.json({
+      _id: user._id,
+      username: user.username,
+      nome: user.nome,
+      bio: user.bio,
+      followersCount: user.followers.length,
+      followingCount: user.following.length
+    });
   } catch {
     res.status(500).json({ message: "Errore server" });
   }
 });
+
 
 // ➕➖ Follow/Unfollow
 app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
