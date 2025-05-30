@@ -80,6 +80,8 @@ window.onload = async function () {
     document.getElementById("name").textContent = user.nome;
     document.getElementById("username").textContent = user.username;
     document.getElementById("bio").textContent = user.bio || "Nessuna bio";
+  document.getElementById("followerCount").textContent = result.followersCount || 0;
+document.getElementById("followingCount").textContent = result.followingCount || 0;
 
     const profileImg = document.getElementById("profile");
     profileImg.src = `/api/user-photo/${user._id || user.id}`;
@@ -118,7 +120,7 @@ window.onload = async function () {
                 if (res.ok) {
                     followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
                     document.getElementById("followerCount").textContent = result.followersCount || 0;
-document.getElementById("followingCount").textContent = result.followingCount || 0;
+
 
                 } else {
                     alert("Errore: " + result.message);
