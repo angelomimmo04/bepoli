@@ -89,180 +89,174 @@
   <h3>Visitati di recente</h3>
   <div id="recenti"></div>
 
-<script>
-  const risultatiDiv = document.getElementById('risultati');
-  const recentiDiv = document.getElementById('recenti');
-  let utenteLoggato = null;
+  <script>
+    const risultatiDiv = document.getElementById('risultati');
+    const recentiDiv = document.getElementById('recenti');
+    let utenteLoggato = null;
 
-  let paginaCorrente = 1;
-  const limitePerPagina = 10;
-  let queryCorrente = "";
-  let fineLista = false;
+    let paginaCorrente = 1;
+    const limitePerPagina = 10;
+    let queryCorrente = "";
+    let fineLista = false;
 
-  // Bottone Carica altri
-  const loadMoreBtn = document.createElement("button");
-  loadMoreBtn.textContent = "Carica altri";
-  loadMoreBtn.className = "btn";
-  loadMoreBtn.style.display = "none";
-  loadMoreBtn.style.margin = "10px auto";
-  risultatiDiv.parentNode.insertBefore(loadMoreBtn, risultatiDiv.nextSibling);
+    const loadMoreBtn = document.createElement("button");
+    loadMoreBtn.textContent = "Carica altri";
+    loadMoreBtn.className = "btn";
+    loadMoreBtn.style.display = "none";
+    loadMoreBtn.style.margin = "10px auto";
+    risultatiDiv.parentNode.insertBefore(loadMoreBtn, risultatiDiv.nextSibling);
 
-  // Recupera utente loggato
-  fetch('/api/user', { credentials: 'include' })
-    .then(res => {
-      if (!res.ok) throw new Error("Non autenticato");
-      return res.json();
-    })
-    .then(user => {
-      utenteLoggato = user;
-    })
-    .catch(() => {
-      utenteLoggato = null;
-    });
-
-  function salvaInCronologia(utente) {
-    fetch(`/api/visit-user/${utente.id}`, {
-      method: 'POST',
-      credentials: 'include'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore salvataggio cronologia");
-      mostraRecenti(); // aggiorna recenti
-    })
-    .catch(console.error);
-  }
-
-  function creaDivUtente(user) {
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <img src="${user.profilePicUrl || 'fotoprofilo.png'}" width="40" height="40" onerror="this.src='fotoprofilo.png'">
-      <div>
-        <strong>${user.username}</strong>
-      </div>
-    `;
-    div.onclick = () => {
-      salvaInCronologia(user);
-      window.location.href = `/profile.html?id=${user.id}`;
-    };
-    return div;
-  }
-
-  function mostraRecenti() {
-    fetch('/api/recent-users', { credentials: 'include' })
+    fetch('/api/user', { credentials: 'include' })
       .then(res => {
-        if (!res.ok) throw new Error("Errore nel caricamento recenti");
+        if (!res.ok) throw new Error("Non autenticato");
         return res.json();
       })
-      .then(recenti => {
-        recentiDiv.innerHTML = '';
-        if (!Array.isArray(recenti)) {
-          console.warn("Risposta recenti non è un array", recenti);
+      .then(user => {
+        utenteLoggato = user;
+      })
+      .catch(() => {
+        utenteLoggato = null;
+      });
+
+    function salvaInCronologia(utente) {
+      fetch(`/api/visit-user/${utente.id}`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Errore salvataggio cronologia");
+        mostraRecenti();
+      })
+      .catch(console.error);
+    }
+
+    function creaDivUtente(user) {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <img src="${user.profilePicUrl || 'fotoprofilo.png'}" onerror="this.src='fotoprofilo.png'">
+        <div>
+          <strong>${user.username}</strong>
+        </div>
+      `;
+      div.onclick = () => {
+        salvaInCronologia(user);
+        window.location.href = `/profile.html?id=${user.id}`;
+      };
+      return div;
+    }
+
+    function mostraRecenti() {
+      fetch('/api/recent-users', { credentials: 'include' })
+        .then(res => {
+          if (!res.ok) throw new Error("Errore nel caricamento recenti");
+          return res.json();
+        })
+        .then(recenti => {
+          recentiDiv.innerHTML = '';
+          if (!Array.isArray(recenti)) {
+            console.warn("Risposta recenti non è un array", recenti);
+            return;
+          }
+          recenti.forEach(user => {
+            const div = creaDivUtente(user);
+            recentiDiv.appendChild(div);
+          });
+        })
+        .catch(err => {
+          console.error("Errore nel caricamento dei recenti:", err);
+        });
+    }
+
+    async function cercaUtente(query, page = 1) {
+      if (query.length < 1) {
+        risultatiDiv.innerHTML = '';
+        loadMoreBtn.style.display = "none";
+        paginaCorrente = 1;
+        fineLista = false;
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}&page=${page}&limit=${limitePerPagina}`, {
+          credentials: 'include'
+        });
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            risultatiDiv.innerHTML = '<p>Devi effettuare il login per cercare utenti.</p>';
+          } else {
+            risultatiDiv.innerHTML = '<p>Errore nella ricerca (codice ' + res.status + ')</p>';
+          }
+          loadMoreBtn.style.display = "none";
+          fineLista = true;
           return;
         }
-        recenti.forEach(user => {
-          const div = creaDivUtente(user);
-          recentiDiv.appendChild(div);
-        });
-      })
-      .catch(err => {
-        console.error("Errore nel caricamento dei recenti:", err);
-      });
-  }
 
-  async function cercaUtente(query, page = 1) {
-    if (query.length < 1) {
-      risultatiDiv.innerHTML = '';
-      loadMoreBtn.style.display = "none";
-      paginaCorrente = 1;
-      fineLista = false;
-      return;
-    }
+        const data = await res.json();
+        let utenti = [];
 
-    try {
-      const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}&page=${page}&limit=${limitePerPagina}`, {
-        credentials: 'include'
-      });
-      if (!res.ok) {
-        if(res.status === 401) {
-          risultatiDiv.innerHTML = '<p>Devi effettuare il login per cercare utenti.</p>';
+        if (Array.isArray(data)) {
+          utenti = data;
+        } else if (Array.isArray(data.results)) {
+          utenti = data.results;
         } else {
-          risultatiDiv.innerHTML = '<p>Errore nella ricerca (codice ' + res.status + ')</p>';
+          console.warn("Risposta inattesa:", data);
+          risultatiDiv.innerHTML = '<p>Risposta inattesa dal server.</p>';
+          loadMoreBtn.style.display = "none";
+          fineLista = true;
+          return;
         }
+
+        if (page === 1) {
+          risultatiDiv.innerHTML = '';
+          fineLista = false;
+        }
+
+        const utentiFiltrati = utenteLoggato
+          ? utenti.filter(user => user.id !== utenteLoggato._id && user.id !== utenteLoggato.id)
+          : utenti;
+
+        if (utentiFiltrati.length === 0 && page === 1) {
+          risultatiDiv.innerHTML = '<p>Nessun utente trovato.</p>';
+          loadMoreBtn.style.display = "none";
+          fineLista = true;
+          return;
+        }
+
+        utentiFiltrati.forEach(user => {
+          const div = creaDivUtente(user);
+          risultatiDiv.appendChild(div);
+        });
+
+        if (utentiFiltrati.length < limitePerPagina) {
+          fineLista = true;
+          loadMoreBtn.style.display = "none";
+        } else {
+          loadMoreBtn.style.display = "block";
+        }
+
+      } catch (error) {
+        console.error(error);
+        risultatiDiv.innerHTML = '<p>Errore nel caricamento dei risultati.</p>';
         loadMoreBtn.style.display = "none";
-        fineLista = true;
-        return;
       }
-
-      const data = await res.json();
-
-      // Se la risposta non è un array, prova a leggere data.results o alert
-      let utenti = [];
-      if (Array.isArray(data)) {
-        utenti = data;
-      } else if (Array.isArray(data.results)) {
-        utenti = data.results;
-      } else {
-        console.warn("Risposta inattesa:", data);
-        risultatiDiv.innerHTML = '<p>Risposta inattesa dal server.</p>';
-        loadMoreBtn.style.display = "none";
-        fineLista = true;
-        return;
-      }
-
-      // Se pagina 1, resetta lista e flag fineLista
-      if (page === 1) {
-        risultatiDiv.innerHTML = '';
-        fineLista = false;
-      }
-
-      // Filtro per escludere utente loggato
-      const utentiFiltrati = utenteLoggato
-        ? utenti.filter(user => user.id !== utenteLoggato._id && user.id !== utenteLoggato.id)
-        : utenti;
-
-      // Se nessun risultato e pagina 1, messaggio
-      if (utentiFiltrati.length === 0 && page === 1) {
-        risultatiDiv.innerHTML = '<p>Nessun utente trovato.</p>';
-        loadMoreBtn.style.display = "none";
-        fineLista = true;
-        return;
-      }
-
-      utentiFiltrati.forEach(user => {
-        const div = creaDivUtente(user);
-        risultatiDiv.appendChild(div);
-      });
-
-      // Se meno risultati del limite significa fine lista
-      if (utentiFiltrati.length < limitePerPagina) {
-        fineLista = true;
-        loadMoreBtn.style.display = "none";
-      } else {
-        loadMoreBtn.style.display = "block";
-      }
-
-    } catch (error) {
-      console.error(error);
-      risultatiDiv.innerHTML = '<p>Errore nel caricamento dei risultati.</p>';
-      loadMoreBtn.style.display = "none";
     }
-  }
 
-  loadMoreBtn.onclick = () => {
-    if (fineLista) return;
-    paginaCorrente++;
-    cercaUtente(queryCorrente, paginaCorrente);
-  };
+    loadMoreBtn.onclick = () => {
+      if (fineLista) return;
+      paginaCorrente++;
+      cercaUtente(queryCorrente, paginaCorrente);
+    };
 
-  let timeout = null;
-  document.getElementById('searchInput').addEventListener('input', function () {
-    clearTimeout(timeout);
-    queryCorrente = this.value.trim();
-    paginaCorrente = 1;
-    timeout = setTimeout(() => cercaUtente(queryCorrente, paginaCorrente), 300);
-  });
+    let timeout = null;
+    document.getElementById('searchInput').addEventListener('input', function () {
+      clearTimeout(timeout);
+      queryCorrente = this.value.trim();
+      paginaCorrente = 1;
+      timeout = setTimeout(() => cercaUtente(queryCorrente, paginaCorrente), 300);
+    });
 
-  mostraRecenti();
-</script>
+    mostraRecenti();
+  </script>
 </body>
 </html>
