@@ -80,8 +80,8 @@ window.onload = async function () {
     document.getElementById("name").textContent = user.nome;
     document.getElementById("username").textContent = user.username;
     document.getElementById("bio").textContent = user.bio || "Nessuna bio";
-  document.getElementById("followerCount").textContent = result.followersCount || 0;
-document.getElementById("followingCount").textContent = result.followingCount || 0;
+  document.getElementById("followerCount").textContent = user.followersCount || 0;
+document.getElementById("followingCount").textContent = user.followingCount || 0;
 
     const profileImg = document.getElementById("profile");
     profileImg.src = `/api/user-photo/${user._id || user.id}`;
