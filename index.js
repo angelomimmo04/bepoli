@@ -223,18 +223,35 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
   const query = req.query.q;
   if (!query) return res.status(400).json({ message: "Query mancante" });
 
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;  // default 5 risultati per pagina
+  const skip = (page - 1) * limit;
+
   try {
-    const results = await Utente.find({ username: new RegExp(query, 'i') }, 'username nome _id').limit(10);
-    res.json(results.map(u => ({
-      id: u._id,
-      username: u.username,
-      nome: u.nome,
-      profilePicUrl: `/api/user-photo/${u._id}`
-    })));
-  } catch {
+    // Conteggio totale risultati matching
+    const total = await Utente.countDocuments({ username: new RegExp(query, 'i') });
+
+    // Trova risultati con paginazione
+    const results = await Utente.find({ username: new RegExp(query, 'i') }, 'username nome _id')
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      total,
+      page,
+      limit,
+      results: results.map(u => ({
+        id: u._id,
+        username: u.username,
+        nome: u.nome,
+        profilePicUrl: `/api/user-photo/${u._id}`
+      }))
+    });
+  } catch (err) {
     res.status(500).json({ message: "Errore ricerca" });
   }
 });
+
 
 //salva utente come visto
 
