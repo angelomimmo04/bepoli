@@ -47,82 +47,85 @@
 
 <script>
 window.onload = async function () {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
-  let isOwnProfile = false;
-  let user;
-  let loggedUser;
+    let isOwnProfile = false;
+    let user;
 
-  try {
-    // Recupera utente loggato
-    const resUser = await fetch('/api/user', {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    if (!resUser.ok) throw new Error("Non autenticato");
-    loggedUser = await resUser.json();
-
-    if (!id || id === loggedUser._id) {
-      user = loggedUser;
-      isOwnProfile = true;
-    } else {
-      // Profilo pubblico
-      const res = await fetch(`/api/user-public/${id}`);
-      if (!res.ok) throw new Error("Utente non trovato");
-      user = await res.json();
+    try {
+        if (id) {
+            // Profilo pubblico
+            const res = await fetch(`/api/user-public/${id}`);
+            if (!res.ok) throw new Error("Utente non trovato");
+            user = await res.json();
+            isOwnProfile = false;
+        } else {
+            // Profilo personale
+            const res = await fetch('/api/user', {
+                credentials: 'include',
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!res.ok) throw new Error("Non autenticato");
+            user = await res.json();
+            isOwnProfile = true;
+        }
+    } catch (err) {
+        alert("Utente non trovato o accesso non autorizzato.");
+        window.location.href = "login.html";
+        return;
     }
 
-  } catch (err) {
-    alert("Errore: " + err.message);
-    window.location.href = "login.html";
-    return;
-  }
+    document.title = user.username + "'s profile";
+    document.getElementById("name").textContent = user.nome;
+    document.getElementById("username").textContent = user.username;
+    document.getElementById("bio").textContent = user.bio || "Nessuna bio";
 
-  document.title = user.username + "'s profile";
-  document.getElementById("name").textContent = user.nome;
-  document.getElementById("username").textContent = user.username;
-  document.getElementById("bio").textContent = user.bio || "Nessuna bio";
+    const profileImg = document.getElementById("profile");
+    profileImg.src = `/api/user-photo/${user._id || user.id}`;
+    profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
 
-  const profileImg = document.getElementById("profile");
-  profileImg.src = `/api/user-photo/${user._id || user.id}`;
-  profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
+    const followBtn = document.getElementById("followBtn");
+    const editBtn = document.getElementById("editBtn");
 
-  if (isOwnProfile) {
-    document.getElementById("editBtn").style.display = "inline-block";
-  } else {
-    document.getElementById("editBtn").style.display = "none";
-    document.getElementById("followBtn").style.display = "inline-block";
+    if (!isOwnProfile) {
+        editBtn.style.display = "none";
+        followBtn.style.display = "inline-block";
 
-    document.getElementById("followBtn").onclick = async () => {
-      const res = await fetch(`/api/follow/${user.id || user._id}`, {
-        method: "POST",
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("Hai seguito " + user.username);
-        document.getElementById("followBtn").disabled = true;
-        document.getElementById("followBtn").innerText = "Seguito";
-      } else {
-        alert(data.message || "Errore");
-      }
-    };
-  }
+        // Controlla stato follow
+        try {
+            const res = await fetch(`/api/follow-status/${user.id}`, {
+                credentials: 'include'
+            });
+            const data = await res.json();
+            followBtn.textContent = data.following ? "Smetti di seguire" : "Segui";
+        } catch (err) {
+            console.error("Errore stato follow", err);
+        }
 
-  // Conta follower e seguiti (opzionale)
-  try {
-    const fullRes = await fetch(`/api/user-public/${user._id || user.id}`);
-    const fullData = await fullRes.json();
-    document.getElementById("followerCount").textContent = `Follower: ${fullData.followers?.length || 0}`;
-    document.getElementById("followingCount").textContent = `Seguiti: ${fullData.following?.length || 0}`;
-  } catch (e) {
-    console.warn("Conteggio follower non disponibile.");
-  }
+        // Gestione click
+        followBtn.addEventListener("click", async () => {
+            try {
+                const res = await fetch(`/api/follow/${user.id}`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" }
+                });
+                const data = await res.json();
+                followBtn.textContent = data.following ? "Smetti di seguire" : "Segui";
+            } catch (err) {
+                console.error("Errore follow/unfollow", err);
+            }
+        });
+    }
 
+    // ✅ Salva solo i dati leggeri nel sessionStorage
+    const { _id, nome, username, bio } = user;
+    sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 };
 </script>
+
 
 </body>
 </html>
