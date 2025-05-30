@@ -86,38 +86,46 @@ window.onload = async function () {
     profileImg.src = `/api/user-photo/${user._id || user.id}`;
     profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
 
-    const followBtn = document.getElementById("followBtn");
-    const editBtn = document.getElementById("editBtn");
+    if (isOwnProfile) {
+        document.getElementById("editBtn").style.display = "inline-block";
+    } else {
+        document.getElementById("editBtn").style.display = "none";
 
-    if (!isOwnProfile) {
-        editBtn.style.display = "none";
-        followBtn.style.display = "inline-block";
+        // 🔁 Aggiungi bottone "Segui/Smetti di seguire"
+        const followBtn = document.createElement("button");
+        followBtn.id = "followBtn";
+        followBtn.className = "btn";
+        followBtn.textContent = "Caricamento...";
+        document.getElementById("social").appendChild(followBtn);
 
-        // Controlla stato follow
         try {
-            const res = await fetch(`/api/follow-status/${user.id}`, {
+            const followRes = await fetch(`/api/follow-status/${user._id || user.id}`, {
                 credentials: 'include'
             });
-            const data = await res.json();
-            followBtn.textContent = data.following ? "Smetti di seguire" : "Segui";
-        } catch (err) {
-            console.error("Errore stato follow", err);
-        }
+            const followData = await followRes.json();
 
-        // Gestione click
-        followBtn.addEventListener("click", async () => {
-            try {
-                const res = await fetch(`/api/follow/${user.id}`, {
+            followBtn.textContent = followData.following ? "Smetti di seguire" : "Segui";
+
+            followBtn.onclick = async () => {
+                const res = await fetch(`/api/follow/${user._id || user.id}`, {
                     method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" }
+                    credentials: 'include',
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 });
-                const data = await res.json();
-                followBtn.textContent = data.following ? "Smetti di seguire" : "Segui";
-            } catch (err) {
-                console.error("Errore follow/unfollow", err);
-            }
-        });
+
+                const result = await res.json();
+                if (res.ok) {
+                    followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
+                } else {
+                    alert("Errore: " + result.message);
+                }
+            };
+        } catch (error) {
+            console.error("Errore stato follow", error);
+            followBtn.textContent = "Errore";
+        }
     }
 
     // ✅ Salva solo i dati leggeri nel sessionStorage
@@ -125,6 +133,7 @@ window.onload = async function () {
     sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 };
 </script>
+
 
 
 </body>
