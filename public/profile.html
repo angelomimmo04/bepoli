@@ -105,7 +105,16 @@ document.getElementById("followingCount").textContent = user.followingCount || 0
             if (!followRes.ok) throw new Error("Errore fetching follow info");
             const followData = await followRes.json();
 
-            followBtn.textContent = followData.isFollowing ? "Smetti di seguire" : "Segui";
+            if (followData.isFollowing) {
+    followBtn.textContent = "Smetti di seguire";
+    followBtn.classList.add("following");
+    followBtn.classList.remove("not-following");
+} else {
+    followBtn.textContent = "Segui";
+    followBtn.classList.add("not-following");
+    followBtn.classList.remove("following");
+}
+
 
             followBtn.onclick = async () => {
                 const res = await fetch(`/api/follow/${user._id || user.id}`, {
@@ -121,6 +130,14 @@ document.getElementById("followingCount").textContent = user.followingCount || 0
                     followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
                     document.getElementById("followerCount").textContent = result.followersCount || 0;
 
+                  if (result.following) {
+        followBtn.classList.add("following");
+        followBtn.classList.remove("not-following");
+    } else {
+        followBtn.classList.add("not-following");
+        followBtn.classList.remove("following");
+    }
+
 
                 } else {
                     alert("Errore: " + result.message);
@@ -132,10 +149,10 @@ document.getElementById("followingCount").textContent = user.followingCount || 0
         }
     }
 
-    // ⬇️ QUESTO BLOCCO DEVE ESSERE DENTRO LA FUNZIONE
+    
     const { _id, nome, username, bio } = user;
     sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
-}; // ⬅️ CHIUSURA CORRETTA DELLA FUNZIONE
+}; 
 
 </script>
 
