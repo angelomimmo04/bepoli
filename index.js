@@ -92,6 +92,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // --- Rotte ---
+
 app.get("/csrf-token", (req, res, next) => {
   req.session.touch();
   next();
@@ -106,7 +107,8 @@ app.get("/", (req, res) => {
 // 🔐 Login tradizionale
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ message: "Dati mancanti" });
+  if (!username || !password)
+    return res.status(400).json({ message: "Dati mancanti" });
 
   try {
     const utente = await Utente.findOne({ username });
@@ -129,7 +131,8 @@ app.post("/login", csrfProtection, async (req, res) => {
 // 🔐 Login con Google
 app.post("/auth/google", async (req, res) => {
   const { id_token } = req.body;
-  if (!id_token) return res.status(400).json({ message: "Token mancante" });
+  if (!id_token)
+    return res.status(400).json({ message: "Token mancante" });
 
   try {
     const ticket = await client.verifyIdToken({ idToken: id_token, audience: CLIENT_ID });
@@ -168,7 +171,8 @@ app.post("/register", csrfProtection, async (req, res) => {
     return res.status(400).json({ message: "Dati mancanti" });
 
   try {
-    if (await Utente.findOne({ username })) return res.status(400).json({ message: "Username già esistente" });
+    if (await Utente.findOne({ username }))
+      return res.status(400).json({ message: "Username già esistente" });
 
     const hash = await bcrypt.hash(password, 10);
     const nuovoUtente = new Utente({
@@ -195,7 +199,8 @@ app.post("/api/update-profile", checkFingerprint, csrfProtection, upload.single(
 
   try {
     const updated = await Utente.findByIdAndUpdate(userId, { $set: updateData }, { new: true });
-    if (!updated) return res.status(404).json({ message: "Utente non trovato" });
+    if (!updated)
+      return res.status(404).json({ message: "Utente non trovato" });
 
     res.json({ message: "Profilo aggiornato" });
   } catch (err) {
@@ -221,7 +226,8 @@ app.get("/api/user-photo/:userId", async (req, res) => {
 // 🔍 Ricerca utenti
 app.get("/api/search-users", checkFingerprint, async (req, res) => {
   const query = req.query.q;
-  if (!query) return res.status(400).json({ message: "Query mancante" });
+  if (!query)
+    return res.status(400).json({ message: "Query mancante" });
 
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;  // default 5 risultati per pagina
@@ -252,18 +258,18 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
   }
 });
 
-
-//salva utente come visto
-
+// salva utente come visto
 app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
   const userId = req.session.user.id;
   const visitedId = req.params.id;
 
-  if (userId === visitedId) return res.status(400).json({ message: "Non puoi visitare te stesso" });
+  if (userId === visitedId)
+    return res.status(400).json({ message: "Non puoi visitare te stesso" });
 
   try {
     const utente = await Utente.findById(userId);
-    if (!utente) return res.status(404).json({ message: "Utente non trovato" });
+    if (!utente)
+      return res.status(404).json({ message: "Utente non trovato" });
 
     // Rimuovi se già presente e metti in cima
     utente.utentiRecenti = utente.utentiRecenti.filter(id => id.toString() !== visitedId);
@@ -280,7 +286,7 @@ app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
   }
 });
 
-//ottieni utenti visti
+// ottieni utenti visti
 app.get("/api/recent-users", checkFingerprint, async (req, res) => {
   try {
     const utente = await Utente.findById(req.session.user.id)
@@ -300,7 +306,6 @@ app.get("/api/recent-users", checkFingerprint, async (req, res) => {
   }
 });
 
-
 // 🔽 Lista dei follower
 app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -315,7 +320,8 @@ app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
         options: { skip, limit }
       });
 
-    if (!user) return res.status(404).json({ message: "Utente non trovato" });
+    if (!user)
+      return res.status(404).json({ message: "Utente non trovato" });
 
     const total = user.followers.length;
 
@@ -337,7 +343,6 @@ app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
   }
 });
 
-
 // 🔼 Lista dei seguiti
 app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -352,7 +357,8 @@ app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
         options: { skip, limit }
       });
 
-    if (!user) return res.status(404).json({ message: "Utente non trovato" });
+    if (!user)
+      return res.status(404).json({ message: "Utente non trovato" });
 
     const total = user.following.length;
 
@@ -374,126 +380,63 @@ app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
   }
 });
 
-
-
-
-
-
-// 👤 Profilo pubblico
-app.get("/api/user-public/:id", async (req, res) => {
-  try {
-    const user = await Utente.findById(req.params.id).select("username nome bio followers following");
-    if (!user) return res.status(404).json({ message: "Utente non trovato" });
-
-    res.json({
-      _id: user._id,
-      username: user.username,
-      nome: user.nome,
-      bio: user.bio,
-      followersCount: user.followers.length,
-      followingCount: user.following.length
-    });
-  } catch {
-    res.status(500).json({ message: "Errore server" });
-  }
-});
-
-
-// ➕➖ Follow/Unfollow
+// ✅ Segui utente
 app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
   const followerId = req.session.user.id;
-  const targetId = req.params.id;
+  const followingId = req.params.id;
 
-  if (followerId === targetId)
+  if (followerId === followingId)
     return res.status(400).json({ message: "Non puoi seguire te stesso" });
 
   try {
-    const [follower, target] = await Promise.all([
-      Utente.findById(followerId),
-      Utente.findById(targetId)
-    ]);
-    if (!follower || !target)
+    const follower = await Utente.findById(followerId);
+    const following = await Utente.findById(followingId);
+
+    if (!follower || !following)
       return res.status(404).json({ message: "Utente non trovato" });
 
-    const isFollowing = follower.following.includes(target._id);
-    if (isFollowing) {
-      follower.following.pull(target._id);
-      target.followers.pull(follower._id);
+    if (!follower.following.includes(followingId)) {
+      follower.following.push(followingId);
+      following.followers.push(followerId);
+
+      await follower.save();
+      await following.save();
+
+      res.json({ message: "Seguito con successo" });
     } else {
-      follower.following.addToSet(target._id);
-      target.followers.addToSet(follower._id);
+      res.status(400).json({ message: "Già segui questo utente" });
     }
-
-    await Promise.all([follower.save(), target.save()]);
-
-    res.json({
-      following: !isFollowing,
-      followersCount: target.followers.length,
-      followingCount: follower.following.length
-    });
-  } catch (err) {
-    console.error("Errore follow:", err);
-    res.status(500).json({ message: "Errore follow" });
-  }
-});
-
-
-// ℹ️ Info follow
-app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
-  const viewerId = req.session.user.id;
-  const targetId = req.params.id;
-
-  try {
-    const [viewer, target] = await Promise.all([
-      Utente.findById(viewerId),
-      Utente.findById(targetId)
-    ]);
-    if (!target) return res.status(404).json({ message: "Utente non trovato" });
-    if (!viewer) return res.status(404).json({ message: "Utente viewer non trovato" });
-
-    const isFollowing = viewer.following.includes(target._id);
-
-    res.json({
-      followersCount: target.followers.length,
-      followingCount: target.following.length,
-      isFollowing
-    });
-  } catch {
-    res.status(500).json({ message: "Errore follow-info" });
-  }
-});
-
-
-// 👤 Utente autenticato
-app.get("/api/user", checkFingerprint, async (req, res) => {
-  try {
-    const user = await Utente.findById(req.session.user.id).select("username nome bio followers following");
-    if (!user) return res.status(404).json({ message: "Utente non trovato" });
-
-    res.json({
-      _id: user._id,
-      username: user.username,
-      nome: user.nome,
-      bio: user.bio,
-      followersCount: user.followers.length,
-      followingCount: user.following.length
-    });
   } catch {
     res.status(500).json({ message: "Errore server" });
   }
 });
 
-// 🚪 Logout
-app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).json({ message: "Errore logout" });
-    res.clearCookie("connect.sid");
-    res.json({ message: "Logout effettuato" });
-  });
+// ❌ Smetti di seguire
+app.post("/api/unfollow/:id", checkFingerprint, async (req, res) => {
+  const followerId = req.session.user.id;
+  const followingId = req.params.id;
+
+  try {
+    const follower = await Utente.findById(followerId);
+    const following = await Utente.findById(followingId);
+
+    if (!follower || !following)
+      return res.status(404).json({ message: "Utente non trovato" });
+
+    follower.following = follower.following.filter(id => id.toString() !== followingId);
+    following.followers = following.followers.filter(id => id.toString() !== followerId);
+
+    await follower.save();
+    await following.save();
+
+    res.json({ message: "Non segui più questo utente" });
+  } catch {
+    res.status(500).json({ message: "Errore server" });
+  }
 });
 
 // --- Avvio server ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server attivo su porta ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Server avviato sulla porta ${PORT}`);
 });
