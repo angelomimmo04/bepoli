@@ -238,7 +238,7 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
 // 👤 Profilo pubblico
 app.get("/api/user-public/:id", async (req, res) => {
   try {
-    const user = await Utente.findById(req.params.id);
+    const user = await Utente.findById(req.params.id).select("username nome bio followers following");
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
     res.json({
@@ -260,36 +260,39 @@ app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
   const followerId = req.session.user.id;
   const targetId = req.params.id;
 
-  if (followerId === targetId) return res.status(400).json({ message: "Non puoi seguire te stesso" });
+  if (followerId === targetId)
+    return res.status(400).json({ message: "Non puoi seguire te stesso" });
 
   try {
     const [follower, target] = await Promise.all([
       Utente.findById(followerId),
       Utente.findById(targetId)
     ]);
-    if (!follower || !target) return res.status(404).json({ message: "Utente non trovato" });
+    if (!follower || !target)
+      return res.status(404).json({ message: "Utente non trovato" });
 
     const isFollowing = follower.following.includes(target._id);
     if (isFollowing) {
       follower.following.pull(target._id);
       target.followers.pull(follower._id);
     } else {
-      follower.following.push(target._id);
-      target.followers.push(follower._id);
+      follower.following.addToSet(target._id);
+      target.followers.addToSet(follower._id);
     }
 
-    await follower.save();
-    await target.save();
+    await Promise.all([follower.save(), target.save()]);
 
     res.json({
       following: !isFollowing,
       followersCount: target.followers.length,
       followingCount: follower.following.length
     });
-  } catch {
+  } catch (err) {
+    console.error("Errore follow:", err);
     res.status(500).json({ message: "Errore follow" });
   }
 });
+
 
 // ℹ️ Info follow
 app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
@@ -320,9 +323,17 @@ app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
 // 👤 Utente autenticato
 app.get("/api/user", checkFingerprint, async (req, res) => {
   try {
-    const user = await Utente.findById(req.session.user.id);
+    const user = await Utente.findById(req.session.user.id).select("username nome bio followers following");
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
-    res.json(user);
+
+    res.json({
+      _id: user._id,
+      username: user.username,
+      nome: user.nome,
+      bio: user.bio,
+      followersCount: user.followers.length,
+      followingCount: user.following.length
+    });
   } catch {
     res.status(500).json({ message: "Errore server" });
   }
