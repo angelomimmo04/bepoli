@@ -204,7 +204,7 @@
 
       async function apriListaFollow(tipo, userId) {
   let page = 1;
-  const limit = 10;
+  const limit = 9;
   let fineLista = false;
 
   const modal = document.getElementById("modalFollow");
@@ -226,6 +226,9 @@
   loadMoreBtn.style.padding = "8px 16px";
   loadMoreBtn.style.borderRadius = "5px";
   loadMoreBtn.style.fontSize = "1rem";
+
+  // Appendiamo subito il bottone sotto la lista (prima che si aggiungano i li)
+  modalList.appendChild(loadMoreBtn);
 
   async function caricaUtenti() {
     if (fineLista) return;
@@ -249,7 +252,8 @@
       if (page === 1) {
         const li = document.createElement("li");
         li.textContent = "Nessun utente trovato.";
-        modalList.appendChild(li);
+        // Inserisci il messaggio prima del bottone
+        modalList.insertBefore(li, loadMoreBtn);
       }
       loadMoreBtn.style.display = "none"; // Nascondi bottone se non serve
       return;
@@ -278,20 +282,23 @@
 
       li.appendChild(img);
       li.appendChild(link);
-      modalList.appendChild(li);
+
+      // Aggiungi ogni utente prima del bottone (così il bottone rimane sempre in fondo)
+      modalList.insertBefore(li, loadMoreBtn);
     });
 
     page++;
+    // Nascondi il bottone se meno utenti di limit
     loadMoreBtn.style.display = users.length < limit ? "none" : "block";
   }
 
   loadMoreBtn.onclick = caricaUtenti;
 
   modal.style.display = "block";
-  modalList.appendChild(loadMoreBtn);
 
   await caricaUtenti(); // Carica i primi 10
 }
+
 
 
       const modal = document.getElementById("modalFollow");
