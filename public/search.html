@@ -82,15 +82,12 @@
     <h3>Visitati di recente</h3>
     <div id="recenti"></div>
   </div>
-</body>
-
 
   <script>
     const risultatiDiv = document.getElementById('risultati');
     const recentiDiv = document.getElementById('recenti');
     let utenteLoggato = null;
 
-    // Recupera l'utente attualmente loggato
     fetch('/api/user', { credentials: 'include' })
       .then(res => res.json())
       .then(user => {
