@@ -81,8 +81,8 @@
 
         <div id="social">
           <div><p>post: <span id="postCount">0</span></p></div>
-          <span id="followerCount" style="cursor:pointer;">0</span>
-          <span id="followingCount" style="cursor:pointer;">0</span>
+          <span id="followerCount" style="cursor:pointer;">Follower: 0</span>
+          <span id="followingCount" style="cursor:pointer;">Seguiti: 0</span>
 
           <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
           <button id="followBtn" class="btn" style="display:none;">Segui</button>
@@ -142,8 +142,10 @@
       document.getElementById("name").textContent = user.nome;
       document.getElementById("username").textContent = user.username;
       document.getElementById("bio").textContent = user.bio || "Nessuna bio";
-      document.getElementById("followerCount").textContent = user.followersCount || 0;
-      document.getElementById("followingCount").textContent = user.followingCount || 0;
+
+      // Qui aggiungo le etichette
+      document.getElementById("followerCount").textContent = "Follower: " + (user.followersCount || 0);
+      document.getElementById("followingCount").textContent = "Seguiti: " + (user.followingCount || 0);
 
       const profileImg = document.getElementById("profile");
       profileImg.src = `/api/user-photo/${user._id || user.id}`;
@@ -185,8 +187,8 @@
             const result = await res.json();
             if (res.ok) {
               followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-              document.getElementById("followerCount").textContent =
-                result.followersCount || 0;
+              // Aggiorno il conteggio con etichetta
+              document.getElementById("followerCount").textContent = "Follower: " + (result.followersCount || 0);
               followBtn.classList.toggle("following", result.following);
               followBtn.classList.toggle("not-following", !result.following);
             } else {
@@ -203,103 +205,101 @@
       sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 
       async function apriListaFollow(tipo, userId) {
-  let page = 1;
-  const limit = 9;
-  let fineLista = false;
+        let page = 1;
+        const limit = 9;
+        let fineLista = false;
 
-  const modal = document.getElementById("modalFollow");
-  const modalList = document.getElementById("modalList");
-  const modalTitle = document.getElementById("modalTitle");
+        const modal = document.getElementById("modalFollow");
+        const modalList = document.getElementById("modalList");
+        const modalTitle = document.getElementById("modalTitle");
 
-  modalTitle.textContent = tipo === "followers" ? "Follower" : "Seguiti";
-  modalList.innerHTML = "";
+        modalTitle.textContent = tipo === "followers" ? "Follower" : "Seguiti";
+        modalList.innerHTML = "";
 
-  const loadMoreBtn = document.createElement("button");
-  loadMoreBtn.textContent = "Carica altri";
-  loadMoreBtn.className = "btn";
-  loadMoreBtn.style.display = "none"; // Nascondi inizialmente
-  loadMoreBtn.style.margin = "10px auto 0 auto";
-  loadMoreBtn.style.backgroundColor = "white";
-  loadMoreBtn.style.color = "black";
-  loadMoreBtn.style.border = "1px solid #ccc";
-  loadMoreBtn.style.cursor = "pointer";
-  loadMoreBtn.style.padding = "8px 16px";
-  loadMoreBtn.style.borderRadius = "5px";
-  loadMoreBtn.style.fontSize = "1rem";
+        const loadMoreBtn = document.createElement("button");
+        loadMoreBtn.textContent = "Carica altri";
+        loadMoreBtn.className = "btn";
+        loadMoreBtn.style.display = "none"; // Nascondi inizialmente
+        loadMoreBtn.style.margin = "10px auto 0 auto";
+        loadMoreBtn.style.backgroundColor = "white";
+        loadMoreBtn.style.color = "black";
+        loadMoreBtn.style.border = "1px solid #ccc";
+        loadMoreBtn.style.cursor = "pointer";
+        loadMoreBtn.style.padding = "8px 16px";
+        loadMoreBtn.style.borderRadius = "5px";
+        loadMoreBtn.style.fontSize = "1rem";
 
-  // Appendiamo subito il bottone sotto la lista (prima che si aggiungano i li)
-  modalList.appendChild(loadMoreBtn);
+        // Appendiamo subito il bottone sotto la lista (prima che si aggiungano i li)
+        modalList.appendChild(loadMoreBtn);
 
-  async function caricaUtenti() {
-    if (fineLista) return;
+        async function caricaUtenti() {
+          if (fineLista) return;
 
-    const endpoint =
-      tipo === "followers"
-        ? `/api/user/${userId}/followers?page=${page}&limit=${limit}`
-        : `/api/user/${userId}/following?page=${page}&limit=${limit}`;
+          const endpoint =
+            tipo === "followers"
+              ? `/api/user/${userId}/followers?page=${page}&limit=${limit}`
+              : `/api/user/${userId}/following?page=${page}&limit=${limit}`;
 
-    const res = await fetch(endpoint, { credentials: "include" });
-    if (!res.ok) {
-      alert("Errore caricando la lista.");
-      return;
-    }
+          const res = await fetch(endpoint, { credentials: "include" });
+          if (!res.ok) {
+            alert("Errore caricando la lista.");
+            return;
+          }
 
-    const data = await res.json();
-    const users = tipo === "followers" ? data.followers : data.following;
+          const data = await res.json();
+          const users = tipo === "followers" ? data.followers : data.following;
 
-    if (!Array.isArray(users) || users.length === 0) {
-      fineLista = true;
-      if (page === 1) {
-        const li = document.createElement("li");
-        li.textContent = "Nessun utente trovato.";
-        // Inserisci il messaggio prima del bottone
-        modalList.insertBefore(li, loadMoreBtn);
+          if (!Array.isArray(users) || users.length === 0) {
+            fineLista = true;
+            if (page === 1) {
+              const li = document.createElement("li");
+              li.textContent = "Nessun utente trovato.";
+              // Inserisci il messaggio prima del bottone
+              modalList.insertBefore(li, loadMoreBtn);
+            }
+            loadMoreBtn.style.display = "none"; // Nascondi bottone se non serve
+            return;
+          }
+
+          users.forEach((u) => {
+            const li = document.createElement("li");
+            li.style.display = "flex";
+            li.style.alignItems = "center";
+            li.style.gap = "10px";
+
+            const img = document.createElement("img");
+            img.src = `/api/user-photo/${u._id || u.id}`;
+            img.alt = "Foto profilo";
+            img.style.width = "32px";
+            img.style.height = "32px";
+            img.style.borderRadius = "50%";
+            img.style.objectFit = "cover";
+            img.onerror = () => {
+              img.src = "fotoprofilo.png";
+            };
+
+            const link = document.createElement("a");
+            link.href = `profile.html?id=${u._id || u.id}`;
+            link.textContent = `@${u.username}`;
+
+            li.appendChild(img);
+            li.appendChild(link);
+
+            // Aggiungi ogni utente prima del bottone (così il bottone rimane sempre in fondo)
+            modalList.insertBefore(li, loadMoreBtn);
+          });
+
+          page++;
+          // Nascondi il bottone se meno utenti di limit
+          loadMoreBtn.style.display = users.length < limit ? "none" : "block";
+        }
+
+        loadMoreBtn.onclick = caricaUtenti;
+
+        modal.style.display = "block";
+
+        await caricaUtenti(); // Carica i primi utenti
       }
-      loadMoreBtn.style.display = "none"; // Nascondi bottone se non serve
-      return;
-    }
-
-    users.forEach((u) => {
-      const li = document.createElement("li");
-      li.style.display = "flex";
-      li.style.alignItems = "center";
-      li.style.gap = "10px";
-
-      const img = document.createElement("img");
-      img.src = `/api/user-photo/${u._id || u.id}`;
-      img.alt = "Foto profilo";
-      img.style.width = "32px";
-      img.style.height = "32px";
-      img.style.borderRadius = "50%";
-      img.style.objectFit = "cover";
-      img.onerror = () => {
-        img.src = "fotoprofilo.png";
-      };
-
-      const link = document.createElement("a");
-      link.href = `profile.html?id=${u._id || u.id}`;
-      link.textContent = `@${u.username}`;
-
-      li.appendChild(img);
-      li.appendChild(link);
-
-      // Aggiungi ogni utente prima del bottone (così il bottone rimane sempre in fondo)
-      modalList.insertBefore(li, loadMoreBtn);
-    });
-
-    page++;
-    // Nascondi il bottone se meno utenti di limit
-    loadMoreBtn.style.display = users.length < limit ? "none" : "block";
-  }
-
-  loadMoreBtn.onclick = caricaUtenti;
-
-  modal.style.display = "block";
-
-  await caricaUtenti(); // Carica i primi 10
-}
-
-
 
       const modal = document.getElementById("modalFollow");
       const closeBtn = document.querySelector(".close-btn");
