@@ -75,87 +75,140 @@
   <h3>Visitati di recente</h3>
   <div id="recenti"></div>
 
-  <script>
-    const risultatiDiv = document.getElementById('risultati');
-    const recentiDiv = document.getElementById('recenti');
-    let utenteLoggato = null;
+  <!-- ... tuo codice HTML e CSS rimangono uguali ... -->
 
-    // Recupera l'utente attualmente loggato
-    fetch('/api/user', { credentials: 'include' })
+<script>
+  const risultatiDiv = document.getElementById('risultati');
+  const recentiDiv = document.getElementById('recenti');
+  let utenteLoggato = null;
+
+  let paginaCorrente = 1;
+  const limitePerPagina = 10;
+  let queryCorrente = "";
+  let fineLista = false;
+
+  // Bottone Carica altri
+  const loadMoreBtn = document.createElement("button");
+  loadMoreBtn.textContent = "Carica altri";
+  loadMoreBtn.className = "btn";
+  loadMoreBtn.style.display = "none";
+  loadMoreBtn.style.margin = "10px auto";
+  risultatiDiv.parentNode.insertBefore(loadMoreBtn, risultatiDiv.nextSibling);
+
+  // Recupera utente loggato
+  fetch('/api/user', { credentials: 'include' })
+    .then(res => res.json())
+    .then(user => {
+      utenteLoggato = user;
+    });
+
+  function salvaInCronologia(utente) {
+    fetch(`/api/visit-user/${utente.id}`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => {
+      mostraRecenti(); // aggiorna recenti
+    });
+  }
+
+  function creaDivUtente(user) {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <img src="${user.profilePicUrl}" width="40" height="40" onerror="this.src='fotoprofilo.png'">
+      <div>
+        <strong>${user.username}</strong>
+      </div>
+    `;
+    div.onclick = () => {
+      salvaInCronologia(user);
+      window.location.href = `/profile.html?id=${user.id}`;
+    };
+    return div;
+  }
+
+  function mostraRecenti() {
+    fetch('/api/recent-users', { credentials: 'include' })
       .then(res => res.json())
-      .then(user => {
-        utenteLoggato = user;
+      .then(recenti => {
+        recentiDiv.innerHTML = '';
+        recenti.forEach(user => {
+          const div = creaDivUtente(user);
+          recentiDiv.appendChild(div);
+        });
       });
+  }
 
-    function salvaInCronologia(utente) {
-  fetch(`/api/visit-user/${utente.id}`, {
-    method: 'POST',
-    credentials: 'include'
-  }).then(() => {
-    mostraRecenti(); // Ricarica i dati dal backend
-  });
-}
-
-
-    function creaDivUtente(user) {
-      const div = document.createElement('div');
-      div.innerHTML = `
-        <img src="${user.profilePicUrl}" width="40" height="40" onerror="this.src='fotoprofilo.png'">
-        <div>
-          <strong>${user.username}</strong>
-        </div>
-      `;
-      div.onclick = () => {
-        salvaInCronologia(user);
-        window.location.href = `/profile.html?id=${user.id}`;
-      };
-      return div;
+  async function cercaUtente(query, page = 1) {
+    if (query.length < 1) {
+      risultatiDiv.innerHTML = '';
+      loadMoreBtn.style.display = "none";
+      paginaCorrente = 1;
+      fineLista = false;
+      return;
     }
 
-    function mostraRecenti() {
-  fetch('/api/recent-users', { credentials: 'include' })
-    .then(res => res.json())
-    .then(recenti => {
-      recentiDiv.innerHTML = '';
-      recenti.forEach(user => {
-        const div = creaDivUtente(user);
-        recentiDiv.appendChild(div);
+    try {
+      const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}&page=${page}&limit=${limitePerPagina}`, {
+        credentials: 'include'
       });
-    });
-}
+      if (!res.ok) throw new Error("Errore nella ricerca");
+      const data = await res.json();
 
-
-    function cercaUtente(query) {
-      if (query.length < 1) {
+      // Se pagina 1, resetta lista e flag fineLista
+      if (page === 1) {
         risultatiDiv.innerHTML = '';
+        fineLista = false;
+      }
+
+      // Filtro per escludere utente loggato
+      const utentiFiltrati = utenteLoggato
+        ? data.filter(user => user.id !== utenteLoggato._id)
+        : data;
+
+      // Se nessun risultato e pagina 1, messaggio
+      if (utentiFiltrati.length === 0 && page === 1) {
+        risultatiDiv.innerHTML = '<p>Nessun utente trovato.</p>';
+        loadMoreBtn.style.display = "none";
+        fineLista = true;
         return;
       }
 
-      fetch(`/api/search-users?q=${encodeURIComponent(query)}`, {
-        credentials: 'include'
-      })
-      .then(res => res.json())
-      .then(data => {
-        risultatiDiv.innerHTML = '';
-        const utentiFiltrati = utenteLoggato
-          ? data.filter(user => user.id !== utenteLoggato._id)
-          : data;
-
-        utentiFiltrati.forEach(user => {
-          const div = creaDivUtente(user);
-          risultatiDiv.appendChild(div);
-        });
+      utentiFiltrati.forEach(user => {
+        const div = creaDivUtente(user);
+        risultatiDiv.appendChild(div);
       });
+
+      // Se meno risultati del limite significa fine lista
+      if (utentiFiltrati.length < limitePerPagina) {
+        fineLista = true;
+        loadMoreBtn.style.display = "none";
+      } else {
+        loadMoreBtn.style.display = "block";
+      }
+
+    } catch (error) {
+      console.error(error);
+      risultatiDiv.innerHTML = '<p>Errore nel caricamento dei risultati.</p>';
+      loadMoreBtn.style.display = "none";
     }
+  }
 
-    let timeout = null;
-    document.getElementById('searchInput').addEventListener('input', function () {
-      clearTimeout(timeout);
-      const query = this.value;
-      timeout = setTimeout(() => cercaUtente(query), 300);
-    });
+  loadMoreBtn.onclick = () => {
+    if (fineLista) return;
+    paginaCorrente++;
+    cercaUtente(queryCorrente, paginaCorrente);
+  };
 
-    mostraRecenti();
-  </script>
+  let timeout = null;
+  document.getElementById('searchInput').addEventListener('input', function () {
+    clearTimeout(timeout);
+    queryCorrente = this.value.trim();
+    paginaCorrente = 1;
+    timeout = setTimeout(() => cercaUtente(queryCorrente, paginaCorrente), 300);
+  });
+
+  mostraRecenti();
+</script>
+
 </body>
 </html>
