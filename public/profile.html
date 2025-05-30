@@ -234,7 +234,8 @@ window.onload = async function () {
     img.style.width = "32px";
     img.style.height = "32px";
     img.style.borderRadius = "50%";
-    img.style.object-fit =  cover;          
+    img.style.objectFit = "cover";
+      
     img.onerror = () => { img.src = "fotoprofilo.png"; };
 
     const link = document.createElement("a");
