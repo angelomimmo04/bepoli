@@ -44,6 +44,15 @@
       padding: 10px 0;
       border-bottom: 1px solid #ddd;
     }
+
+    #modalList li a {
+      text-decoration: none;
+      color: #0077cc;
+    }
+
+    #modalList li a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -215,7 +224,10 @@ window.onload = async function () {
         } else {
             users.forEach(u => {
                 const li = document.createElement("li");
-                li.textContent = `${u.nome} (@${u.username})`;
+                const link = document.createElement("a");
+                link.href = `profile.html?id=${u._id || u.id}`;
+                link.textContent = `@${u.username}`;
+                li.appendChild(link);
                 modalList.appendChild(li);
             });
         }
@@ -223,7 +235,6 @@ window.onload = async function () {
         modal.style.display = "block";
     }
 
-    // Chiusura modale
     const modal = document.getElementById("modalFollow");
     const closeBtn = document.querySelector(".close-btn");
 
@@ -238,4 +249,3 @@ window.onload = async function () {
 
 </body>
 </html>
-
