@@ -223,13 +223,28 @@ window.onload = async function () {
             modalList.appendChild(li);
         } else {
             users.forEach(u => {
-                const li = document.createElement("li");
-                const link = document.createElement("a");
-                link.href = `profile.html?id=${u._id || u.id}`;
-                link.textContent = `@${u.username}`;
-                li.appendChild(link);
-                modalList.appendChild(li);
-            });
+    const li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.alignItems = "center";
+    li.style.gap = "10px";
+
+    const img = document.createElement("img");
+    img.src = `/api/user-photo/${u._id || u.id}`;
+    img.alt = "Foto profilo";
+    img.style.width = "32px";
+    img.style.height = "32px";
+    img.style.borderRadius = "50%";
+    img.onerror = () => { img.src = "fotoprofilo.png"; };
+
+    const link = document.createElement("a");
+    link.href = `profile.html?id=${u._id || u.id}`;
+    link.textContent = `@${u.username}`;
+
+    li.appendChild(img);
+    li.appendChild(link);
+    modalList.appendChild(li);
+});
+
         }
 
         modal.style.display = "block";
