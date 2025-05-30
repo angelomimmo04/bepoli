@@ -167,3 +167,14 @@ main{
     font-weight: bold;
 }
 
+.btn.following {
+  background-color: gray;
+  color: white;
+}
+
+.btn.not-following {
+  background-color: blue;
+  color: white;
+}
+
+
