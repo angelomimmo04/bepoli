@@ -84,7 +84,7 @@
           <span id="followerCount" style="cursor:pointer;">Follower: 0</span>
           <span id="followingCount" style="cursor:pointer;">Seguiti: 0</span>
 
-          <a href="modificaprofilo.html" id="editBtn" class="btn" style="display:none;">Modifica profilo</a>
+          <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
           <button id="followBtn" class="btn" style="display:none;">Segui</button>
         </div>
 
@@ -110,29 +110,21 @@
 
     let isOwnProfile = false;
     let user;
-    let loggedUser;
 
     try {
-      // Fetch utente loggato sempre, serve per confronti e gestione follow
-      const loggedRes = await fetch("/api/user", {
-        credentials: "include",
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!loggedRes.ok) throw new Error("Non autenticato");
-      loggedUser = await loggedRes.json();
-
       if (id) {
-        // Profilo pubblico di un altro utente (o anche proprio ma con id esplicito)
         const res = await fetch(`/api/user-public/${id}`);
         if (!res.ok) throw new Error("Utente non trovato");
         user = await res.json();
-
-        // Controllo se è proprio profilo
-        isOwnProfile = loggedUser._id === (user._id || user.id);
+        isOwnProfile = false;
       } else {
-        // Profilo proprio (nessun id)
-        user = loggedUser;
+        const res = await fetch("/api/user", {
+          credentials: "include",
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) throw new Error("Non autenticato");
+        user = await res.json();
         isOwnProfile = true;
       }
     } catch (err) {
@@ -162,13 +154,14 @@
 
     if (isOwnProfile) {
       document.getElementById("editBtn").style.display = "inline-block";
-      document.getElementById("followBtn").style.display = "none";
     } else {
       document.getElementById("editBtn").style.display = "none";
 
-      const followBtn = document.getElementById("followBtn");
-      followBtn.style.display = "inline-block";
+      const followBtn = document.createElement("button");
+      followBtn.id = "followBtn";
+      followBtn.className = "btn";
       followBtn.textContent = "Caricamento...";
+      document.getElementById("social").appendChild(followBtn);
 
       try {
         const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
@@ -236,7 +229,7 @@
 
       modalList.appendChild(loadMoreBtn);
 
-      // Ottengo utente loggato dal sessionStorage
+      // Ottengo utente loggato
       const loggedUser = JSON.parse(sessionStorage.getItem("user")) || {};
 
       async function caricaUtenti() {
@@ -286,21 +279,20 @@
 
           const link = document.createElement("a");
 
-          // Link sempre con id, anche per profilo proprio
-          link.href = `profile.html?id=${u._id || u.id}`;
+          // Link al profilo proprio senza id se utente loggato
+          if (u._id === loggedUser._id) {
+            link.href = "profile.html";
+          } else {
+            link.href = `profile.html?id=${u._id || u.id}`;
+          }
           link.textContent = `@${u.username}`;
 
           li.appendChild(img);
           li.appendChild(link);
 
           if (u._id === loggedUser._id) {
-            // Bottone Modifica profilo
-            const editBtn = document.createElement("a");
-            editBtn.href = "modificaprofilo.html";
-            editBtn.textContent = "Modifica profilo";
-            editBtn.className = "btn";
-            editBtn.style.marginLeft = "auto";
-            li.appendChild(editBtn);
+            // Utente è se stesso, non mostriamo il bottone segui/smetti
+            // (eventualmente si potrebbe aggiungere il bottone Modifica profilo qui se serve)
           } else {
             // Bottone Segui/Smetti di seguire
             const followBtn = document.createElement("button");
