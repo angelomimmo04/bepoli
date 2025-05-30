@@ -1,16 +1,77 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="style-profilo.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="style-profilo.css" rel="stylesheet" />
   <title>Profilo utente</title>
+  <style>
+    /* Stili per la modale lista follow */
+    #followModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #followModal > div {
+      background: #fff;
+      border-radius: 8px;
+      width: 320px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #closeModal {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      line-height: 1;
+      color: #333;
+    }
+    #modalList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #modalList li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    #modalList img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+      border: 1px solid #ccc;
+    }
+    #modalList a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    #modalList a:hover {
+      color: #007bff;
+    }
+  </style>
 </head>
 <body>
 
 <header>
   <a href="prova18.html">
-    <img src="logobepoli.png" alt="Logo" id="logo">
+    <img src="logobepoli.png" alt="Logo" id="logo" />
   </a>
 </header>
 
@@ -27,17 +88,14 @@
 
 <div id="info">
   <div id="base">
-    <img src="fotoprofilo.png" alt="Profilo utente" id="profile">
+    <img src="fotoprofilo.png" alt="Profilo utente" id="profile" />
     <div id="gigi">
       <p id="username">loading...</p>
 
       <div id="social">
         <div><p>post: <span id="postCount">0</span></p></div>
-<span id="followerCount" style="cursor:pointer;">0</span>
-<span id="followingCount" style="cursor:pointer;">0</span>
-
-
-
+        <span id="followerCount" style="cursor:pointer;">0</span>
+        <span id="followingCount" style="cursor:pointer;">0</span>
 
         <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
         <button id="followBtn" class="btn" style="display:none;">Segui</button>
@@ -49,138 +107,456 @@
   </div>
 </div>
 
+<!-- MODALE LISTA FOLLOW -->
+<div id="followModal">
+  <div>
+    <button id="closeModal" aria-label="Chiudi">&times;</button>
+    <h2 id="modalTitle" style="margin-bottom: 15px;">Lista</h2>
+    <ul id="modalList"></ul>
+  </div>
+</div>
+
 <script>
 window.onload = async function () {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-    let isOwnProfile = false;
-    let user;
+  let isOwnProfile = false;
+  let user;
 
-    try {
-        if (id) {
-            const res = await fetch(`/api/user-public/${id}`);
-            if (!res.ok) throw new Error("Utente non trovato");
-            user = await res.json();
-            isOwnProfile = false;
-        } else {
-            const res = await fetch('/api/user', {
-                credentials: 'include',
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (!res.ok) throw new Error("Non autenticato");
-            user = await res.json();
-            isOwnProfile = true;
-        }
-    } catch (err) {
-        alert("Utente non trovato o accesso non autorizzato.");
-        window.location.href = "login.html";
-        return;
-    }
-
-  document.getElementById("followerCount").onclick = () => apriListaFollow('followers', user._id || user.id);
-document.getElementById("followingCount").onclick = () => apriListaFollow('following', user._id || user.id);
-
-
-    document.title = user.username + "'s profile";
-    document.getElementById("name").textContent = user.nome;
-    document.getElementById("username").textContent = user.username;
-    document.getElementById("bio").textContent = user.bio || "Nessuna bio";
-  document.getElementById("followerCount").textContent = user.followersCount || 0;
-document.getElementById("followingCount").textContent = user.followingCount || 0;
-
-    const profileImg = document.getElementById("profile");
-    profileImg.src = `/api/user-photo/${user._id || user.id}`;
-    profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
-
-    if (isOwnProfile) {
-        document.getElementById("editBtn").style.display = "inline-block";
+  try {
+    if (id) {
+      const res = await fetch(`/api/user-public/${id}`);
+      if (!res.ok) throw new Error("Utente non trovato");
+      user = await res.json();
+      isOwnProfile = false;
     } else {
-        document.getElementById("editBtn").style.display = "none";
-
-        const followBtn = document.createElement("button");
-        followBtn.id = "followBtn";
-        followBtn.className = "btn";
-        followBtn.textContent = "Caricamento...";
-        document.getElementById("social").appendChild(followBtn);
-
-        try {
-            const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
-                credentials: 'include'
-            });
-            if (!followRes.ok) throw new Error("Errore fetching follow info");
-            const followData = await followRes.json();
-
-            if (followData.isFollowing) {
-    followBtn.textContent = "Smetti di seguire";
-    followBtn.classList.add("following");
-    followBtn.classList.remove("not-following");
-} else {
-    followBtn.textContent = "Segui";
-    followBtn.classList.add("not-following");
-    followBtn.classList.remove("following");
-}
-
-
-            followBtn.onclick = async () => {
-                const res = await fetch(`/api/follow/${user._id || user.id}`, {
-                    method: "POST",
-                    credentials: 'include',
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                const result = await res.json();
-                if (res.ok) {
-                    followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-                    document.getElementById("followerCount").textContent = result.followersCount || 0;
-
-                  if (result.following) {
-        followBtn.classList.add("following");
-        followBtn.classList.remove("not-following");
-    } else {
-        followBtn.classList.add("not-following");
-        followBtn.classList.remove("following");
+      const res = await fetch('/api/user', {
+        credentials: 'include',
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) throw new Error("Non autenticato");
+      user = await res.json();
+      isOwnProfile = true;
     }
-
-
-                } else {
-                    alert("Errore: " + result.message);
-                }
-            };
-        } catch (error) {
-            console.error("Errore stato follow", error);
-            followBtn.textContent = "Errore";
-        }
-    }
-
-    
-    const { _id, nome, username, bio } = user;
-    sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
-
-  async function apriListaFollow(tipo, userId) {
-  const endpoint = tipo === "followers"
-    ? `/api/user/${userId}/followers`
-    : `/api/user/${userId}/following`;
-
-  const res = await fetch(endpoint, { credentials: "include" });
-  if (!res.ok) {
-    alert("Errore caricando la lista.");
+  } catch (err) {
+    alert("Utente non trovato o accesso non autorizzato.");
+    window.location.href = "login.html";
     return;
   }
-  const users = await res.json();
 
-  // esempio semplice: alert elenco utenti (meglio creare un modal)
-  alert(users.map(u => `${u.nome} (@${u.username})`).join("\n"));
-}
+  document.title = user.username + "'s profile";
+  document.getElementById("name").textContent = user.nome;
+  document.getElementById("username").textContent = user.username;
+  document.getElementById("bio").textContent = user.bio || "Nessuna bio";
+  document.getElementById("followerCount").textContent = user.followersCount || 0;
+  document.getElementById("followingCount").textContent = user.followingCount || 0;
 
-}; 
+  const profileImg = document.getElementById("profile");
+  profileImg.src = `/api/user-photo/${user._id || user.id}`;
+  profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
 
+  if (isOwnProfile) {
+    document.getElementById("editBtn").style.display = "inline-block";
+  } else {
+    document.getElementById("editBtn").style.display = "none";
+
+    const followBtn = document.getElementById("followBtn");
+    followBtn.style.display = "inline-block";
+    followBtn.textContent = "Caricamento...";
+
+    try {
+      const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
+        credentials: 'include'
+      });
+      if (!followRes.ok) throw new Error("Errore fetching follow info");
+      const followData = await followRes.json();
+
+      if (followData.isFollowing) {
+        followBtn.textContent = "Smetti di seguire";
+        followBtn.classList.add("following");
+        followBtn.classList.remove("not-following");
+      } else {
+        followBtn.textContent = "Segui";
+        followBtn.classList.add("not-following");
+        followBtn.classList.remove("following");
+      }
+
+      followBtn.onclick = async () => {
+        const res = await fetch(`/api/follow/${user._id || user.id}`, {
+          method: "POST",
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
+          document.getElementById("followerCount").textContent = result.followersCount || 0;
+
+          if (result.following) {
+            followBtn.classList.add("following");
+            followBtn.classList.remove("not-following");
+          } else {
+            followBtn.classList.add("not-following");
+            followBtn.classList.remove("following");
+          }
+        } else {
+          alert("Errore: " + result.message);
+        }
+      };
+    } catch (error) {
+      console.error("Errore stato follow", error);
+      followBtn.textContent = "Errore";
+    }
+  }
+
+  // Salvo info utente in sessionStorage (se serve)
+  const { _id, nome, username, bio } = user;
+  sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
+
+  // Funzione apriListaFollow aggiornata per modale
+  async function apriListaFollow(tipo, userId) {
+    const endpoint = tipo === "followers"
+      ? `/api/user/${userId}/followers`
+      : `/api/user/${userId}/following`;
+
+    const res = await fetch(endpoint, { credentials: "include" });
+    if (!res.ok) {
+      alert("Errore caricando la lista.");
+      return;
+    }
+    const users = await res.json();
+
+    const modal = document.getElementById("followModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalList = document.getElementById("modalList");
+
+    modalTitle.textContent = tipo === "followers" ? "Follower" : "Seguiti";
+    modalList.innerHTML = "";
+
+    users.forEach(user => {
+      const li = document.createElement("li");
+
+      const img = document.createElement("img");
+      img.src = user.profilePicUrl || "/fotoprofilo.png";
+      img.alt = user.username;
+
+      const a = document.createElement("a");
+      a.href = `/profile.html?id=${user.id || user._id}`;
+      a.textContent = `${user.nome} (@${user.username})`;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+
+      li.appendChild(img);
+      li.appendChild(a);
+      modalList.appendChild(li);
+    });
+
+    modal.style.display = "flex";
+  }
+
+  // Event listeners per aprire la modale
+  document.getElementById("followerCount").onclick = () => apriListaFollow("followers", user._id || user.id);
+  document.getElementById("followingCount").onclick = () => apriListaFollow("following", user._id || user.id);
+
+  // Chiudi modale cliccando sulla X o fuori dalla modale
+  const modal = document.getElementById("followModal");
+  document.getElementById("closeModal").onclick = () => {
+    modal.style.display = "none";
+  };
+  window.onclick = function(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+
+};
 </script>
 
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="style-profilo.css" rel="stylesheet" />
+  <title>Profilo utente</title>
+  <style>
+    /* Stili per la modale lista follow */
+    #followModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #followModal > div {
+      background: #fff;
+      border-radius: 8px;
+      width: 320px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #closeModal {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      line-height: 1;
+      color: #333;
+    }
+    #modalList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #modalList li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    #modalList img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+      border: 1px solid #ccc;
+    }
+    #modalList a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    #modalList a:hover {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
 
+<header>
+  <a href="prova18.html">
+    <img src="logobepoli.png" alt="Logo" id="logo" />
+  </a>
+</header>
+
+<nav class="leftnav" id="mainnav">
+  <ul>
+    <li><a href="prova18.html">home</a></li>
+    <li><a href="#">messaggi</a></li>
+    <li><a href="#">notifiche</a></li>
+    <li><a href="#">esplora</a></li>
+    <li><a href="profile.html">profilo</a></li>
+    <li><a href="#">crea</a></li>
+  </ul>
+</nav>
+
+<div id="info">
+  <div id="base">
+    <img src="fotoprofilo.png" alt="Profilo utente" id="profile" />
+    <div id="gigi">
+      <p id="username">loading...</p>
+
+      <div id="social">
+        <div><p>post: <span id="postCount">0</span></p></div>
+        <span id="followerCount" style="cursor:pointer;">0</span>
+        <span id="followingCount" style="cursor:pointer;">0</span>
+
+        <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
+        <button id="followBtn" class="btn" style="display:none;">Segui</button>
+      </div>
+
+      <h1 id="name">nome utente</h1>
+      <p id="bio">Bio utente</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE LISTA FOLLOW -->
+<div id="followModal">
+  <div>
+    <button id="closeModal" aria-label="Chiudi">&times;</button>
+    <h2 id="modalTitle" style="margin-bottom: 15px;">Lista</h2>
+    <ul id="modalList"></ul>
+  </div>
+</div>
+
+<script>
+window.onload = async function () {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  let isOwnProfile = false;
+  let user;
+
+  try {
+    if (id) {
+      const res = await fetch(`/api/user-public/${id}`);
+      if (!res.ok) throw new Error("Utente non trovato");
+      user = await res.json();
+      isOwnProfile = false;
+    } else {
+      const res = await fetch('/api/user', {
+        credentials: 'include',
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) throw new Error("Non autenticato");
+      user = await res.json();
+      isOwnProfile = true;
+    }
+  } catch (err) {
+    alert("Utente non trovato o accesso non autorizzato.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  document.title = user.username + "'s profile";
+  document.getElementById("name").textContent = user.nome;
+  document.getElementById("username").textContent = user.username;
+  document.getElementById("bio").textContent = user.bio || "Nessuna bio";
+  document.getElementById("followerCount").textContent = user.followersCount || 0;
+  document.getElementById("followingCount").textContent = user.followingCount || 0;
+
+  const profileImg = document.getElementById("profile");
+  profileImg.src = `/api/user-photo/${user._id || user.id}`;
+  profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
+
+  if (isOwnProfile) {
+    document.getElementById("editBtn").style.display = "inline-block";
+  } else {
+    document.getElementById("editBtn").style.display = "none";
+
+    const followBtn = document.getElementById("followBtn");
+    followBtn.style.display = "inline-block";
+    followBtn.textContent = "Caricamento...";
+
+    try {
+      const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
+        credentials: 'include'
+      });
+      if (!followRes.ok) throw new Error("Errore fetching follow info");
+      const followData = await followRes.json();
+
+      if (followData.isFollowing) {
+        followBtn.textContent = "Smetti di seguire";
+        followBtn.classList.add("following");
+        followBtn.classList.remove("not-following");
+      } else {
+        followBtn.textContent = "Segui";
+        followBtn.classList.add("not-following");
+        followBtn.classList.remove("following");
+      }
+
+      followBtn.onclick = async () => {
+        const res = await fetch(`/api/follow/${user._id || user.id}`, {
+          method: "POST",
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
+          document.getElementById("followerCount").textContent = result.followersCount || 0;
+
+          if (result.following) {
+            followBtn.classList.add("following");
+            followBtn.classList.remove("not-following");
+          } else {
+            followBtn.classList.add("not-following");
+            followBtn.classList.remove("following");
+          }
+        } else {
+          alert("Errore: " + result.message);
+        }
+      };
+    } catch (error) {
+      console.error("Errore stato follow", error);
+      followBtn.textContent = "Errore";
+    }
+  }
+
+  // Salvo info utente in sessionStorage (se serve)
+  const { _id, nome, username, bio } = user;
+  sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
+
+  // Funzione apriListaFollow aggiornata per modale
+  async function apriListaFollow(tipo, userId) {
+    const endpoint = tipo === "followers"
+      ? `/api/user/${userId}/followers`
+      : `/api/user/${userId}/following`;
+
+    const res = await fetch(endpoint, { credentials: "include" });
+    if (!res.ok) {
+      alert("Errore caricando la lista.");
+      return;
+    }
+    const users = await res.json();
+
+    const modal = document.getElementById("followModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalList = document.getElementById("modalList");
+
+    modalTitle.textContent = tipo === "followers" ? "Follower" : "Seguiti";
+    modalList.innerHTML = "";
+
+    users.forEach(user => {
+      const li = document.createElement("li");
+
+      const img = document.createElement("img");
+      img.src = user.profilePicUrl || "/fotoprofilo.png";
+      img.alt = user.username;
+
+      const a = document.createElement("a");
+      a.href = `/profile.html?id=${user.id || user._id}`;
+      a.textContent = `${user.nome} (@${user.username})`;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+
+      li.appendChild(img);
+      li.appendChild(a);
+      modalList.appendChild(li);
+    });
+
+    modal.style.display = "flex";
+  }
+
+  // Event listeners per aprire la modale
+  document.getElementById("followerCount").onclick = () => apriListaFollow("followers", user._id || user.id);
+  document.getElementById("followingCount").onclick = () => apriListaFollow("following", user._id || user.id);
+
+  // Chiudi modale cliccando sulla X o fuori dalla modale
+  const modal = document.getElementById("followModal");
+  document.getElementById("closeModal").onclick = () => {
+    modal.style.display = "none";
+  };
+  window.onclick = function(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+
+};
+</script>
 
 </body>
 </html>
