@@ -33,8 +33,11 @@
 
       <div id="social">
         <div><p>post: <span id="postCount">0</span></p></div>
-<div><p>follower: <span id="followerCount">0</span></p></div>
-<div><p>seguiti: <span id="followingCount">0</span></p></div>
+<span id="followerCount" style="cursor:pointer;">0</span>
+<span id="followingCount" style="cursor:pointer;">0</span>
+
+
+
 
         <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
         <button id="followBtn" class="btn" style="display:none;">Segui</button>
@@ -75,6 +78,10 @@ window.onload = async function () {
         window.location.href = "login.html";
         return;
     }
+
+  document.getElementById("followerCount").onclick = () => apriListaFollow('followers', user._id || user.id);
+document.getElementById("followingCount").onclick = () => apriListaFollow('following', user._id || user.id);
+
 
     document.title = user.username + "'s profile";
     document.getElementById("name").textContent = user.nome;
