@@ -32,9 +32,10 @@
       <p id="username">loading...</p>
 
       <div id="social">
-        <div><p id="postCount">post</p></div>
-        <div><p id="followerCount">follower</p></div>
-        <div><p id="followingCount">seguiti</p></div>
+        <div><p>post: <span id="postCount">0</span></p></div>
+<div><p>follower: <span id="followerCount">0</span></p></div>
+<div><p>seguiti: <span id="followingCount">0</span></p></div>
+
         <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
         <button id="followBtn" class="btn" style="display:none;">Segui</button>
       </div>
@@ -116,8 +117,9 @@ window.onload = async function () {
                 const result = await res.json();
                 if (res.ok) {
                     followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-                    document.getElementById("followerCount").textContent = result.followersCount;
-                    document.getElementById("followingCount").textContent = result.followingCount;
+                    document.getElementById("followerCount").textContent = result.followersCount || 0;
+document.getElementById("followingCount").textContent = result.followingCount || 0;
+
                 } else {
                     alert("Errore: " + result.message);
                 }
