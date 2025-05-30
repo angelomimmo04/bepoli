@@ -286,19 +286,28 @@ app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
 // ℹ️ Info follow
 app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
   const viewerId = req.session.user.id;
+  const targetId = req.params.id;
+
   try {
-    const target = await Utente.findById(req.params.id);
+    const [viewer, target] = await Promise.all([
+      Utente.findById(viewerId),
+      Utente.findById(targetId)
+    ]);
     if (!target) return res.status(404).json({ message: "Utente non trovato" });
+    if (!viewer) return res.status(404).json({ message: "Utente viewer non trovato" });
+
+    const isFollowing = viewer.following.includes(target._id);
 
     res.json({
       followersCount: target.followers.length,
       followingCount: target.following.length,
-      isFollowing: target.followers.includes(viewerId)
+      isFollowing
     });
   } catch {
     res.status(500).json({ message: "Errore follow-info" });
   }
 });
+
 
 // 👤 Utente autenticato
 app.get("/api/user", checkFingerprint, async (req, res) => {
