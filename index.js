@@ -284,6 +284,48 @@ app.get("/api/recent-users", checkFingerprint, async (req, res) => {
 });
 
 
+// 🔽 Lista dei follower
+app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
+  try {
+    const user = await Utente.findById(req.params.id).populate("followers", "nome username _id");
+    if (!user) return res.status(404).json({ message: "Utente non trovato" });
+
+    const list = user.followers.map(u => ({
+      id: u._id,
+      nome: u.nome,
+      username: u.username,
+      profilePicUrl: `/api/user-photo/${u._id}`
+    }));
+
+    res.json(list);
+  } catch {
+    res.status(500).json({ message: "Errore nel recupero follower" });
+  }
+});
+
+// 🔼 Lista dei seguiti
+app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
+  try {
+    const user = await Utente.findById(req.params.id).populate("following", "nome username _id");
+    if (!user) return res.status(404).json({ message: "Utente non trovato" });
+
+    const list = user.following.map(u => ({
+      id: u._id,
+      nome: u.nome,
+      username: u.username,
+      profilePicUrl: `/api/user-photo/${u._id}`
+    }));
+
+    res.json(list);
+  } catch {
+    res.status(500).json({ message: "Errore nel recupero following" });
+  }
+});
+
+
+
+
+
 
 // 👤 Profilo pubblico
 app.get("/api/user-public/:id", async (req, res) => {
