@@ -483,6 +483,113 @@ app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
   });
 });
 
+// POST RICCARDO 9
+app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res) => {
+  try {
+    const newPost = new Post({
+      userId: req.session.user.id,
+      desc: req.body.desc,
+      image: req.file ? {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      } : null,
+      likes: [],
+      comments: []
+    });
+
+    await newPost.save();
+    res.status(201).json({ message: "Post creato con successo" });
+  } catch (err) {
+    console.error("Errore creazione post:", err);
+    res.status(500).json({ message: "Errore creazione post" });
+  }
+});
+
+
+
+
+
+// === SCHEMA POST ===
+const postSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
+  desc: String,
+  image: {
+    data: Buffer,
+    contentType: String
+  },
+  createdAt: { type: Date, default: Date.now },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
+  comments: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
+      text: String,
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
+});
+
+const Post = mongoose.model("Post", postSchema);
+
+app.get("/api/posts", async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("userId", "username nome");
+
+    res.json(posts.map(post => ({
+      _id: post._id,
+      userId: post.userId.username,
+      desc: post.desc,
+      createdAt: post.createdAt,
+      imageUrl: post.image?.data
+        ? `/api/post-image/${post._id}`
+        : null,
+      likes: post.likes.length,
+      comments: post.comments.length
+    })));
+  } catch {
+    res.status(500).json({ message: "Errore caricamento post" });
+  }
+});
+
+app.get("/api/post-image/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (post?.image?.data) {
+      res.contentType(post.image.contentType);
+      res.send(post.image.data);
+    } else {
+      res.status(404).send("Nessuna immagine");
+    }
+  } catch {
+    res.status(500).send("Errore immagine");
+  }
+});
+
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "home9.html"));
+});
+
+
+/////////FINE POST RICCARDO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // --- Avvio server ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
