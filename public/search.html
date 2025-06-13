@@ -1,96 +1,136 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Search</title>
-  <link rel="icon" href="https://raw.githubusercontent.com/angelomimmo04/bepoli/refs/heads/master/public/logobepoli.png">
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f7f9fc;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
+    <meta charset="UTF-8" />
+    <title>Search</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/angelomimmo04/bepoli/refs/heads/master/public/logobepoli.png">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
 
-    h2, h3 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
+        h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
 
-    input[type="text"] {
-      width: 100%;
-      max-width: 400px;
-      padding: 12px 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      transition: border 0.2s ease;
-    }
+        input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: border 0.2s ease;
+        }
 
-    input[type="text"]:focus {
-      border-color: #3498db;
-      outline: none;
-    }
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
 
-    #risultati div, #recenti div {
-      background-color: #fff;
-      border: 1px solid #e1e4e8;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin: 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: box-shadow 0.2s ease, transform 0.1s ease;
-    }
+        #risultati div, #recenti div {
+            background-color: #fff;
+            border: 1px solid #e1e4e8;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, transform 0.1s ease;
+        }
 
-    #risultati div:hover, #recenti div:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      transform: translateY(-2px);
-    }
+        #risultati div:hover, #recenti div:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
 
-    img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-    }
+        img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
 
-    #risultati strong, #recenti strong {
-      font-size: 16px;
-      color: #2c3e50;
-    }
+        #risultati strong, #recenti strong {
+            font-size: 16px;
+            color: #2c3e50;
+        }
 
-    button.btn {
-      padding: 10px 20px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      display: block;
-    }
+        button.btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+        }
 
-    button.btn:hover {
-      background-color: #2980b9;
-    }
-  </style>
+        button.btn:hover {
+            background-color: #2980b9;
+        }
+
+        @media (max-width: 768px) {
+            body{
+
+                body {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 10px;
+                }
+
+                h2, h3 {
+                    text-align: center;
+                    width: 100%;
+                }
+
+                input[type="text"] {
+                    width: 90%;
+                }
+
+                #risultati div, #recenti div {
+                    width: 100%;
+                    max-width: 90vw;
+                }
+
+                button.btn {
+                    width: 90%;
+                }
+
+
+            }
+
+            #risultati div, #recenti div {
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+            }
+
+
+        }
+    </style>
 </head>
 <body>
-  <h2>Cerca Utente</h2>
-  <input type="text" id="searchInput" placeholder="Scrivi un username..." autocomplete="off" />
-  <div id="risultati"></div>
+<h2>Cerca Utente</h2>
+<input type="text" id="searchInput" placeholder="Scrivi un username..." autocomplete="off" />
+<div id="risultati"></div>
 
-  <h3>Visitati di recente</h3>
-  <div id="recenti"></div>
+<h3>Visitati di recente</h3>
+<div id="recenti"></div>
 
-  <script>
+<script>
     const risultatiDiv = document.getElementById('risultati');
     const recentiDiv = document.getElementById('recenti');
     let utenteLoggato = null;
@@ -108,156 +148,158 @@
     risultatiDiv.parentNode.insertBefore(loadMoreBtn, risultatiDiv.nextSibling);
 
     fetch('/api/user', { credentials: 'include' })
-      .then(res => {
-        if (!res.ok) throw new Error("Non autenticato");
-        return res.json();
-      })
-      .then(user => {
-        utenteLoggato = user;
-      })
-      .catch(() => {
-        utenteLoggato = null;
-      });
+        .then(res => {
+            if (!res.ok) throw new Error("Non autenticato");
+            return res.json();
+        })
+        .then(user => {
+            utenteLoggato = user;
+        })
+        .catch(() => {
+            utenteLoggato = null;
+        });
 
     function salvaInCronologia(utente) {
-      fetch(`/api/visit-user/${utente.id}`, {
-        method: 'POST',
-        credentials: 'include'
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Errore salvataggio cronologia");
-        mostraRecenti();
-      })
-      .catch(console.error);
+        fetch(`/api/visit-user/${utente.id}`, {
+            method: 'POST',
+            credentials: 'include'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Errore salvataggio cronologia");
+                mostraRecenti();
+            })
+            .catch(console.error);
     }
 
     function creaDivUtente(user) {
-      const div = document.createElement('div');
-      div.innerHTML = `
+        const div = document.createElement('div');
+        div.innerHTML = `
         <img src="${user.profilePicUrl || 'fotoprofilo.png'}" onerror="this.src='fotoprofilo.png'">
         <div>
           <strong>${user.username}</strong>
         </div>
       `;
-      div.onclick = () => {
-        salvaInCronologia(user);
-        window.location.href = `/profile.html?id=${user.id}`;
-      };
-      return div;
+        div.onclick = () => {
+            salvaInCronologia(user);
+            window.location.href = `/profile.html?id=${user.id}`;
+        };
+        return div;
     }
 
     function mostraRecenti() {
-      fetch('/api/recent-users', { credentials: 'include' })
-        .then(res => {
-          if (!res.ok) throw new Error("Errore nel caricamento recenti");
-          return res.json();
-        })
-        .then(recenti => {
-          recentiDiv.innerHTML = '';
-          if (!Array.isArray(recenti)) {
-            console.warn("Risposta recenti non è un array", recenti);
-            return;
-          }
-          recenti.forEach(user => {
-            const div = creaDivUtente(user);
-            recentiDiv.appendChild(div);
-          });
-        })
-        .catch(err => {
-          console.error("Errore nel caricamento dei recenti:", err);
-        });
+        fetch('/api/recent-users', { credentials: 'include' })
+            .then(res => {
+                if (!res.ok) throw new Error("Errore nel caricamento recenti");
+                return res.json();
+            })
+            .then(recenti => {
+                recentiDiv.innerHTML = '';
+                if (!Array.isArray(recenti)) {
+                    console.warn("Risposta recenti non è un array", recenti);
+                    return;
+                }
+                recenti.forEach(user => {
+                    const div = creaDivUtente(user);
+                    recentiDiv.appendChild(div);
+                });
+            })
+            .catch(err => {
+                console.error("Errore nel caricamento dei recenti:", err);
+            });
     }
 
     async function cercaUtente(query, page = 1) {
-      if (query.length < 1) {
-        risultatiDiv.innerHTML = '';
-        loadMoreBtn.style.display = "none";
-        paginaCorrente = 1;
-        fineLista = false;
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}&page=${page}&limit=${limitePerPagina}`, {
-          credentials: 'include'
-        });
-
-        if (!res.ok) {
-          if (res.status === 401) {
-            risultatiDiv.innerHTML = '<p>Devi effettuare il login per cercare utenti.</p>';
-          } else {
-            risultatiDiv.innerHTML = '<p>Errore nella ricerca (codice ' + res.status + ')</p>';
-          }
-          loadMoreBtn.style.display = "none";
-          fineLista = true;
-          return;
+        if (query.length < 1) {
+            risultatiDiv.innerHTML = '';
+            loadMoreBtn.style.display = "none";
+            paginaCorrente = 1;
+            fineLista = false;
+            return;
         }
 
-        const data = await res.json();
-        let utenti = [];
+        try {
+            const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}&page=${page}&limit=${limitePerPagina}`, {
+                credentials: 'include'
+            });
 
-        if (Array.isArray(data)) {
-          utenti = data;
-        } else if (Array.isArray(data.results)) {
-          utenti = data.results;
-        } else {
-          console.warn("Risposta inattesa:", data);
-          risultatiDiv.innerHTML = '<p>Risposta inattesa dal server.</p>';
-          loadMoreBtn.style.display = "none";
-          fineLista = true;
-          return;
+            if (!res.ok) {
+                if (res.status === 401) {
+                    risultatiDiv.innerHTML = '<p>Devi effettuare il login per cercare utenti.</p>';
+                } else {
+                    risultatiDiv.innerHTML = '<p>Errore nella ricerca (codice ' + res.status + ')</p>';
+                }
+                loadMoreBtn.style.display = "none";
+                fineLista = true;
+                return;
+            }
+
+            const data = await res.json();
+            let utenti = [];
+
+            if (Array.isArray(data)) {
+                utenti = data;
+            } else if (Array.isArray(data.results)) {
+                utenti = data.results;
+            } else {
+                console.warn("Risposta inattesa:", data);
+                risultatiDiv.innerHTML = '<p>Risposta inattesa dal server.</p>';
+                loadMoreBtn.style.display = "none";
+                fineLista = true;
+                return;
+            }
+
+            if (page === 1) {
+                risultatiDiv.innerHTML = '';
+                fineLista = false;
+            }
+
+            const utentiFiltrati = utenteLoggato
+                ? utenti.filter(user => user.id !== utenteLoggato._id && user.id !== utenteLoggato.id)
+                : utenti;
+
+            if (utentiFiltrati.length === 0 && page === 1) {
+                risultatiDiv.innerHTML = '<p>Nessun utente trovato.</p>';
+                loadMoreBtn.style.display = "none";
+                fineLista = true;
+                return;
+            }
+
+            utentiFiltrati.forEach(user => {
+                const div = creaDivUtente(user);
+                risultatiDiv.appendChild(div);
+            });
+
+            if (utentiFiltrati.length < limitePerPagina) {
+                fineLista = true;
+                loadMoreBtn.style.display = "none";
+            } else {
+                loadMoreBtn.style.display = "block";
+            }
+
+        } catch (error) {
+            console.error(error);
+            risultatiDiv.innerHTML = '<p>Errore nel caricamento dei risultati.</p>';
+            loadMoreBtn.style.display = "none";
         }
-
-        if (page === 1) {
-          risultatiDiv.innerHTML = '';
-          fineLista = false;
-        }
-
-        const utentiFiltrati = utenteLoggato
-          ? utenti.filter(user => user.id !== utenteLoggato._id && user.id !== utenteLoggato.id)
-          : utenti;
-
-        if (utentiFiltrati.length === 0 && page === 1) {
-          risultatiDiv.innerHTML = '<p>Nessun utente trovato.</p>';
-          loadMoreBtn.style.display = "none";
-          fineLista = true;
-          return;
-        }
-
-        utentiFiltrati.forEach(user => {
-          const div = creaDivUtente(user);
-          risultatiDiv.appendChild(div);
-        });
-
-        if (utentiFiltrati.length < limitePerPagina) {
-          fineLista = true;
-          loadMoreBtn.style.display = "none";
-        } else {
-          loadMoreBtn.style.display = "block";
-        }
-
-      } catch (error) {
-        console.error(error);
-        risultatiDiv.innerHTML = '<p>Errore nel caricamento dei risultati.</p>';
-        loadMoreBtn.style.display = "none";
-      }
     }
 
     loadMoreBtn.onclick = () => {
-      if (fineLista) return;
-      paginaCorrente++;
-      cercaUtente(queryCorrente, paginaCorrente);
+        if (fineLista) return;
+        paginaCorrente++;
+        cercaUtente(queryCorrente, paginaCorrente);
     };
 
     let timeout = null;
     document.getElementById('searchInput').addEventListener('input', function () {
-      clearTimeout(timeout);
-      queryCorrente = this.value.trim();
-      paginaCorrente = 1;
-      timeout = setTimeout(() => cercaUtente(queryCorrente, paginaCorrente), 300);
+        clearTimeout(timeout);
+        queryCorrente = this.value.trim();
+        paginaCorrente = 1;
+        timeout = setTimeout(() => cercaUtente(queryCorrente, paginaCorrente), 300);
     });
 
     mostraRecenti();
-  </script>
+</script>
+
+
 </body>
 </html>
