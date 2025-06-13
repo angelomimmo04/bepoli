@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulazione Home Feed con Creazione Post</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">BePoli</div>
+    <nav class="nav">
+      <a href="#">Profilo</a>
+      <a href="#" class="active">Home</a>
+      <a href="#">Logout</a>
+    </nav>
+  </header>
+
+  <!-- ===== FORM PER CREARE UN NUOVO POST ===== -->
+  <section class="create-post-section">
+    <form id="createPostForm" enctype="multipart/form-data">
+      <textarea
+        id="postDescInput"
+        name="desc"
+        placeholder="Scrivi una didascalia..."
+        maxlength="500"
+        rows="3"
+      ></textarea>
+      <div class="file-input-wrapper">
+        <input type="file" id="postImageInput" name="image" accept="image/*" />
+      </div>
+      <button type="submit" class="post-submit-button">Pubblica</button>
+    </form>
+    <div id="createPostError" class="error-message hidden"></div>
+  </section>
+
+  <!-- ===== FEED CONTENITORE ===== -->
+  <main class="feed-container" id="feed">
+    <!-- I post verranno inseriti qui dinamicamente -->
+  </main>
+
+  <!-- ===== TEMPLATE POST ===== -->
+  <template id="post-template">
+    <article class="post-card">
+      <header class="post-header">
+        <div class="post-user-info">
+          <div class="post-user-avatar"></div>
+          <span class="post-username">Username</span>
+        </div>
+        <time class="post-date" datetime="">Data</time>
+      </header>
+
+      <div class="post-image-container">
+        <img class="post-image" src="" alt="Immagine del post" />
+      </div>
+
+      <div class="post-actions">
+        <button class="like-button">❤ <span class="like-count">0</span></button>
+        <button class="comment-toggle-button">💬 <span class="comment-count">0</span></button>
+      </div>
+
+      <div class="post-description">
+        <p class="post-desc-text"></p>
+      </div>
+
+      <div class="comment-section hidden">
+        <ul class="comments-list"></ul>
+        <form class="comment-form">
+          <input
+            type="text"
+            class="comment-input"
+            placeholder="Scrivi un commento..."
+            maxlength="200"
+          />
+          <button type="submit" class="comment-submit">Invia</button>
+        </form>
+      </div>
+    </article>
+  </template>
+
+  <script src="main.js"></script>
+</body>
+</html>
