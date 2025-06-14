@@ -14,6 +14,26 @@ const { OAuth2Client } = require("google-auth-library");
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
 
+
+//PARTE RICCARDO 9 
+const path = require("path");
+const multer = require("multer");
+const fs = require("fs"); // 👈 aggiunta nuova
+
+// 👇 questo blocco crea la cartella per le immagini
+const uploadsPath = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
+
+
+
+//FINE RICCARDO 9
+
+
+
+
 const app = express();
 app.set('trust proxy', 1);
 
