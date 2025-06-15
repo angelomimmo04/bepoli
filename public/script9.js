@@ -1,6 +1,3 @@
-const samplePosts = [
-    ];
-
 document.getElementById('createPostForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -60,7 +57,3 @@ async function caricaPost() {
 
 window.addEventListener('DOMContentLoaded', caricaPost);
 
-
-    window.addEventListener("DOMContentLoaded", () => {
-      loadSamplePosts();
-    });
