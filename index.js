@@ -18,13 +18,10 @@ const client = new OAuth2Client(CLIENT_ID);
 //PARTE RICCARDO 9 
 const path = require("path");
 const multer = require("multer");
-const fs = require("fs"); // 👈 aggiunta nuova
 
-// 👇 questo blocco crea la cartella per le immagini
-const uploadsPath = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadsPath)) {
-  fs.mkdirSync(uploadsPath, { recursive: true });
-}
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 
 
 
@@ -551,7 +548,7 @@ app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res
       userId: req.session.user.id,
       desc: req.body.desc,
       image: req.file ? {
-        path: `/uploads/${req.file.filename}`,
+        data: req.file.buffer,
         contentType: req.file.mimetype
       } : null,
       likes: [],
@@ -565,6 +562,8 @@ app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res
     res.status(500).json({ message: "Errore creazione post" });
   }
 });
+
+
 
 
 
@@ -591,7 +590,7 @@ const postSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
   desc: String,
   image: {
-    path: String,
+    path: Buffer,
     contentType: String
   },
   createdAt: { type: Date, default: Date.now },
@@ -640,12 +639,15 @@ app.get("/api/posts", async (req, res) => {
       userId: post.userId.username,
       desc: post.desc,
       createdAt: post.createdAt,
-      imageUrl: post.image?.data
-        ? `/api/post-image/${post._id}`
-        : null,
+      imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
       likes: post.likes.length,
       comments: post.comments.length
     })));
+  } catch {
+    res.status(500).json({ message: "Errore caricamento post" });
+  }
+});
+
 
 
 app.get("/api/post-image/:id", async (req, res) => {
