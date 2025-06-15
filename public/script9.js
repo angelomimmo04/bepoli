@@ -1,139 +1,65 @@
 const samplePosts = [
     ];
 
-    const postTemplate = document.getElementById("post-template");
-    const feedContainer = document.getElementById("feed");
-    const createPostForm = document.getElementById("createPostForm");
-    const postDescInput = document.getElementById("postDescInput");
-    const postImageInput = document.getElementById("postImageInput");
-    const createPostError = document.getElementById("createPostError");
+document.getElementById('createPostForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    function loadSamplePosts() {
-      feedContainer.innerHTML = "";
-      samplePosts.forEach(post => {
-        const postEl = createPostElement(post);
-        feedContainer.appendChild(postEl);
-      });
-    }
+  const form = e.target;
+  const formData = new FormData(form);
 
-    function createPostElement(post) {
-      const clone = postTemplate.content.cloneNode(true);
-      const postCard = clone.querySelector(".post-card");
-      const usernameEl = postCard.querySelector(".post-username");
-      const dateEl = postCard.querySelector(".post-date");
-      const postImg = postCard.querySelector(".post-image");
-      const descEl = postCard.querySelector(".post-desc-text");
-      const likeBtn = postCard.querySelector(".like-button");
-      const likeCountEl = postCard.querySelector(".like-count");
-      const commentToggleBtn = postCard.querySelector(".comment-toggle-button");
-      const commentCountEl = postCard.querySelector(".comment-count");
-      const commentSection = postCard.querySelector(".comment-section");
-      const commentsList = postCard.querySelector(".comments-list");
-      const commentForm = postCard.querySelector(".comment-form");
-      const commentInput = postCard.querySelector(".comment-input");
-
-      usernameEl.textContent = post.userId;
-      const dt = new Date(post.createdAt);
-      dateEl.textContent = dt.toLocaleString("it-IT", {
-        day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
-      });
-      dateEl.setAttribute("datetime", post.createdAt);
-
-      postImg.src = post.Image;
-      postImg.alt = post.desc;
-
-      descEl.textContent = post.desc;
-
-      likeCountEl.textContent = post.likes.length;
-      commentCountEl.textContent = post.comments.length;
-
-      likeBtn.addEventListener("click", () => {
-        const user = "simulatedUser";
-        if (post.likes.includes(user)) {
-          post.likes = post.likes.filter(id => id !== user);
-        } else {
-          post.likes.push(user);
-        }
-        likeCountEl.textContent = post.likes.length;
-      });
-
-      commentToggleBtn.addEventListener("click", () => {
-        commentSection.classList.toggle("hidden");
-      });
-
-      commentForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const text = commentInput.value.trim();
-        if (!text) return;
-        const newComment = { userId: "simulatedUser", text, createdAt: new Date().toISOString() };
-        post.comments.push(newComment);
-        commentCountEl.textContent = post.comments.length;
-
-        const li = document.createElement("li");
-        const authorSpan = document.createElement("span");
-        authorSpan.textContent = newComment.userId;
-        authorSpan.classList.add("comment-author");
-        const textSpan = document.createElement("span");
-        textSpan.textContent = newComment.text;
-        li.appendChild(authorSpan);
-        li.appendChild(textSpan);
-        commentsList.prepend(li);
-        commentInput.value = "";
-      });
-
-      return postCard;
-    }
-
-    createPostForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      createPostError.classList.add("hidden");
-      createPostError.textContent = "";
-
-      const desc = postDescInput.value.trim();
-      const file = postImageInput.files[0];
-
-      if (!desc && !file) {
-        createPostError.textContent = "Inserisci descrizione o seleziona un'immagine.";
-        createPostError.classList.remove("hidden");
-        return;
-      }
-
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const base64Image = event.target.result;
-          const newPost = {
-            _id: Date.now().toString(),
-            userId: "simulatedUser",
-            createdAt: new Date().toISOString(),
-            desc: desc,
-            Image: base64Image,
-            likes: [],
-            comments: []
-          };
-          samplePosts.unshift(newPost);
-          const newPostEl = createPostElement(newPost);
-          feedContainer.prepend(newPostEl);
-          postDescInput.value = "";
-          postImageInput.value = "";
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const newPost = {
-          _id: Date.now().toString(),
-          userId: "simulatedUser",
-          createdAt: new Date().toISOString(),
-          desc: desc,
-          Image: "",
-          likes: [],
-          comments: []
-        };
-        samplePosts.unshift(newPost);
-        const newPostEl = createPostElement(newPost);
-        feedContainer.prepend(newPostEl);
-        postDescInput.value = "";
-      }
+  try {
+    const res = await fetch('/api/posts', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
     });
+
+    const data = await res.json();
+    if (res.ok) {
+      form.reset();
+      caricaPost(); // aggiorna il feed
+    } else {
+      alert(data.message || 'Errore nella creazione del post');
+    }
+  } catch (err) {
+    alert('Errore di rete');
+  }
+});
+
+async function caricaPost() {
+  try {
+    const res = await fetch('/api/posts', { credentials: 'include' });
+    const posts = await res.json();
+
+    const feed = document.getElementById('feed');
+    const template = document.getElementById('post-template');
+    feed.innerHTML = ''; // svuota il contenitore
+
+    posts.forEach(post => {
+      const clone = template.content.cloneNode(true);
+
+      clone.querySelector('.post-username').textContent = post.userId;
+      clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
+      clone.querySelector('.post-desc-text').textContent = post.desc;
+      clone.querySelector('.like-count').textContent = post.likes;
+      clone.querySelector('.comment-count').textContent = post.comments;
+
+      const imageEl = clone.querySelector('.post-image');
+      if (post.imageUrl) {
+        imageEl.src = post.imageUrl;
+      } else {
+        imageEl.style.display = 'none';
+      }
+
+      feed.appendChild(clone);
+    });
+  } catch (err) {
+    console.error('Errore nel caricamento post:', err);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', caricaPost);
+
 
     window.addEventListener("DOMContentLoaded", () => {
       loadSamplePosts();
