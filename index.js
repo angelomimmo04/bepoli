@@ -590,7 +590,7 @@ const postSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
   desc: String,
   image: {
-    path: Buffer,
+    data: Buffer,
     contentType: String
   },
   createdAt: { type: Date, default: Date.now },
