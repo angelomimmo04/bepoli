@@ -101,17 +101,6 @@ const Utente = mongoose.model("Utente", utenteSchema);
 
 
 // prova salvataggio riccardo 9
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  }
-});
-
-const upload = multer({ storage });
 
 //fine riccardo9
 
