@@ -2,6 +2,7 @@
   "name": "loginform",
   "version": "1.0.0",
   "description": "Once you clone it make sure you run 'npm install' to install all libraries mentioned in package.json.",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -36,4 +37,5 @@
   },
   "homepage": "https://github.com/angelomimmo04/bepoli#readme"
 }
+
 
