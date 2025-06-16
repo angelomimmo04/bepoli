@@ -128,7 +128,7 @@ async function inviaDatiUtente() {
         const { id, username, nome } = payload;
 
         // 3. Invia i dati al sito esterno
-        const response = await fetch("https://bepoliby-1-2.onrender.com/", {
+        const response = await fetch("https://bepoliby-1-2.onrender.com/api/ricevi-dati", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
