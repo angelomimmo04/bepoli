@@ -18,6 +18,37 @@ const { OAuth2Client } = require("google-auth-library");
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
 
+
+
+
+
+
+const jwt = require('jsonwebtoken');
+
+app.get("/api/auth-token", checkFingerprint, (req, res) => {
+  if (!req.session.user) return res.status(401).json({ message: "Non autenticato" });
+
+  const payload = {
+    id: req.session.user.id,
+    username: req.session.user.username,
+    nome: req.session.user.nome
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "15m" // valido per 15 minuti
+  });
+
+  res.json({ token });
+});
+
+
+
+
+
+
+
+
+
 // === PARTE RICCARDO 9 ===
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
