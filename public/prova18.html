@@ -113,7 +113,7 @@ async function inviaDatiUtente() {
         // 1. Richiedi il JWT al tuo backend
         const res = await fetch("/api/auth-token", {
             method: "GET",
-            credentials: "include" // invia cookie di sessione
+            credentials: "include"
         });
 
         if (!res.ok) {
@@ -122,26 +122,36 @@ async function inviaDatiUtente() {
         }
 
         const { token } = await res.json();
-
-        // 2. Decodifica il JWT per ottenere i dati
         const payload = JSON.parse(atob(token.split('.')[1]));
         const { id, username, nome } = payload;
 
-        // 3. Invia i dati al sito esterno
-        const response = await fetch("https://bepoliby-1-2.onrender.com/api/ricevi-dati", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // opzionale, se il sito esterno lo verifica
-            },
-            body: JSON.stringify({ id, username, nome })
-        });
+        // 2. Apri il sito esterno in una nuova finestra
+        const popup = window.open("https://bepoliby-1-2.onrender.com", "_blank");
 
-        if (response.ok) {
-            console.log("Dati inviati al sito esterno con successo.");
-        } else {
-            console.error("Errore nell'invio al sito esterno.");
-        }
+        // 3. Aspetta che la finestra sia pronta e invia i dati
+        const sendMessage = () => {
+            if (popup && !popup.closed) {
+                popup.postMessage(
+                    {
+                        type: "inviaDatiUtente",
+                        dati: { id, username, nome, token }
+                    },
+                    "https://bepoliby-1-2.onrender.com"
+                );
+                console.log("✅ Dati inviati tramite postMessage");
+            } else {
+                console.error("❌ La finestra è stata chiusa prima dell'invio.");
+            }
+        };
+
+        // Aspetta che la finestra carichi prima di inviare
+        const interval = setInterval(() => {
+            if (popup.document?.readyState === "complete") {
+                clearInterval(interval);
+                sendMessage();
+            }
+        }, 300);
+
     } catch (err) {
         console.error("Errore:", err);
     }
