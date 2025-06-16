@@ -35,7 +35,7 @@ async function caricaPost() {
     posts.forEach(post => {
       const clone = template.content.cloneNode(true);
 
-      clone.querySelector('.post-username').textContent = post.userId;
+      clone.querySelector('.post-username').textContent = `${post.userId?.nome} (@${post.userId?.username})`;
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
       clone.querySelector('.like-count').textContent = post.likes;
