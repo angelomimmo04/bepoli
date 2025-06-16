@@ -27,6 +27,7 @@ async function caricaPost() {
   try {
     const res = await fetch('/api/posts', { credentials: 'include' });
     const posts = await res.json();
+    console.log(posts);
 
     const feed = document.getElementById('feed');
     const template = document.getElementById('post-template');
