@@ -636,7 +636,10 @@ app.get("/api/posts", async (req, res) => {
 
     res.json(posts.map(post => ({
       _id: post._id,
-      userId: post.userId.username,
+      userId: {
+        username: post.userId.username,
+        nome:post.userId.nome
+      },
       desc: post.desc,
       createdAt: post.createdAt,
       imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
