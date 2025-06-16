@@ -4,8 +4,8 @@
   "description": "Once you clone it make sure you run 'npm install' command to install all libraries mention in package.json file.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
-  },
+    "start": "nodemon index.js"
+  },//serve.js
   "author": "",
   "license": "ISC",
   "dependencies": {
