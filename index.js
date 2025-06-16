@@ -25,21 +25,7 @@ const client = new OAuth2Client(CLIENT_ID);
 
 const jwt = require('jsonwebtoken');
 
-app.get("/api/auth-token", checkFingerprint, (req, res) => {
-  if (!req.session.user) return res.status(401).json({ message: "Non autenticato" });
 
-  const payload = {
-    id: req.session.user.id,
-    username: req.session.user.username,
-    nome: req.session.user.nome
-  };
-
-  const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "15m" // valido per 15 minuti
-  });
-
-  res.json({ token });
-});
 
 
 
@@ -150,6 +136,37 @@ app.get("/csrf-token", (req, res, next) => {
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/login.html"));
 });
+
+
+
+//PASSAGGIO DATI
+app.get("/api/auth-token", checkFingerprint, (req, res) => {
+  if (!req.session.user) return res.status(401).json({ message: "Non autenticato" });
+
+  const payload = {
+    id: req.session.user.id,
+    username: req.session.user.username,
+    nome: req.session.user.nome
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "15m" // valido per 15 minuti
+  });
+
+  res.json({ token });
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 // 🔐 Login tradizionale
 app.post("/login", csrfProtection, async (req, res) => {
