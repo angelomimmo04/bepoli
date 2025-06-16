@@ -656,7 +656,6 @@ app.get("/", (req, res) => {
 
 
 
-
 await newPost.save();
 console.log("✅ Post salvato:", {
   desc: newPost.desc,
@@ -664,6 +663,7 @@ console.log("✅ Post salvato:", {
   hasImage: !!newPost.image?.data
 });
 res.status(201).json({ message: "Post creato con successo" });
+
 
 /////////FINE POST RICCARDO
 
