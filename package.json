@@ -1,10 +1,10 @@
 {
   "name": "loginform",
   "version": "1.0.0",
-  "description": "Once you clone it make sure you run 'npm install' command to install all libraries mention in package.json file.",
+  "description": "Once you clone it make sure you run 'npm install' to install all libraries mentioned in package.json.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,7 +17,6 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
-    "express.js": "^1.0.0",
     "google-auth-library": "^9.15.1",
     "helmet": "^8.1.0",
     "knex": "^0.95.6",
@@ -37,3 +36,4 @@
   },
   "homepage": "https://github.com/angelomimmo04/bepoli#readme"
 }
+
