@@ -2,7 +2,7 @@
   "name": "loginform",
   "version": "1.0.0",
   "description": "Once you clone it make sure you run 'npm install' command to install all libraries mention in package.json file.",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
   },
