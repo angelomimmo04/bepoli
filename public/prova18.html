@@ -109,52 +109,44 @@
 
 
 async function inviaDatiUtente() {
-    try {
-        // 1. Richiedi il JWT al tuo backend
-        const res = await fetch("/api/auth-token", {
-            method: "GET",
-            credentials: "include"
-        });
+  try {
+    // 1. Apri il sito 2 in una nuova finestra
+    const sito2 = window.open("https://bepoliby-1-2.onrender.com", "_blank");
 
-        if (!res.ok) {
-            console.error("Utente non autenticato");
-            return;
-        }
-
-        const { token } = await res.json();
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const { id, username, nome } = payload;
-
-        // 2. Apri il sito esterno in una nuova finestra
-        const popup = window.open("https://bepoliby-1-2.onrender.com", "_blank");
-
-        // 3. Aspetta che la finestra sia pronta e invia i dati
-        const sendMessage = () => {
-            if (popup && !popup.closed) {
-                popup.postMessage(
-                    {
-                        type: "inviaDatiUtente",
-                        dati: { id, username, nome, token }
-                    },
-                    "https://bepoliby-1-2.onrender.com"
-                );
-                console.log("✅ Dati inviati tramite postMessage");
-            } else {
-                console.error("❌ La finestra è stata chiusa prima dell'invio.");
-            }
-        };
-
-        // Aspetta che la finestra carichi prima di inviare
-        const interval = setInterval(() => {
-            if (popup.document?.readyState === "complete") {
-                clearInterval(interval);
-                sendMessage();
-            }
-        }, 300);
-
-    } catch (err) {
-        console.error("Errore:", err);
+    if (!sito2) {
+      console.error("La finestra è stata bloccata dal browser.");
+      return;
     }
+
+    // 2. Recupera il JWT
+    const res = await fetch("/api/auth-token", {
+      method: "GET",
+      credentials: "include"
+    });
+
+    if (!res.ok) {
+      console.error("Utente non autenticato.");
+      return;
+    }
+
+    const { token } = await res.json();
+
+    // 3. Decodifica il JWT
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const { id, username, nome } = payload;
+
+    // 4. Invia i dati alla finestra del sito2 usando postMessage (dopo breve attesa)
+    setTimeout(() => {
+      sito2.postMessage({
+        type: "inviaDatiUtente",
+        dati: { id, username, nome, token }
+      }, "https://bepoliby-1-2.onrender.com");
+    }, 1000); // tempo per permettere al sito2 di caricare
+
+  } catch (err) {
+    console.error("Errore:", err);
+  }
+}
 }
 
 
