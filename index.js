@@ -656,13 +656,7 @@ app.get("/", (req, res) => {
 
 
 
-await newPost.save();
-console.log("✅ Post salvato:", {
-  desc: newPost.desc,
-  image: newPost.image,
-  hasImage: !!newPost.image?.data
-});
-res.status(201).json({ message: "Post creato con successo" });
+
 
 
 /////////FINE POST RICCARDO
