@@ -14,22 +14,10 @@ const { OAuth2Client } = require("google-auth-library");
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
 
-
-//PARTE RICCARDO 9 
-const path = require("path");
-const multer = require("multer");
-
+// === PARTE RICCARDO 9 ===
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
-
-
-
-
-//FINE RICCARDO 9
-
-
-
+// === FINE PARTE RICCARDO 9 ===
 
 const app = express();
 app.set('trust proxy', 1);
