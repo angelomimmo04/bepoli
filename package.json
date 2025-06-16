@@ -38,4 +38,8 @@
   "homepage": "https://github.com/angelomimmo04/bepoli#readme"
 }
 
+"dependencies": {
+  "jsonwebtoken": "^9.0.0" 
+}
+
 
