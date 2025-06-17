@@ -52,3 +52,13 @@
     .comment-input { flex-grow: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
     .comment-submit { padding: 6px 12px; background-color: #0073e6; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
     .comment-submit:hover { background-color: #005bb5; }
+
+    /* caricamento foto 
+    .camera-hint {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.3rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      }
+
