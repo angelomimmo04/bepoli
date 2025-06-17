@@ -42,6 +42,8 @@ const upload = multer({ storage });
 
 const app = express();
 app.set('trust proxy', 1);
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // --- Funzione Fingerprint ---
 function getFingerprint(req) {
