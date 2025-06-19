@@ -69,39 +69,37 @@ async function caricaPost() {
       });
 
       // === Commenti ===
+          // === Commenti ===
       const commentToggleBtn = clone.querySelector('.comment-toggle-button');
       const commentSection = clone.querySelector('.comment-section');
-      commentToggleBtn.addEventListener('click', async () => {
-      commentSection.classList.toggle('hidden');
-
-      if (!commentSection.classList.contains('hidden') && commentsList.children.length === 0) {
-      try {
-      const res = await fetch(`/api/posts/${post._id}/comments`, {
-      credentials: 'include'
-      });
-      const allComments = await res.json();
-
-      allComments.forEach(c => {
-        const li = document.createElement('li');
-        const u = c.userId;
-        const autore = u?.nome ? `${u.nome} (@${u.username})` : "Utente";
-        const data = new Date(c.createdAt).toLocaleString('it-IT');
-        li.textContent = `${autore}: ${c.text} – ${data}`;
-        commentsList.appendChild(li);
-        });
-        } catch (err) {
-        console.error('Errore nel caricamento commenti:', err);
-        }
-        }
-        });
-
-        
-      });
-
+      const commentsList = clone.querySelector('.comments-list');
       const commentForm = clone.querySelector('.comment-form');
       const commentInput = clone.querySelector('.comment-input');
-      const commentsList = clone.querySelector('.comments-list');
       const commentCountEl = clone.querySelector('.comment-count');
+
+      commentToggleBtn.addEventListener('click', async () => {
+        commentSection.classList.toggle('hidden');
+
+        if (!commentSection.classList.contains('hidden') && commentsList.children.length === 0) {
+          try {
+            const res = await fetch(`/api/posts/${post._id}/comments`, {
+              credentials: 'include'
+            });
+            const allComments = await res.json();
+
+            allComments.forEach(c => {
+              const li = document.createElement('li');
+              const u = c.userId;
+              const autore = u?.nome ? `${u.nome} (@${u.username})` : "Utente";
+              const data = new Date(c.createdAt).toLocaleString('it-IT');
+              li.textContent = `${autore}: ${c.text} – ${data}`;
+              commentsList.appendChild(li);
+            });
+          } catch (err) {
+            console.error('Errore nel caricamento commenti:', err);
+          }
+        }
+      });
 
       commentForm.addEventListener('submit', async e => {
         e.preventDefault();
@@ -132,9 +130,8 @@ async function caricaPost() {
         }
       });
 
-      // Appendiamo il clone SOLO dopo aver aggiunto gli event listener
       feed.appendChild(clone);
-    });
+    }); // ✅ questa chiude posts.forEach
 
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
