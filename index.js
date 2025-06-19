@@ -756,25 +756,23 @@ app.post("/api/posts/:id/comment", async (req, res) => {
     post.comments.push(newComment);
     await post.save();
 
-    // Recupera info dell'utente dal DB
-    const user = await User.findById(req.session.user.id).select('nome username');
+    const lastComment = post.comments[post.comments.length - 1];
+
+    const populated = await Post.populate(lastComment, {
+      path: "userId",
+      select: "nome username"
+    });
 
     res.json({
       comments: post.comments.length,
-      newComment: {
-        text: newComment.text,
-        createdAt: newComment.createdAt,
-        userId: {
-          nome: user.nome,
-          username: user.username
-        }
-      }
+      newComment: populated
     });
   } catch (err) {
     console.error("Errore commento:", err);
     res.status(500).json({ message: "Errore commento" });
   }
 });
+
 
 
 
