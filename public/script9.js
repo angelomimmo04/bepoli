@@ -46,92 +46,54 @@ async function caricaPost() {
       clone.querySelector('.comment-count').textContent = post.comments;
 
       const imageEl = clone.querySelector('.post-image');
-      if (post.imageUrl) {
-        imageEl.src = post.imageUrl;
-      } else {
-        imageEl.style.display = 'none';
-      }
+  if (post.imageUrl) imageEl.src = post.imageUrl;
+  else imageEl.style.display = 'none';
 
+  // Event listener devono usare questa clone **prima** dell’append
+  const likeButton = clone.querySelector('.like-button');
+  likeButton.addEventListener('click', async () => {
+    // gestione like...
+  });
 
+  const commentToggleBtn = clone.querySelector('.comment-toggle-button');
+  const commentSection = clone.querySelector('.comment-section');
+  commentToggleBtn.addEventListener('click', () => commentSection.classList.toggle('hidden'));
 
-          // === Gestione LIKE ===
-      const likeButton = clone.querySelector('.like-button');
-const likeCount = clone.querySelector(".like-count");
-likeButton.addEventListener('click', async () => {
-  try {
-    const res = await fetch(`/api/posts/${post._id}/like`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-    if (res.ok) {
+  const commentForm = clone.querySelector('.comment-form');
+  const commentInput = clone.querySelector('.comment-input');
+  const commentsList = clone.querySelector('.comments-list');
+  const commentCountEl = clone.querySelector('.comment-count');
+
+  commentForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const text = commentInput.value.trim();
+    if (!text) return;
+    try {
+      const res = await fetch(`/api/posts/${post._id}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ text })
+      });
       const updated = await res.json();
-      likeCount.textContent = updated.likes;
+      commentInput.value = '';
+      commentCountEl.textContent = updated.comments;
+      if (updated.newComment) {
+        const li = document.createElement('li');
+        const u = updated.newComment.userId;
+        const autore = u?.nome ? `${u.nome} (@${u.username})` : "Utente";
+        const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
+        li.textContent = `${autore}: ${updated.newComment.text} – ${data}`;
+        commentsList.appendChild(li);
+      }
+    } catch (err) {
+      console.error('Errore commento:', err);
     }
-  } catch (err) {
-    console.error('Errore like:', err);
-  }
+  });
+
+  // Solo adesso appendi il clone al DOM
+  feed.appendChild(clone);
 });
-
-
-      // === Toggle commenti ===
-      const commentToggleBtn = clone.querySelector('.comment-toggle-button');
-      const commentSection = clone.querySelector('.comment-section');
-      commentToggleBtn.addEventListener('click', () => {
-        commentSection.classList.toggle('hidden');
-      });
-
-      // === Invio commento ===
-      const commentForm = clone.querySelector('.comment-form');
-      const commentInput = clone.querySelector('.comment-input');
-      const commentsList = clone.querySelector('.comments-list');
-
-
-      if (post.commentsData && post.commentsData.length > 0) {
-      post.commentsData.forEach(comment => {
-      const li = document.createElement('li');
-      const user = comment.userId;
-      const autore = user?.nome ? `${user.nome} (@${user.username})` : "Utente";
-      const data = new Date(comment.createdAt).toLocaleString('it-IT');
-      li.textContent = `${autore}: ${comment.text} - ${data}`;
-      commentsList.appendChild(li);
-      });
-      }  
-
-
-
-      commentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const text = commentInput.value.trim();
-        if (!text) return;
-
-        try {
-          const res = await fetch(`/api/posts/${post._id}/comment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ text })
-          });
-
-          if (res.ok) {
-            const updated = await res.json();
-            commentInput.value = '';
-            commentToggleBtn.querySelector('.comment-count').textContent = updated.comments;
-            // aggiorna lista commenti (opzionale)
-            if (updated.newComment) {
-            const li = document.createElement('li');
-            const user = updated.newComment.userId;
-            const autore = user?.nome ? `${user.nome} (@${user.username})` : "Utente";
-            const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
-            li.textContent = `${autore}: ${updated.newComment.text} - ${data}`;
-            commentsList.appendChild(li);
-            }
-          }
-        } catch (err) {
-          console.error('Errore commento:', err);
-        }
-      });
-            feed.appendChild(clone);
-    });
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
   }
