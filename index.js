@@ -736,14 +736,29 @@ app.post("/api/posts/:id/comment", async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post non trovato" });
 
-    post.comments.push({
+    const newComment = {
       text: req.body.text,
       userId: req.session.user.id,
       createdAt: new Date()
-    });
+    };
 
+    post.comments.push(newComment);
     await post.save();
-    res.json({ comments: post.comments.length });
+
+    // Recupera info dell'utente dal DB
+    const user = await User.findById(req.session.user.id).select('nome username');
+
+    res.json({
+      comments: post.comments.length,
+      newComment: {
+        text: newComment.text,
+        createdAt: newComment.createdAt,
+        userId: {
+          nome: user.nome,
+          username: user.username
+        }
+      }
+    });
   } catch (err) {
     console.error("Errore commento:", err);
     res.status(500).json({ message: "Errore commento" });
