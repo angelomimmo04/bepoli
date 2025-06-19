@@ -52,8 +52,19 @@ async function caricaPost() {
   // Event listener devono usare questa clone **prima** dell’append
   const likeButton = clone.querySelector('.like-button');
   likeButton.addEventListener('click', async () => {
-    // gestione like...
-  });
+  try {
+    const res = await fetch(`/api/posts/${post._id}/like`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      likeButton.querySelector('.like-count').textContent = updated.likes;
+    }
+  } catch (err) {
+    console.error('Errore like:', err);
+  }
+});
 
   const commentToggleBtn = clone.querySelector('.comment-toggle-button');
   const commentSection = clone.querySelector('.comment-section');
