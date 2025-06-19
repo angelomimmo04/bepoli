@@ -663,24 +663,35 @@ app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("userId", "username nome");
+      .populate("userId", "username nome")
+      .populate("comments.userId", "username nome");
 
     res.json(posts.map(post => ({
       _id: post._id,
       userId: {
         username: post.userId.username,
-        nome:post.userId.nome
+        nome: post.userId.nome
       },
       desc: post.desc,
       createdAt: post.createdAt,
       imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
       likes: post.likes.length,
-      comments: post.comments.length
+      comments: post.comments.length,
+      commentsData: post.comments.map(comment => ({
+        text: comment.text,
+        createdAt: comment.createdAt,
+        userId: {
+          username: comment.userId?.username,
+          nome: comment.userId?.nome
+        }
+      }))
     })));
-  } catch {
+  } catch (err) {
+    console.error("Errore caricamento post:", err);
     res.status(500).json({ message: "Errore caricamento post" });
   }
 });
+
 
 
 
