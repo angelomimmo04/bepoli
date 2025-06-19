@@ -54,6 +54,59 @@ async function caricaPost() {
 
       feed.appendChild(clone);
     });
+
+          // === Gestione LIKE ===
+      const likeButton = clone.querySelector('.like-button');
+      likeButton.addEventListener('click', async () => {
+        try {
+          const res = await fetch(`/api/posts/${post._id}/like`, {
+            method: 'POST',
+            credentials: 'include'
+          });
+          if (res.ok) {
+            const updated = await res.json();
+            likeButton.querySelector('.like-count').textContent = updated.likes;
+          }
+        } catch (err) {
+          console.error('Errore like:', err);
+        }
+      });
+
+      // === Toggle commenti ===
+      const commentToggleBtn = clone.querySelector('.comment-toggle-button');
+      const commentSection = clone.querySelector('.comment-section');
+      commentToggleBtn.addEventListener('click', () => {
+        commentSection.classList.toggle('hidden');
+      });
+
+      // === Invio commento ===
+      const commentForm = clone.querySelector('.comment-form');
+      const commentInput = clone.querySelector('.comment-input');
+      const commentsList = clone.querySelector('.comments-list');
+
+      commentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = commentInput.value.trim();
+        if (!text) return;
+
+        try {
+          const res = await fetch(`/api/posts/${post._id}/comment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ text })
+          });
+
+          if (res.ok) {
+            const updated = await res.json();
+            commentInput.value = '';
+            commentToggleBtn.querySelector('.comment-count').textContent = updated.comments;
+            // aggiorna lista commenti (opzionale)
+          }
+        } catch (err) {
+          console.error('Errore commento:', err);
+        }
+      });
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
   }
