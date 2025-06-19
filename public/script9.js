@@ -85,6 +85,19 @@ likeButton.addEventListener('click', async () => {
       const commentInput = clone.querySelector('.comment-input');
       const commentsList = clone.querySelector('.comments-list');
 
+
+      if (post.comments && post.comments.length > 0) {
+      post.comments.forEach(comment => {
+      const li = document.createElement('li');
+      const user = comment.userId;
+      const autore = user?.nome ? `${user.nome} (@${user.username})` : "Utente";
+      const data = new Date(comment.createdAt).toLocaleString('it-IT');
+      li.textContent = `${autore}: ${comment.text} - ${data}`;
+      commentsList.appendChild(li);
+      });
+      }
+
+
       commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const text = commentInput.value.trim();
