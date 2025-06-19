@@ -103,6 +103,14 @@ likeButton.addEventListener('click', async () => {
             commentInput.value = '';
             commentToggleBtn.querySelector('.comment-count').textContent = updated.comments;
             // aggiorna lista commenti (opzionale)
+            if (updated.newComment) {
+            const li = document.createElement('li');
+            const user = updated.newComment.userId;
+            const autore = user?.nome ? `${user.nome} (@${user.username})` : "Utente";
+            const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
+            li.textContent = `${autore}: ${updated.newComment.text} - ${data}`;
+            commentsList.appendChild(li);
+            }
           }
         } catch (err) {
           console.error('Errore commento:', err);
