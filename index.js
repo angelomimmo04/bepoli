@@ -773,6 +773,21 @@ app.post("/api/posts/:id/comment", async (req, res) => {
   }
 });
 
+app.get("/api/posts/:id/comments", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate('comments.userId', 'nome username');
+
+    if (!post) return res.status(404).json({ message: "Post non trovato" });
+
+    res.json(post.comments);
+  } catch (err) {
+    console.error("Errore caricamento commenti:", err);
+    res.status(500).json({ message: "Errore commenti" });
+  }
+});
+
+
 
 
 
