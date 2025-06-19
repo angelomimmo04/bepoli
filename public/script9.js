@@ -38,7 +38,7 @@ async function caricaPost() {
 
         const nomeUtente = post.userId?.nome || "Nome mancante";
         const usernameUtente = post.userId?.username || "username";
-
+// imposta dati post
       clone.querySelector('.post-username').textContent = `${post.userId?.nome} (@${post.userId?.username})`;
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
@@ -52,26 +52,26 @@ async function caricaPost() {
         imageEl.style.display = 'none';
       }
 
-      feed.appendChild(clone);
-    });
+
 
           // === Gestione LIKE ===
       const likeButton = clone.querySelector('.like-button');
-      const likeCount = clone.querySelector(".like-count");
-      likeButton.addEventListener('click', async () => {
-        try {
-          const res = await fetch(`/api/posts/${post._id}/like`, {
-            method: 'POST',
-            credentials: 'include'
-          });
-          if (res.ok) {
-            const updated = await res.json();
-            likeButton.querySelector('.like-count').textContent = updated.likes;
-          }
-        } catch (err) {
-          console.error('Errore like:', err);
-        }
-      });
+const likeCount = clone.querySelector(".like-count");
+likeButton.addEventListener('click', async () => {
+  try {
+    const res = await fetch(`/api/posts/${post._id}/like`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      likeCount.textContent = updated.likes;
+    }
+  } catch (err) {
+    console.error('Errore like:', err);
+  }
+});
+
 
       // === Toggle commenti ===
       const commentToggleBtn = clone.querySelector('.comment-toggle-button');
@@ -108,6 +108,8 @@ async function caricaPost() {
           console.error('Errore commento:', err);
         }
       });
+            feed.appendChild(clone);
+    });
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
   }
