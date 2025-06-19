@@ -40,7 +40,7 @@ async function caricaPost() {
       const nomeUtente = post.userId?.nome || "Nome mancante";
       const usernameUtente = post.userId?.username || "username";
 
-      clone.querySelector('.post-username').textContent = `${nomeUtente} (@${usernameUtente})`;
+      clone.querySelector('.post-username').textContent = nomeUtente;
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
       clone.querySelector('.like-count').textContent = post.likes;
