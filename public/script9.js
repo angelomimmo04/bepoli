@@ -57,6 +57,7 @@ async function caricaPost() {
 
           // === Gestione LIKE ===
       const likeButton = clone.querySelector('.like-button');
+      const likeCount = clone.querySelector(".like-count");
       likeButton.addEventListener('click', async () => {
         try {
           const res = await fetch(`/api/posts/${post._id}/like`, {
