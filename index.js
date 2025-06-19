@@ -705,6 +705,50 @@ app.get("/", (req, res) => {
 
 
 
+// Like a post
+app.post("/api/posts/:id/like", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post non trovato" });
+
+    const userId = req.session.user.id;
+    const index = post.likes.indexOf(userId);
+
+    if (index === -1) {
+      post.likes.push(userId); // aggiunge il like
+    } else {
+      post.likes.splice(index, 1); // toglie il like
+    }
+
+    await post.save();
+    res.json({ likes: post.likes.length });
+  } catch (err) {
+    console.error("Errore nel like:", err);
+    res.status(500).json({ message: "Errore like" });
+  }
+});
+
+
+
+// Commenta un post
+app.post("/api/posts/:id/comment", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post non trovato" });
+
+    post.comments.push({
+      text: req.body.text,
+      userId: req.session.user.id,
+      createdAt: new Date()
+    });
+
+    await post.save();
+    res.json({ comments: post.comments.length });
+  } catch (err) {
+    console.error("Errore commento:", err);
+    res.status(500).json({ message: "Errore commento" });
+  }
+});
 
 
 
