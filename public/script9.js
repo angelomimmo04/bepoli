@@ -86,8 +86,8 @@ likeButton.addEventListener('click', async () => {
       const commentsList = clone.querySelector('.comments-list');
 
 
-      if (post.comments && post.comments.length > 0) {
-      post.comments.forEach(comment => {
+      if (post.commentsData && post.commentsData.length > 0) {
+      post.commentsData.forEach(comment => {
       const li = document.createElement('li');
       const user = comment.userId;
       const autore = user?.nome ? `${user.nome} (@${user.username})` : "Utente";
@@ -95,7 +95,8 @@ likeButton.addEventListener('click', async () => {
       li.textContent = `${autore}: ${comment.text} - ${data}`;
       commentsList.appendChild(li);
       });
-      }
+      }  
+
 
 
       commentForm.addEventListener('submit', async (e) => {
