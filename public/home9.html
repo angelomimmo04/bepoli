@@ -45,42 +45,43 @@
 
   <!-- ===== TEMPLATE POST ===== -->
   <template id="post-template">
-    <article class="post-card">
-      <header class="post-header">
-        <div class="post-user-info">
-          <div class="post-user-avatar"></div>
-          <span class="post-username">Username</span>
-        </div>
-        <time class="post-date" datetime="">Data</time>
-      </header>
-
-      <div class="post-image-container">
-        <img class="post-image" src="" alt="Immagine del post" />
+  <article class="post-card">
+    <header class="post-header">
+      <div class="post-user-info">
+        <div class="post-user-avatar"></div>
+        <span class="post-username">Username</span>
       </div>
+      <time class="post-date" datetime="">Data</time>
+    </header>
 
-      <div class="post-actions">
-        <button class="like-button">❤ <span class="like-count">0</span></button>
-        <button class="comment-toggle-button">💬 <span class="comment-count">0</span></button>
-      </div>
+    <div class="post-image-container">
+      <img class="post-image" src="" alt="Immagine del post" />
+    </div>
 
-      <div class="post-description">
-        <p class="post-desc-text"></p>
-      </div>
+    <div class="post-actions">
+      <button class="like-button">❤ <span class="like-count">0</span></button>
+      <button class="comment-toggle-button">💬 <span class="comment-count">0</span></button>
+    </div>
 
-      <div class="comment-section hidden">
-        <ul class="comments-list"></ul>
-        <form class="comment-form">
-          <input
-            type="text"
-            class="comment-input"
-            placeholder="Scrivi un commento..."
-            maxlength="200"
-          />
-          <button type="submit" class="comment-submit">Invia</button>
-        </form>
-      </div>
-    </article>
-  </template>
+    <div class="post-description">
+      <p class="post-desc-text"></p>
+    </div>
+
+    <div class="comment-section hidden">
+      <ul class="comments-list"></ul>
+      <form class="comment-form">
+        <input
+          type="text"
+          class="comment-input"
+          placeholder="Scrivi un commento..."
+          maxlength="200"
+        />
+        <button type="submit" class="comment-submit">Invia</button>
+      </form>
+    </div>
+  </article>
+</template>
+
 
   <script src="script9.js" defer></script>
 </body>
