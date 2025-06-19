@@ -71,8 +71,31 @@ async function caricaPost() {
       // === Commenti ===
       const commentToggleBtn = clone.querySelector('.comment-toggle-button');
       const commentSection = clone.querySelector('.comment-section');
-      commentToggleBtn.addEventListener('click', () => {
-        commentSection.classList.toggle('hidden');
+      commentToggleBtn.addEventListener('click', async () => {
+      commentSection.classList.toggle('hidden');
+
+      if (!commentSection.classList.contains('hidden') && commentsList.children.length === 0) {
+      try {
+      const res = await fetch(`/api/posts/${post._id}/comments`, {
+      credentials: 'include'
+      });
+      const allComments = await res.json();
+
+      allComments.forEach(c => {
+        const li = document.createElement('li');
+        const u = c.userId;
+        const autore = u?.nome ? `${u.nome} (@${u.username})` : "Utente";
+        const data = new Date(c.createdAt).toLocaleString('it-IT');
+        li.textContent = `${autore}: ${c.text} – ${data}`;
+        commentsList.appendChild(li);
+        });
+        } catch (err) {
+        console.error('Errore nel caricamento commenti:', err);
+        }
+        }
+        });
+
+        
       });
 
       const commentForm = clone.querySelector('.comment-form');
