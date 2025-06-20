@@ -40,7 +40,11 @@ async function caricaPost() {
       const nomeUtente = post.userId?.nome || "Nome mancante";
       const usernameUtente = post.userId?.username || "username";
 
-      clone.querySelector('.post-username').textContent = nomeUtente;
+      const userLink = clone.querySelector('.post-username');
+      userLink.textContent = `${nomeUtente}`;
+      userLink.style.cursor = 'pointer';
+      userLink.addEventListener('click', () => apriProfiloModal(post.userId._id));
+
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
       clone.querySelector('.like-count').textContent = post.likes;
