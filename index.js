@@ -1,5 +1,3 @@
-//require("dotenv").config();
-
 require("dotenv").config();
 
 
@@ -117,15 +115,6 @@ const utenteSchema = new mongoose.Schema({
 const Utente = mongoose.model("Utente", utenteSchema);
 
 
-
-
-//const storage = multer.memoryStorage();
-//const upload = multer({ storage });
-
-
-// prova salvataggio riccardo 9
-
-//fine riccardo9
 
 // --- Rotte ---
 app.get("/csrf-token", (req, res, next) => {
@@ -551,27 +540,6 @@ app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
 });
 
 // POST RICCARDO 9
-//app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res) => {
-//  try {
-//    const newPost = new Post({
-//      userId: req.session.user.id,
-//      desc: req.body.desc,
-//      image: req.file ? {
- //       data: req.file.buffer,
-//        contentType: req.file.mimetype
-//      } : null,
-//      likes: [],
-//      comments: []
-//    });
-
-//    await newPost.save();
-//    res.status(201).json({ message: "Post creato con successo" });
-//  } catch (err) {
-//    console.error("Errore creazione post:", err);
-//    res.status(500).json({ message: "Errore creazione post" });
-//  }
-//});
-
 
 app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res) => {
   try {
@@ -600,23 +568,6 @@ app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res
 
 
 // === SCHEMA POST ===
-// const postSchema = new mongoose.Schema({
-//  userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
- // desc: String,
- // image: {
-  //  data: Buffer,
- //   contentType: String
-//  },
-//  createdAt: { type: Date, default: Date.now },
-//  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
- // comments: [
- //   {
- //     userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
- //     text: String,
- //     createdAt: { type: Date, default: Date.now }
-  //  }
-//  ]
-//});
 const postSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
   desc: String,
@@ -638,27 +589,8 @@ const postSchema = new mongoose.Schema({
 
 const Post = mongoose.model("Post", postSchema);
 
-//app.get("/api/posts", async (req, res) => {
- // try {
-  //  const posts = await Post.find()
-//      .sort({ createdAt: -1 })
- //     .populate("userId", "username nome");
 
- //   res.json(posts.map(post => ({
-     // _id: post._id,
-      //userId: post.userId.username,
-    //  desc: post.desc,
-    //  createdAt: post.createdAt,
-     // imageUrl: post.image?.data
-      //  ? `/api/post-image/${post._id}`
-      //  : null,
-      //likes: post.likes.length,
-      //comments: post.comments.length
-    //})));
-  //} catch {
-  //  res.status(500).json({ message: "Errore caricamento post" });
-//  }
-//});
+
 app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
