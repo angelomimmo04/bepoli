@@ -31,23 +31,23 @@ async function caricaPost() {
 
     const feed = document.getElementById('feed');
     const template = document.getElementById('post-template');
-    feed.innerHTML = ''; // svuota il contenitore
+    feed.innerHTML = '';
 
     posts.forEach(post => {
       const clone = template.content.cloneNode(true);
 
-      // Dati utente
+      // === Dati autore ===
       const nomeUtente = post.userId?.nome || "Nome mancante";
       const usernameUtente = post.userId?.username || "username";
+      const userId = post.userId?._id;
 
       const nomeSpan = clone.querySelector('.post-username');
-      nomeSpan.textContent = `${nomeUtente}`;
+      nomeSpan.textContent = nomeUtente;
       nomeSpan.style.cursor = 'pointer';
       nomeSpan.style.color = 'blue';
       nomeSpan.addEventListener('click', () => {
-      apriProfiloModal(post.userId._id);
+        apriProfiloModal(userId);
       });
-
 
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
@@ -77,7 +77,6 @@ async function caricaPost() {
       });
 
       // === Commenti ===
-          // === Commenti ===
       const commentToggleBtn = clone.querySelector('.comment-toggle-button');
       const commentSection = clone.querySelector('.comment-section');
       const commentsList = clone.querySelector('.comments-list');
@@ -87,14 +86,10 @@ async function caricaPost() {
 
       commentToggleBtn.addEventListener('click', async () => {
         commentSection.classList.toggle('hidden');
-
         if (!commentSection.classList.contains('hidden') && commentsList.children.length === 0) {
           try {
-            const res = await fetch(`/api/posts/${post._id}/comments`, {
-              credentials: 'include'
-            });
+            const res = await fetch(`/api/posts/${post._id}/comments`, { credentials: 'include' });
             const allComments = await res.json();
-
             allComments.forEach(c => {
               const li = document.createElement('li');
               const u = c.userId;
@@ -132,32 +127,34 @@ async function caricaPost() {
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
             li.textContent = `${autore}: ${updated.newComment.text} – ${data}`;
             commentsList.appendChild(li);
-            }
-            } catch (err) {
-            console.error('Errore commento:', err);
-            }
-            });
-            
-      
-      
-            function apriProfiloModal(userId) {
-            const iframe = document.getElementById('profileIframe');
-            iframe.src = `profile.html?id=${userId}`;
-            document.getElementById('profileModal').style.display = 'block';
-            }
-
-document.querySelector('.close-btn').addEventListener('click', () => {
-  document.getElementById('profileModal').style.display = 'none';
-});
-
-            
+          }
+        } catch (err) {
+          console.error('Errore commento:', err);
+        }
+      });
 
       feed.appendChild(clone);
-    }); // ✅ questa chiude posts.forEach
+    });
 
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
   }
 }
 
-window.addEventListener('DOMContentLoaded', caricaPost);
+// === MODALE PROFILO ===
+function apriProfiloModal(userId) {
+  const iframe = document.getElementById('profileIframe');
+  iframe.src = `profile.html?id=${userId}`;
+  document.getElementById('profileModal').style.display = 'block';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  caricaPost();
+
+  const closeBtn = document.querySelector('.close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      document.getElementById('profileModal').style.display = 'none';
+    });
+  }
+});
