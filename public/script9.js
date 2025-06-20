@@ -40,10 +40,14 @@ async function caricaPost() {
       const nomeUtente = post.userId?.nome || "Nome mancante";
       const usernameUtente = post.userId?.username || "username";
 
-      const userLink = clone.querySelector('.post-username');
-      userLink.textContent = `${nomeUtente}`;
-      userLink.style.cursor = 'pointer';
-      userLink.addEventListener('click', () => apriProfiloModal(post.userId._id));
+      const nomeSpan = clone.querySelector('.post-username');
+      nomeSpan.textContent = `${nomeUtente}`;
+      nomeSpan.style.cursor = 'pointer';
+      nomeSpan.style.color = 'blue';
+      nomeSpan.addEventListener('click', () => {
+      apriProfiloModal(post.userId._id);
+      });
+
 
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
@@ -128,11 +132,25 @@ async function caricaPost() {
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
             li.textContent = `${autore}: ${updated.newComment.text} – ${data}`;
             commentsList.appendChild(li);
-          }
-        } catch (err) {
-          console.error('Errore commento:', err);
-        }
-      });
+            }
+            } catch (err) {
+            console.error('Errore commento:', err);
+            }
+            });
+            
+      
+      
+            function apriProfiloModal(userId) {
+            const iframe = document.getElementById('profileIframe');
+            iframe.src = `profile.html?id=${userId}`;
+            document.getElementById('profileModal').style.display = 'block';
+            }
+
+document.querySelector('.close-btn').addEventListener('click', () => {
+  document.getElementById('profileModal').style.display = 'none';
+});
+
+            
 
       feed.appendChild(clone);
     }); // ✅ questa chiude posts.forEach
