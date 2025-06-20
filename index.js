@@ -590,17 +590,17 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model("Post", postSchema);
 
 
-
 app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("userId", "username nome")
+      .populate("userId", "username nome _id") // ✅ incluso _id
       .populate("comments.userId", "username nome");
 
     res.json(posts.map(post => ({
       _id: post._id,
       userId: {
+        _id: post.userId._id, // ✅ questo campo è fondamentale
         username: post.userId.username,
         nome: post.userId.nome
       },
@@ -623,6 +623,7 @@ app.get("/api/posts", async (req, res) => {
     res.status(500).json({ message: "Errore caricamento post" });
   }
 });
+
 
 
 
