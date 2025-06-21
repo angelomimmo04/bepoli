@@ -135,6 +135,60 @@ main{
     border-radius: 50%;
 }
 
+#post-section {
+  grid-column: 2;
+  grid-row: 4/9;
+  margin-left: 10rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+#posts-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.post-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.post-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.post-meta {
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 5px;
+}
+
+.post-desc {
+  margin-top: 10px;
+  font-size: 0.95em;
+  text-align: center;
+}
+@media (max-width: 768px) {
+  #posts-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  #posts-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
 @media (max-width: 768px) {
     /*serve a dire che in particolati condizioni magari alcune cose non si devono vedere*/
     header,
