@@ -732,6 +732,39 @@ app.get("/api/posts/:id/comments", async (req, res) => {
 
 
 
+app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
+  try {
+    const posts = await Post.find({ userId: req.params.id })
+      .sort({ createdAt: -1 })
+      .populate("userId", "username nome _id")
+      .populate("comments.userId", "username nome");
+
+    res.json(posts.map(post => ({
+      _id: post._id,
+      userId: {
+        _id: post.userId._id,
+        username: post.userId.username,
+        nome: post.userId.nome
+      },
+      desc: post.desc,
+      createdAt: post.createdAt,
+      imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
+      likes: post.likes.length,
+      comments: post.comments.length,
+      commentsData: post.comments.map(comment => ({
+        text: comment.text,
+        createdAt: comment.createdAt,
+        userId: {
+          username: comment.userId?.username,
+          nome: comment.userId?.nome
+        }
+      }))
+    })));
+  } catch (err) {
+    console.error("Errore caricamento post utente:", err);
+    res.status(500).json({ message: "Errore caricamento post utente" });
+  }
+});
 
 
 
