@@ -54,6 +54,36 @@
     #modalList li a:hover {
       text-decoration: none;
     }
+
+    #posts-container {
+      margin: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .post-card {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      background: white;
+    }
+
+    .post-card img {
+      width: 100%;
+      border-radius: 8px;
+      object-fit: cover;
+      max-height: 300px;
+    }
+
+    .post-meta {
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .post-desc {
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
@@ -95,6 +125,8 @@
     </div>
   </div>
 
+  <div id="posts-container"></div>
+
   <!-- MODALE PER FOLLOWER/SEGUENTI -->
   <div id="modalFollow" class="modal">
     <div class="modal-content">
@@ -134,10 +166,12 @@
       return;
     }
 
+    const userId = user._id || user.id;
+
     document.getElementById("followerCount").onclick = () =>
-      apriListaFollow("followers", user._id || user.id);
+      apriListaFollow("followers", userId);
     document.getElementById("followingCount").onclick = () =>
-      apriListaFollow("following", user._id || user.id);
+      apriListaFollow("following", userId);
 
     document.title = user.username + "'s profile";
     document.getElementById("name").textContent = user.nome;
@@ -148,7 +182,7 @@
     document.getElementById("followingCount").textContent = "Seguiti: " + (user.followingCount || 0);
 
     const profileImg = document.getElementById("profile");
-    profileImg.src = `/api/user-photo/${user._id || user.id}`;
+    profileImg.src = `/api/user-photo/${userId}`;
     profileImg.onerror = () => {
       profileImg.src = "fotoprofilo.png";
     };
@@ -157,45 +191,33 @@
       document.getElementById("editBtn").style.display = "inline-block";
     } else {
       document.getElementById("editBtn").style.display = "none";
+      document.getElementById("followBtn").style.display = "inline-block";
 
-      const followBtn = document.createElement("button");
-      followBtn.id = "followBtn";
-      followBtn.className = "btn";
+      const followBtn = document.getElementById("followBtn");
       followBtn.textContent = "Caricamento...";
-      document.getElementById("social").appendChild(followBtn);
 
       try {
-        const followRes = await fetch(`/api/follow-info/${user._id || user.id}`, {
+        const followRes = await fetch(`/api/follow-info/${userId}`, {
           credentials: "include",
         });
-        if (!followRes.ok) throw new Error("Errore fetching follow info");
         const followData = await followRes.json();
 
         followBtn.textContent = followData.isFollowing ? "Smetti di seguire" : "Segui";
-        followBtn.classList.toggle("following", followData.isFollowing);
-        followBtn.classList.toggle("not-following", !followData.isFollowing);
-
         followBtn.onclick = async () => {
-          const res = await fetch(`/api/follow/${user._id || user.id}`, {
+          const res = await fetch(`/api/follow/${userId}`, {
             method: "POST",
             credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
           });
-
           const result = await res.json();
           if (res.ok) {
             followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
             document.getElementById("followerCount").textContent = "Follower: " + (result.followersCount || 0);
-            followBtn.classList.toggle("following", result.following);
-            followBtn.classList.toggle("not-following", !result.following);
           } else {
             alert("Errore: " + result.message);
           }
         };
       } catch (error) {
-        console.error("Errore stato follow", error);
         followBtn.textContent = "Errore";
       }
     }
@@ -203,154 +225,31 @@
     const { _id, nome, username, bio } = user;
     sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 
-    async function apriListaFollow(tipo, userId) {
-      let page = 1;
-      const limit = 9;
-      let fineLista = false;
+    // ⬇️ CARICA I POST ⬇️
+    try {
+      const res = await fetch(`/api/user/${userId}/posts`, {
+        credentials: "include"
+      });
+      const posts = await res.json();
 
-      const modal = document.getElementById("modalFollow");
-      const modalList = document.getElementById("modalList");
-      const modalTitle = document.getElementById("modalTitle");
+      document.getElementById("postCount").textContent = posts.length;
+      const container = document.getElementById("posts-container");
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post-card";
 
-      modalTitle.textContent = tipo === "followers" ? "Follower" : "Seguiti";
-      modalList.innerHTML = "";
-
-      const loadMoreBtn = document.createElement("button");
-      loadMoreBtn.textContent = "Carica altri";
-      loadMoreBtn.className = "btn";
-      loadMoreBtn.style.display = "none";
-      loadMoreBtn.style.margin = "10px auto 0 auto";
-      loadMoreBtn.style.backgroundColor = "white";
-      loadMoreBtn.style.color = "black";
-      loadMoreBtn.style.border = "1px solid #ccc";
-      loadMoreBtn.style.cursor = "pointer";
-      loadMoreBtn.style.padding = "8px 16px";
-      loadMoreBtn.style.borderRadius = "5px";
-      loadMoreBtn.style.fontSize = "1rem";
-
-      modalList.appendChild(loadMoreBtn);
-
-      // Ottengo utente loggato
-      const loggedUser = JSON.parse(sessionStorage.getItem("user")) || {};
-
-      async function caricaUtenti() {
-        if (fineLista) return;
-
-        const endpoint =
-          tipo === "followers"
-            ? `/api/user/${userId}/followers?page=${page}&limit=${limit}`
-            : `/api/user/${userId}/following?page=${page}&limit=${limit}`;
-
-        const res = await fetch(endpoint, { credentials: "include" });
-        if (!res.ok) {
-          alert("Errore caricando la lista.");
-          return;
-        }
-
-        const data = await res.json();
-        const users = tipo === "followers" ? data.followers : data.following;
-
-        if (!Array.isArray(users) || users.length === 0) {
-          fineLista = true;
-          if (page === 1) {
-            const li = document.createElement("li");
-            li.textContent = "Nessun utente trovato.";
-            modalList.insertBefore(li, loadMoreBtn);
-          }
-          loadMoreBtn.style.display = "none";
-          return;
-        }
-
-        users.forEach((u) => {
-          const li = document.createElement("li");
-          li.style.display = "flex";
-          li.style.alignItems = "center";
-          li.style.gap = "10px";
-
-          const img = document.createElement("img");
-          img.src = `/api/user-photo/${u._id || u.id}`;
-          img.alt = "Foto profilo";
-          img.style.width = "32px";
-          img.style.height = "32px";
-          img.style.borderRadius = "50%";
-          img.style.objectFit = "cover";
-          img.onerror = () => {
-            img.src = "fotoprofilo.png";
-          };
-
-          const link = document.createElement("a");
-
-          // Link al profilo proprio senza id se utente loggato
-          if (u._id === loggedUser._id) {
-            link.href = "profile.html";
-          } else {
-            link.href = `profile.html?id=${u._id || u.id}`;
-          }
-          link.textContent = `@${u.username}`;
-
-          li.appendChild(img);
-          li.appendChild(link);
-
-          if (u._id === loggedUser._id) {
-            // Bottone Modifica profilo
-            const editBtn = document.createElement("a");
-            editBtn.href = "modificaprofilo.html";
-            editBtn.textContent = "Modifica profilo";
-            editBtn.className = "btn";
-            editBtn.style.marginLeft = "auto";
-            li.appendChild(editBtn);
-          } else {
-            // Bottone Segui/Smetti di seguire
-            const followBtn = document.createElement("button");
-            followBtn.className = "btn";
-            followBtn.style.marginLeft = "auto";
-            followBtn.textContent = "Caricamento...";
-            li.appendChild(followBtn);
-
-            fetch(`/api/follow-info/${u._id || u.id}`, { credentials: "include" })
-              .then((res) => res.json())
-              .then((data) => {
-                followBtn.textContent = data.isFollowing ? "Smetti di seguire" : "Segui";
-                followBtn.classList.toggle("following", data.isFollowing);
-                followBtn.classList.toggle("not-following", !data.isFollowing);
-
-                followBtn.onclick = async () => {
-                  const res = await fetch(`/api/follow/${u._id || u.id}`, {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  });
-                  const result = await res.json();
-                  if (res.ok) {
-                    followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-                    followBtn.classList.toggle("following", result.following);
-                    followBtn.classList.toggle("not-following", !result.following);
-                  } else {
-                    alert("Errore: " + result.message);
-                  }
-                };
-              })
-              .catch(() => {
-                followBtn.textContent = "Errore";
-              });
-          }
-
-          modalList.insertBefore(li, loadMoreBtn);
-        });
-
-        page++;
-        loadMoreBtn.style.display = users.length < limit ? "none" : "block";
-      }
-
-      loadMoreBtn.onclick = caricaUtenti;
-
-      modal.style.display = "block";
-
-      await caricaUtenti();
+        div.innerHTML = `
+          ${post.imageUrl ? `<img src="${post.imageUrl}" alt="post image" />` : ""}
+          <div class="post-desc">${post.desc || ""}</div>
+          <div class="post-meta">❤️ ${post.likes} | 💬 ${post.comments}</div>
+        `;
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Errore nel caricamento post", err);
     }
 
+    // MODALE
     const modal = document.getElementById("modalFollow");
     const closeBtn = document.querySelector(".close-btn");
 
