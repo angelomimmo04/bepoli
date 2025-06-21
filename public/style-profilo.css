@@ -191,6 +191,12 @@ main{
   #posts-container {
     grid-template-columns: 1fr;
   }
+    #post-section {
+  
+  margin-left: 0rem;
+  
+  width: 100%;
+}
 }
 
 
