@@ -157,6 +157,8 @@ main{
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 400px; /* Altezza fissa */
+  box-sizing: border-box;
 }
 
 .post-card img {
@@ -169,24 +171,31 @@ main{
 .post-meta {
   font-size: 0.9em;
   color: #555;
-  margin-top: 5px;
+  margin-top: auto;
+  padding-top: 10px;
 }
 
 .post-desc {
   margin-top: 10px;
   font-size: 0.95em;
   text-align: center;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-@media (max-width: 768px) {
-  #posts-container {
-    grid-template-columns: repeat(1, 1fr);
-  }
-}
-@media (min-width: 769px) and (max-width: 1024px) {
+
+@media (max-width: 1024px) {
   #posts-container {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+@media (max-width: 600px) {
+  #posts-container {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 
 @media (max-width: 768px) {
