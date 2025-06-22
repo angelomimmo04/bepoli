@@ -7,94 +7,114 @@
   <title>Profilo utente</title>
   <link rel="icon" href="https://raw.githubusercontent.com/angelomimmo04/bepoli/refs/heads/master/public/logobepoli.png">
   <style>
-    html, body {
+  html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     max-width: 100%;
-    }
+    box-sizing: border-box;
+    font-family: sans-serif;
+    background-color: #f9f9f9;
+  }
 
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 500px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
 
-    .close-btn {
-      float: right;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
 
-    #modalList {
-      list-style: none;
-      padding: 0;
-    }
+  .close-btn {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 
-    #modalList li {
-      padding: 10px 0;
-      border-bottom: 1px solid #ddd;
-    }
+  #modalList {
+    list-style: none;
+    padding: 0;
+  }
 
-    #modalList li a {
-      text-decoration: none;
-      color: black;
-    }
+  #modalList li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
 
-    #modalList li a:hover {
-      text-decoration: none;
-    }
+  #modalList li a {
+    text-decoration: none;
+    color: black;
+  }
 
-    #posts-container {
-    margin: 20px;
+  #modalList li a:hover {
+    text-decoration: underline;
+  }
+
+  #post-section {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  #posts-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    justify-content: center;
     width: 100%;
-    }
-    #post-section {
+  }
+
+  .post-card {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-card img {
     width: 100%;
-    }
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+  }
 
-   .post-card {
-    width: 100%;
-    max-width: 100%;
-    }
+  .post-desc {
+    padding: 10px;
+    font-size: 1rem;
+  }
 
+  .post-meta {
+    padding: 0 10px 10px;
+    font-size: 0.9em;
+    color: #555;
+  }
+</style>
 
-    .post-card img {
-      width: 100%;
-      border-radius: 8px;
-      object-fit: cover;
-      max-height: 300px;
-    }
-
-    .post-meta {
-      font-size: 0.9em;
-      color: #555;
-    }
-
-    .post-desc {
-      margin: 10px 0;
-    }
-  </style>
 </head>
 <body>
   <header>
