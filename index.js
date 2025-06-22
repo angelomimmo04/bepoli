@@ -87,21 +87,20 @@ app.use((req, res, next) => {
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
-  ...
-}));
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true,
   cookie: {
-    maxAge: 1000 * 60 * 30,
+    maxAge: 1000 * 60 * 30, // 30 minuti
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
   }
 }));
+
+
+
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
