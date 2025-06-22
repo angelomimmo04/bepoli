@@ -170,4 +170,13 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('profileModal').style.display = 'none';
     });
   }
+
+  // Chiudi modale cliccando fuori
+  window.addEventListener('click', (event) => {
+    const modal = document.getElementById('profileModal');
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
 });
+
