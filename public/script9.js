@@ -41,21 +41,14 @@ async function caricaPost() {
       const usernameUtente = post.userId?.username || "username";
       const userId = post.userId?._id;
 
+      
       const nomeSpan = clone.querySelector('.post-username');
-const linkProfilo = document.createElement('span');
+const linkProfilo = document.createElement('a');
 linkProfilo.textContent = nomeUtente;
-linkProfilo.style.cursor = 'pointer';
+linkProfilo.href = `profile.html?id=${userId}`;
 linkProfilo.style.color = 'blue';
 linkProfilo.style.textDecoration = 'underline';
-
-linkProfilo.addEventListener('click', () => {
-  const iframe = document.getElementById('profileIframe');
-  iframe.src = ''; // resetta src per forzare il reload
-  setTimeout(() => {
-    iframe.src = `profile.html?id=${userId}`;
-    document.getElementById('profileModal').style.display = 'block';
-  }, 50);
-});
+linkProfilo.style.cursor = 'pointer';
 
 nomeSpan.replaceWith(linkProfilo);
 
