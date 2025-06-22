@@ -42,12 +42,23 @@ async function caricaPost() {
       const userId = post.userId?._id;
 
       const nomeSpan = clone.querySelector('.post-username');
-      nomeSpan.textContent = nomeUtente;
-      nomeSpan.style.cursor = 'pointer';
-      nomeSpan.style.color = 'blue';
-      nomeSpan.addEventListener('click', () => {
-        apriProfiloModal(userId);
-      });
+const linkProfilo = document.createElement('span');
+linkProfilo.textContent = nomeUtente;
+linkProfilo.style.cursor = 'pointer';
+linkProfilo.style.color = 'blue';
+linkProfilo.style.textDecoration = 'underline';
+
+linkProfilo.addEventListener('click', () => {
+  const iframe = document.getElementById('profileIframe');
+  iframe.src = ''; // resetta src per forzare il reload
+  setTimeout(() => {
+    iframe.src = `profile.html?id=${userId}`;
+    document.getElementById('profileModal').style.display = 'block';
+  }, 50);
+});
+
+nomeSpan.replaceWith(linkProfilo);
+
 
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
@@ -83,6 +94,8 @@ async function caricaPost() {
       const commentForm = clone.querySelector('.comment-form');
       const commentInput = clone.querySelector('.comment-input');
       const commentCountEl = clone.querySelector('.comment-count');
+
+      
 
       commentToggleBtn.addEventListener('click', async () => {
         commentSection.classList.toggle('hidden');
