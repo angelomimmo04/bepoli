@@ -120,7 +120,7 @@ nomeSpan.replaceWith(linkProfilo);
               const u = c.userId;
               const autore = u?.nome || "Utente";
               const data = new Date(c.createdAt).toLocaleString('it-IT');
-              li.innerHTML = `<strong>${autore}:</strong> ${updated.newComment.text}<span class="comment-date">${data}</span>`;
+              li.innerHTML = `<strong>${autore}:</strong> ${c.text} <span class="comment-date">${data}</span>`;
               commentsList.appendChild(li);
             });
           } catch (err) {
@@ -150,7 +150,7 @@ nomeSpan.replaceWith(linkProfilo);
             const u = updated.newComment.userId;
             const autore = u?.nome || "Utente";
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
-            li.innerHTML = `<strong>${autore}:</strong> ${c.text} <br><span class="comment-date">${data}</span>`;
+            li.innerHTML = `<strong>${autore}:</strong> ${updated.newComment.text} <span class="comment-date">${data}</span>`;
             commentsList.appendChild(li);
           }
         } catch (err) {
