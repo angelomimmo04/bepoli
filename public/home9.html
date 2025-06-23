@@ -61,11 +61,15 @@
 
   <style>
   
-  #coords, #location, #accuracy {
-    margin-top: 20px;
-    margin-right: 10px;
-    font-weight: bold;
-  }
+  .coords-nav {
+  margin-left: auto;
+  text-align: right;
+  font-size: 0.85rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 </style>
 
 </head>
@@ -77,14 +81,20 @@
       <a href="#" class="active">Home</a>
       <a href="#">Logout</a>
     </nav>
+
+
+<div class="coords-nav">
+    <p id="coords">Coordinate: --</p>
+    <p id="location">Luogo: --</p>
+    <p id="accuracy">Accuratezza: -- metri</p>
+  </div>
+    
   </header>
 
 <button onclick="startTracking()">Avvia Monitoraggio</button>
 <button onclick="stopTracking()">Ferma Monitoraggio</button>
 
-<p id="coords">Coordinate: --</p>
-<p id="location">Luogo: --</p>
-<p id="accuracy">Accuratezza: -- metri</p>
+
 
 
 
