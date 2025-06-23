@@ -41,15 +41,34 @@ async function caricaPost() {
       const usernameUtente = post.userId?.username || "username";
       const userId = post.userId?._id;
 
-      
       const nomeSpan = clone.querySelector('.post-username');
+const wrapper = document.createElement('div');
+wrapper.style.display = 'flex';
+wrapper.style.alignItems = 'center';
+wrapper.style.gap = '8px';
+
+// ⬇️ Immagine profilo autore
+const profileImg = document.createElement('img');
+profileImg.src = `/api/user-photo/${userId}`;
+profileImg.alt = 'Foto profilo';
+profileImg.style.width = '32px';
+profileImg.style.height = '32px';
+profileImg.style.borderRadius = '50%';
+profileImg.style.objectFit = 'cover';
+profileImg.onerror = () => { profileImg.src = 'fotoprofilo.png'; };
+
+// ⬇️ Nome cliccabile
 const linkProfilo = document.createElement('a');
 linkProfilo.textContent = nomeUtente;
 linkProfilo.href = `profile.html?id=${userId}`;
 linkProfilo.style.color = 'blue';
-linkProfilo.style.textDecoration = 'underline';
-linkProfilo.style.cursor = 'pointer';
+linkProfilo.style.textDecoration = 'none';
 
+wrapper.appendChild(profileImg);
+wrapper.appendChild(linkProfilo);
+nomeSpan.replaceWith(wrapper);
+
+      
 nomeSpan.replaceWith(linkProfilo);
 
 
