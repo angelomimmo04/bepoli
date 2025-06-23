@@ -57,6 +57,8 @@
     .comment-input { flex-grow: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
     .comment-submit { padding: 6px 12px; background-color: #0073e6; border: none; color: #fff; border-radius: 4px; cursor: pointer; }
     .comment-submit:hover { background-color: #005bb5; }
+    .comment-date { font-size: 0.8em; color: #888; }
+
 
     /* caricamento foto 
     .camera-hint {
