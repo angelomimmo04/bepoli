@@ -7,117 +7,84 @@
   <title>Profilo utente</title>
   <link rel="icon" href="https://raw.githubusercontent.com/angelomimmo04/bepoli/refs/heads/master/public/logobepoli.png">
   <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    font-family: sans-serif;
-    background-color: #f9f9f9;
-  }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
 
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
 
+    .close-btn {
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
+    #modalList {
+      list-style: none;
+      padding: 0;
+    }
 
+    #modalList li {
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
 
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
+    #modalList li a {
+      text-decoration: none;
+      color: black;
+    }
 
-  .modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 500px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
+    #modalList li a:hover {
+      text-decoration: none;
+    }
 
-  .close-btn {
-    float: right;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+    #posts-container {
+      margin: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
 
-  #modalList {
-    list-style: none;
-    padding: 0;
-  }
+    .post-card {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      background: white;
+    }
 
-  #modalList li {
-    padding: 10px 0;
-    border-bottom: 1px solid #ddd;
-  }
+    .post-card img {
+      width: 100%;
+      border-radius: 8px;
+      object-fit: cover;
+      max-height: 300px;
+    }
 
-  #modalList li a {
-    text-decoration: none;
-    color: black;
-  }
+    .post-meta {
+      font-size: 0.9em;
+      color: #555;
+    }
 
-  #modalList li a:hover {
-    text-decoration: underline;
-  }
-
-  #post-section {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-
-  #posts-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .post-card {
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .post-card img {
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-    object-fit: cover;
-  }
-
-  .post-desc {
-    padding: 10px;
-    font-size: 1rem;
-  }
-
-  .post-meta {
-    padding: 0 10px 10px;
-    font-size: 0.9em;
-    color: #555;
-  }
-</style>
-
+    .post-desc {
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -126,9 +93,7 @@
     </a>
   </header>
 
-
-  
-    <nav class="leftnav" id="mainnav">
+  <nav class="leftnav" id="mainnav">
     <ul>
       <li><a href="prova18.html">home</a></li>
       <li><a href="#">messaggi</a></li>
@@ -138,8 +103,6 @@
       <li><a href="#">crea</a></li>
     </ul>
   </nav>
-  
-  
 
   <div id="info">
     <div id="base">
@@ -165,11 +128,6 @@
  <div id="post-section">
   <div id="posts-container"></div>
 </div>
-
-
-
-
-  
 
 
   <!-- MODALE PER FOLLOWER/SEGUENTI -->
@@ -466,6 +424,10 @@ async function apriListaFollow(tipo, userId) {
   
 
     
+</script>
+
+</body>
+</html>
 </script>
 
 </body>
