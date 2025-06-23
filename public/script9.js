@@ -120,7 +120,17 @@ nomeSpan.replaceWith(linkProfilo);
               const u = c.userId;
               const autore = u?.nome || "Utente";
               const data = new Date(c.createdAt).toLocaleString('it-IT');
-              li.innerHTML = `<strong>${autore}:</strong> ${c.text} <span class="comment-date">${data}</span>`;
+              const userPhotoUrl = `/api/user-photo/${u?._id}`;
+              li.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="${userPhotoUrl}" alt="Foto profilo" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='fotoprofilo.png'">
+              <div>
+              <strong>${autore}</strong>: ${c.text}<br>
+              <span class="comment-date">${data}</span>
+              </div>
+              </div>
+              `;
+
               commentsList.appendChild(li);
             });
           } catch (err) {
@@ -150,7 +160,17 @@ nomeSpan.replaceWith(linkProfilo);
             const u = updated.newComment.userId;
             const autore = u?.nome || "Utente";
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
-            li.innerHTML = `<strong>${autore}:</strong> ${updated.newComment.text} <span class="comment-date">${data}</span>`;
+            const userPhotoUrl = `/api/user-photo/${u?._id}`;
+            li.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="${userPhotoUrl}" alt="Foto profilo" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='fotoprofilo.png'">
+            <div>
+            <strong>${autore}</strong>: ${updated.newComment.text}<br>
+            <span class="comment-date">${data}</span>
+            </div>
+            </div>
+`            ;
+
             commentsList.appendChild(li);
           }
         } catch (err) {
