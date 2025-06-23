@@ -118,7 +118,7 @@ nomeSpan.replaceWith(linkProfilo);
             allComments.forEach(c => {
               const li = document.createElement('li');
               const u = c.userId;
-              const autore = u?.nome ? `${u.nome} (@${u.username})` : "Utente";
+              const autore = u?.nome || "Utente";
               const data = new Date(c.createdAt).toLocaleString('it-IT');
               li.textContent = `${autore}: ${c.text} – ${data}`;
               commentsList.appendChild(li);
