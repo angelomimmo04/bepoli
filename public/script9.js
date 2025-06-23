@@ -148,7 +148,7 @@ nomeSpan.replaceWith(linkProfilo);
           if (updated.newComment) {
             const li = document.createElement('li');
             const u = updated.newComment.userId;
-            const autore = u?.nome ? `${u.nome} (@${u.username})` : "Utente";
+            const autore = u?.nome || "Utente";
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
             li.textContent = `${autore}: ${updated.newComment.text} – ${data}`;
             commentsList.appendChild(li);
