@@ -150,7 +150,7 @@ nomeSpan.replaceWith(linkProfilo);
             const u = updated.newComment.userId;
             const autore = u?.nome || "Utente";
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
-            li.textContent = `${autore}: ${updated.newComment.text} – ${data}`;
+            li.innerHTML = `<strong>${autore}:</strong> ${c.text} <br><span class="comment-date">${data}</span>`;
             commentsList.appendChild(li);
           }
         } catch (err) {
