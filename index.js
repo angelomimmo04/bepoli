@@ -610,10 +610,6 @@ app.get("/api/posts", async (req, res) => {
   try {
     // Primo tentativo con find() classico
 
-    if (page === 2) {
-  throw new Error('Sort exceeded memory limit');
-}
-   
     const posts = await Post.find()
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
