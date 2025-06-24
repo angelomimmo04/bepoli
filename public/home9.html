@@ -4,76 +4,74 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Simulazione Home Feed con Creazione Post</title>
-  <link rel="stylesheet" href="style9.css" />
+  <link rel="stylesheet" href="style9.css">
+ <style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 40px 20px;
+    box-sizing: border-box;
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 0;
+    border-radius: 12px;
+    max-width: 900px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-content iframe {
+    flex-grow: 1;
+    width: 100%;
+    border: none;
+  }
+
+  .close-btn {
+    font-size: 26px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+
+  .close-btn:hover {
+    color: red;
+  }
+
+
+
+
+
+
+</style>
+
   <style>
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 40px 20px;
-      box-sizing: border-box;
-    }
+  
+  .coords-nav {
+  margin-left: auto;
+  text-align: right;
+  font-size: 0.85rem;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+</style>
 
-    .modal-content {
-      background-color: #fff;
-      margin: auto;
-      padding: 0;
-      border-radius: 12px;
-      max-width: 900px;
-      height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-content iframe {
-      flex-grow: 1;
-      width: 100%;
-      border: none;
-    }
-
-    .close-btn {
-      font-size: 26px;
-      font-weight: bold;
-      color: #333;
-      padding: 10px;
-      cursor: pointer;
-      align-self: flex-end;
-    }
-
-    .close-btn:hover {
-      color: red;
-    }
-
-    .coords-nav {
-      margin-left: auto;
-      text-align: right;
-      font-size: 0.85rem;
-      color: #555;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    #zoneImage {
-      max-width: 300px;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .location-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
-  </style>
 </head>
 <body>
   <header class="header">
@@ -83,22 +81,36 @@
       <a href="#" class="active">Home</a>
       <a href="#">Logout</a>
     </nav>
-    <div class="location-container">
-      <div class="coords-nav">
-        <p id="coords">Coordinate: --</p>
-        <p id="location">Luogo: --</p>
-        <p id="accuracy">Accuratezza: -- metri</p>
-      </div>
-      <img id="zoneImage" src="" alt="Immagine della zona" />
-    </div>
+
+
+<div class="coords-nav">
+    <p id="coords">Coordinate: --</p>
+    <p id="location">Luogo: --</p>
+    <p id="accuracy">Accuratezza: -- metri</p>
+  </div>
+    
   </header>
 
-  <button onclick="startTracking()">Avvia Monitoraggio</button>
-  <button onclick="stopTracking()">Ferma Monitoraggio</button>
+<button onclick="startTracking()">Avvia Monitoraggio</button>
+<button onclick="stopTracking()">Ferma Monitoraggio</button>
 
+
+
+
+
+
+  
+
+  <!-- ===== FORM PER CREARE UN NUOVO POST ===== -->
   <section class="create-post-section">
     <form id="createPostForm" enctype="multipart/form-data">
-      <textarea id="postDescInput" name="desc" placeholder="Scrivi una didascalia..." maxlength="500" rows="3"></textarea>
+      <textarea
+        id="postDescInput"
+        name="desc"
+        placeholder="Scrivi una didascalia..."
+        maxlength="500"
+        rows="3"
+      ></textarea>
       <div class="file-input-wrapper">
         <input type="file" id="postImageInput" name="image" accept="image/*" capture="environment" />
       </div>
@@ -108,32 +120,46 @@
     <div id="createPostError" class="error-message hidden"></div>
   </section>
 
+  <!-- ===== FEED CONTENITORE ===== -->
   <main class="feed-container" id="feed">
     <!-- I post verranno inseriti qui dinamicamente -->
   </main>
 
+
+  <!-- ===== TEMPLATE POST ===== -->
   <template id="post-template">
-    <article class="post-card">
-      <header class="post-header">
-        <div class="post-user-info">
-          <span class="post-username">Username</span>
-        </div>
-        <time class="post-date" datetime="">Data</time>
-      </header>
+  <article class="post-card">
+    <header class="post-header">
+      <div class="post-user-info">
+        <span class="post-username">Username</span>
+      </div>
+      <time class="post-date" datetime="">Data</time>
+    </header>
+    
+
+
       <div class="post-image-container">
         <img class="post-image" src="" alt="Immagine del post" />
       </div>
+
       <div class="post-actions">
         <button class="like-button">❤ <span class="like-count">0</span></button>
         <button class="comment-toggle-button">💬 <span class="comment-count">0</span></button>
       </div>
+
       <div class="post-description">
         <p class="post-desc-text"></p>
       </div>
+
       <div class="comment-section hidden">
         <ul class="comments-list"></ul>
         <form class="comment-form">
-          <input type="text" class="comment-input" placeholder="Scrivi un commento..." maxlength="200" />
+          <input
+            type="text"
+            class="comment-input"
+            placeholder="Scrivi un commento..."
+            maxlength="200"
+          />
           <button type="submit" class="comment-submit">Invia</button>
         </form>
       </div>
@@ -141,6 +167,11 @@
   </template>
 
   <script src="script9.js" defer></script>
-  <script src="localizzazione.js" defer></script>
+<script src="localizzazione.js" defer></script>
+
+
+
+
+ 
 </body>
 </html>
