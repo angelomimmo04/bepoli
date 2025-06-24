@@ -604,10 +604,11 @@ const Post = mongoose.model("Post", postSchema);
 
 
 app.get("/api/posts", async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;      // pagina richiesta, default 1
-    const pageSize = 10;                             // quanti post per pagina
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = 10;
 
+  try {
+    // Primo tentativo con find() classico
     const posts = await Post.find()
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
@@ -615,7 +616,7 @@ app.get("/api/posts", async (req, res) => {
       .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
 
-    res.json(posts.map(post => ({
+    return res.json(posts.map(post => ({
       _id: post._id,
       userId: {
         _id: post.userId._id,
@@ -637,10 +638,101 @@ app.get("/api/posts", async (req, res) => {
       }))
     })));
   } catch (err) {
+    // Se errore è di memoria, fallback a aggregate con allowDiskUse:true
+    if (err.message.includes('Sort exceeded memory limit')) {
+      try {
+        const aggPipeline = [
+          { $sort: { createdAt: -1 } },
+          { $skip: (page - 1) * pageSize },
+          { $limit: pageSize },
+          // Populate userId
+          {
+            $lookup: {
+              from: 'utentes',
+              localField: 'userId',
+              foreignField: '_id',
+              as: 'user'
+            }
+          },
+          { $unwind: '$user' },
+          // Populate comments.userId
+          {
+            $lookup: {
+              from: 'utentes',
+              localField: 'comments.userId',
+              foreignField: '_id',
+              as: 'commentUsers'
+            }
+          },
+          {
+            $addFields: {
+              comments: {
+                $map: {
+                  input: '$comments',
+                  as: 'comment',
+                  in: {
+                    $mergeObjects: [
+                      '$$comment',
+                      {
+                        user: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$commentUsers',
+                                cond: { $eq: ['$$this._id', '$$comment.userId'] }
+                              }
+                            },
+                            0
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          { $project: { commentUsers: 0 } }
+        ];
+
+        const posts = await Post.aggregate(aggPipeline).allowDiskUse(true);
+
+        // Mappa per formattare come prima
+        const formattedPosts = posts.map(post => ({
+          _id: post._id,
+          userId: {
+            _id: post.user._id,
+            username: post.user.username,
+            nome: post.user.nome
+          },
+          desc: post.desc,
+          createdAt: post.createdAt,
+          imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
+          likes: post.likes.length,
+          comments: post.comments.length,
+          commentsData: post.comments.map(comment => ({
+            text: comment.text,
+            createdAt: comment.createdAt,
+            userId: {
+              username: comment.user?.username,
+              nome: comment.user?.nome
+            }
+          }))
+        }));
+
+        return res.json(formattedPosts);
+      } catch (aggErr) {
+        console.error("Errore fallback aggregate:", aggErr);
+        return res.status(500).json({ message: "Errore caricamento post" });
+      }
+    }
+
+    // Altri errori
     console.error("Errore caricamento post:", err);
-    res.status(500).json({ message: "Errore caricamento post" });
+    return res.status(500).json({ message: "Errore caricamento post" });
   }
 });
+
 
 
 
