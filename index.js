@@ -611,6 +611,7 @@ app.get("/api/posts", async (req, res) => {
     // Primo tentativo con find() classico
 
     const posts = await Post.find()
+
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
