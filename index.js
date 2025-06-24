@@ -605,15 +605,20 @@ const Post = mongoose.model("Post", postSchema);
 
 app.get("/api/posts", async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;      // pagina richiesta, default 1
+    const pageSize = 10;                             // quanti post per pagina
+
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("userId", "username nome _id") // ✅ incluso _id
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
 
     res.json(posts.map(post => ({
       _id: post._id,
       userId: {
-        _id: post.userId._id, // ✅ questo campo è fondamentale
+        _id: post.userId._id,
         username: post.userId.username,
         nome: post.userId.nome
       },
@@ -636,6 +641,7 @@ app.get("/api/posts", async (req, res) => {
     res.status(500).json({ message: "Errore caricamento post" });
   }
 });
+
 
 
 
