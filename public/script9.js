@@ -23,15 +23,28 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
   }
 });
 
-async function caricaPost() {
+let currentPage = 1;
+const pageSize = 10;
+let loading = false;
+let finished = false;
+
+async function caricaPost(page = 1) {
+  if (loading || finished) return; // evita chiamate duplicate o se finito
+  loading = true;
+
   try {
-    const res = await fetch('/api/posts', { credentials: 'include' });
+    const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}`, { credentials: 'include' });
+    if (!res.ok) throw new Error("Errore fetch");
+
     const posts = await res.json();
-    console.log(posts);
+
+    if (posts.length < pageSize) finished = true; // non ci sono più post da caricare
 
     const feed = document.getElementById('feed');
     const template = document.getElementById('post-template');
-    feed.innerHTML = '';
+
+    // Se è la prima pagina, pulisci, altrimenti appendi
+    if (page === 1) feed.innerHTML = '';
 
     posts.forEach(post => {
       const clone = template.content.cloneNode(true);
@@ -42,46 +55,47 @@ async function caricaPost() {
       const userId = post.userId?._id;
 
       const nomeSpan = clone.querySelector('.post-username');
-const wrapper = document.createElement('div');
-wrapper.style.display = 'flex';
-wrapper.style.alignItems = 'center';
-wrapper.style.gap = '8px';
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.alignItems = 'center';
+      wrapper.style.gap = '8px';
 
-// ⬇️ Immagine profilo autore
-const profileImg = document.createElement('img');
-profileImg.src = `/api/user-photo/${userId}`;
-profileImg.alt = 'Foto profilo';
-profileImg.style.width = '32px';
-profileImg.style.height = '32px';
-profileImg.style.borderRadius = '50%';
-profileImg.style.objectFit = 'cover';
-profileImg.onerror = () => { profileImg.src = 'fotoprofilo.png'; };
+      // Immagine profilo autore
+      const profileImg = document.createElement('img');
+      profileImg.src = `/api/user-photo/${userId}`;
+      profileImg.alt = 'Foto profilo';
+      profileImg.style.width = '32px';
+      profileImg.style.height = '32px';
+      profileImg.style.borderRadius = '50%';
+      profileImg.style.objectFit = 'cover';
+      profileImg.onerror = () => { profileImg.src = 'fotoprofilo.png'; };
 
-// ⬇️ Nome cliccabile
-const linkProfilo = document.createElement('a');
-linkProfilo.textContent = nomeUtente;
-linkProfilo.href = `profile.html?id=${userId}`;
-linkProfilo.style.color = 'blue';
-linkProfilo.style.textDecoration = 'none';
+      // Nome cliccabile
+      const linkProfilo = document.createElement('a');
+      linkProfilo.textContent = nomeUtente;
+      linkProfilo.href = `profile.html?id=${userId}`;
+      linkProfilo.style.color = 'blue';
+      linkProfilo.style.textDecoration = 'none';
 
-wrapper.appendChild(profileImg);
-wrapper.appendChild(linkProfilo);
-nomeSpan.replaceWith(wrapper);
+      wrapper.appendChild(profileImg);
+      wrapper.appendChild(linkProfilo);
+      nomeSpan.replaceWith(wrapper);
 
-      
-nomeSpan.replaceWith(linkProfilo);
-
-
+      // Data post
       clone.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleString('it-IT');
       clone.querySelector('.post-desc-text').textContent = post.desc;
       clone.querySelector('.like-count').textContent = post.likes;
       clone.querySelector('.comment-count').textContent = post.comments;
 
       const imageEl = clone.querySelector('.post-image');
-      if (post.imageUrl) imageEl.src = post.imageUrl;
-      else imageEl.style.display = 'none';
+      if (post.imageUrl) {
+        imageEl.src = post.imageUrl;
+        imageEl.style.display = '';
+      } else {
+        imageEl.style.display = 'none';
+      }
 
-      // === Like ===
+      // Like
       const likeButton = clone.querySelector('.like-button');
       const likeCount = clone.querySelector(".like-count");
       likeButton.addEventListener('click', async () => {
@@ -99,15 +113,13 @@ nomeSpan.replaceWith(linkProfilo);
         }
       });
 
-      // === Commenti ===
+      // Commenti
       const commentToggleBtn = clone.querySelector('.comment-toggle-button');
       const commentSection = clone.querySelector('.comment-section');
       const commentsList = clone.querySelector('.comments-list');
       const commentForm = clone.querySelector('.comment-form');
       const commentInput = clone.querySelector('.comment-input');
       const commentCountEl = clone.querySelector('.comment-count');
-
-      
 
       commentToggleBtn.addEventListener('click', async () => {
         commentSection.classList.toggle('hidden');
@@ -122,15 +134,14 @@ nomeSpan.replaceWith(linkProfilo);
               const data = new Date(c.createdAt).toLocaleString('it-IT');
               const userPhotoUrl = `/api/user-photo/${u?._id}`;
               li.innerHTML = `
-              <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="${userPhotoUrl}" alt="Foto profilo" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='fotoprofilo.png'">
-              <div>
-              <strong>${autore}</strong>: ${c.text}<br>
-              <span class="comment-date">${data}</span>
-              </div>
-              </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <img src="${userPhotoUrl}" alt="Foto profilo" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='fotoprofilo.png'">
+                  <div>
+                    <strong>${autore}</strong>: ${c.text}<br>
+                    <span class="comment-date">${data}</span>
+                  </div>
+                </div>
               `;
-
               commentsList.appendChild(li);
             });
           } catch (err) {
@@ -162,15 +173,14 @@ nomeSpan.replaceWith(linkProfilo);
             const data = new Date(updated.newComment.createdAt).toLocaleString('it-IT');
             const userPhotoUrl = `/api/user-photo/${u?._id}`;
             li.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-            <img src="${userPhotoUrl}" alt="Foto profilo" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='fotoprofilo.png'">
-            <div>
-            <strong>${autore}</strong>: ${updated.newComment.text}<br>
-            <span class="comment-date">${data}</span>
-            </div>
-            </div>
-`            ;
-
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="${userPhotoUrl}" alt="Foto profilo" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='fotoprofilo.png'">
+                <div>
+                  <strong>${autore}</strong>: ${updated.newComment.text}<br>
+                  <span class="comment-date">${data}</span>
+                </div>
+              </div>
+            `;
             commentsList.appendChild(li);
           }
         } catch (err) {
@@ -181,10 +191,25 @@ nomeSpan.replaceWith(linkProfilo);
       feed.appendChild(clone);
     });
 
+    currentPage = page; // aggiorna pagina corrente
+
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
+  } finally {
+    loading = false;
   }
 }
+
+// Bottone carica altri
+document.getElementById('loadMore').addEventListener('click', () => {
+  if (!loading && !finished) {
+    caricaPost(currentPage + 1);
+  }
+});
+
+// Carica prima pagina all’avvio
+caricaPost(1);
+
 
 // === MODALE PROFILO ===
 function apriProfiloModal(userId) {
