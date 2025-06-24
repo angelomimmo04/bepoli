@@ -38,7 +38,13 @@ async function caricaPost(page = 1) {
 
     const posts = await res.json();
 
-    if (posts.length < pageSize) finished = true; // non ci sono più post da caricare
+    if (posts.length < pageSize) {
+      finished = true;
+      document.getElementById('loadMore').style.display = 'none';  // Nascondi bottone se non ci sono altri post
+    } else {
+      finished = false;
+      document.getElementById('loadMore').style.display = '';      // Mostra bottone
+    }
 
     const feed = document.getElementById('feed');
     const template = document.getElementById('post-template');
