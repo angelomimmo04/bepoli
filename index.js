@@ -642,7 +642,11 @@ app.get("/api/posts", async (req, res) => {
   } catch (err) {
     console.log("ram database piena ma tiro avanti");
     // Se errore è di memoria, fallback a aggregate con allowDiskUse:true
-    if (err.message.includes('Sort exceeded memory limit')) {
+    if if (
+    err.code === 292 ||
+    err.codeName === "QueryExceededMemoryLimitNoDiskUseAllowed" ||
+    err.message.includes("Sort exceeded memory limit")
+  )  {
       try {
         const aggPipeline = [
           { $sort: { createdAt: -1 } },
@@ -734,9 +738,6 @@ app.get("/api/posts", async (req, res) => {
     console.error("Errore caricamento post:", err);
     return res.status(500).json({ message: "Errore caricamento post" });
 
-
-  console.error("🧵 Tipo errore:", typeof err);
-  console.error("📣 Messaggio:", err.message);
 
     
   }
