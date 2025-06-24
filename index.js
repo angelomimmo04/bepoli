@@ -733,6 +733,12 @@ app.get("/api/posts", async (req, res) => {
     // Altri errori
     console.error("Errore caricamento post:", err);
     return res.status(500).json({ message: "Errore caricamento post" });
+
+
+  console.error("🧵 Tipo errore:", typeof err);
+  console.error("📣 Messaggio:", err.message);
+
+    
   }
 });
 
