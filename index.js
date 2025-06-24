@@ -609,6 +609,7 @@ app.get("/api/posts", async (req, res) => {
 
   try {
     // Primo tentativo con find() classico
+    throw new Error('Sort exceeded memory limit');
     const posts = await Post.find()
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
@@ -638,6 +639,7 @@ app.get("/api/posts", async (req, res) => {
       }))
     })));
   } catch (err) {
+    console.log("ram database piena ma tiro avanti")
     // Se errore è di memoria, fallback a aggregate con allowDiskUse:true
     if (err.message.includes('Sort exceeded memory limit')) {
       try {
