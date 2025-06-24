@@ -609,13 +609,14 @@ app.get("/api/posts", async (req, res) => {
 
   try {
     // Primo tentativo con find() classico
-    await Promise.reject(new Error('Sort exceeded memory limit'));
+   
     const posts = await Post.find()
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
+    throw new Error('Sort exceeded memory limit');
 
     return res.json(posts.map(post => ({
       _id: post._id,
