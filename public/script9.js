@@ -35,10 +35,7 @@ async function caricaPost(page = 1) {
   try {
     const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}`, { credentials: 'include' });
     if (!res.ok) throw new Error("Errore fetch");
-    
-const errorData = await response.json(); // leggi messaggio d’errore dal server
-      throw new Error(`Server error: ${errorData.message}`);
-    
+
     const posts = await res.json();
 
     if (posts.length < pageSize) {
