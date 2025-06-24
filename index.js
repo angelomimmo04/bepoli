@@ -640,7 +640,7 @@ app.get("/api/posts", async (req, res) => {
       }))
     })));
   } catch (err) {
-    console.log("ram database piena ma tiro avanti")
+    console.log("ram database piena ma tiro avanti");
     // Se errore è di memoria, fallback a aggregate con allowDiskUse:true
     if (err.message.includes('Sort exceeded memory limit')) {
       try {
