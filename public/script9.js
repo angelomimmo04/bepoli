@@ -201,6 +201,7 @@ async function caricaPost(page = 1) {
 
   } catch (err) {
     console.error('Errore nel caricamento post:', err);
+    res.status(500).json({ message: err.message });
   } finally {
     loading = false;
   }
