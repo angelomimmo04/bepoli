@@ -1,4 +1,4 @@
-let watchId = null;
+//let watchId = null;
 
     const zones = [
         // Le tue zone come da codice originale, le ho omesse per brevità
