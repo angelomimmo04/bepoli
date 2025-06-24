@@ -642,7 +642,7 @@ app.get("/api/posts", async (req, res) => {
   } catch (err) {
     console.log("ram database piena ma tiro avanti");
     // Se errore è di memoria, fallback a aggregate con allowDiskUse:true
-    if if (
+    if (
     err.code === 292 ||
     err.codeName === "QueryExceededMemoryLimitNoDiskUseAllowed" ||
     err.message.includes("Sort exceeded memory limit")
