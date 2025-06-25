@@ -65,7 +65,7 @@
 
 
 
-    /* caricamento foto 
+    /* caricamento foto */
     .camera-hint {
       font-size: 0.9rem;
       color: #555;
@@ -78,5 +78,28 @@
       font-size: 14px;
       color: #333;
       }
+
+/* Bottone "Carica altri post" */
+.load-more-wrapper {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#loadMore {
+  padding: 10px 20px;
+  background-color: #0073e6;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#loadMore:hover {
+  background-color: #005bb5;
+  transform: scale(1.05);
+}
+
 
 
