@@ -121,38 +121,44 @@
 .monitor-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin: 20px 0;
+  gap: 16px;
+  margin-top: 20px;
 }
 
-#startMonitoring,
-#stopMonitoring {
+.monitor-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 20px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: bold;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-#startMonitoring {
-  background-color: #28a745;
+.monitor-btn .icon {
+  font-size: 1.2rem;
+}
+
+.monitor-btn.start {
+  background: linear-gradient(to right, #4caf50, #81c784);
   color: white;
 }
 
-#startMonitoring:hover {
-  background-color: #218838;
-  transform: scale(1.03);
+.monitor-btn.start:hover {
+  background: linear-gradient(to right, #388e3c, #66bb6a);
+  transform: scale(1.05);
 }
 
-#stopMonitoring {
-  background-color: #dc3545;
+.monitor-btn.stop {
+  background: linear-gradient(to right, #f44336, #e57373);
   color: white;
 }
 
-#stopMonitoring:hover {
-  background-color: #c82333;
-  transform: scale(1.03);
+.monitor-btn.stop:hover {
+  background: linear-gradient(to right, #c62828, #ef5350);
+  transform: scale(1.05);
 }
