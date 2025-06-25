@@ -135,30 +135,17 @@
   border: none;
   border-radius: 12px;
   cursor: pointer;
+  background: linear-gradient(to right, #2196f3, #64b5f6); /* Azzurro */
+  color: white;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.monitor-btn:hover {
+  background: linear-gradient(to right, #1976d2, #42a5f5);
+  transform: scale(1.05);
+}
+
 .monitor-btn .icon {
   font-size: 1.2rem;
-}
-
-.monitor-btn.start {
-  background: linear-gradient(to right, #4caf50, #81c784);
-  color: white;
-}
-
-.monitor-btn.start:hover {
-  background: linear-gradient(to right, #388e3c, #66bb6a);
-  transform: scale(1.05);
-}
-
-.monitor-btn.stop {
-  background: linear-gradient(to right, #f44336, #e57373);
-  color: white;
-}
-
-.monitor-btn.stop:hover {
-  background: linear-gradient(to right, #c62828, #ef5350);
-  transform: scale(1.05);
 }
