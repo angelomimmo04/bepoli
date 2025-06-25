@@ -149,3 +149,24 @@
 .monitor-btn .icon {
   font-size: 1.2rem;
 }
+.coords-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 15px;
+  margin-top: 10px;
+  border-left: 4px solid #007bff;
+  background-color: #eaf4ff;
+  border-radius: 8px;
+  max-width: 300px;
+  font-size: 0.95rem;
+  color: #003366;
+  box-shadow: 0 2px 5px rgba(0, 123, 255, 0.1);
+}
+
+.coords-nav p {
+  margin: 0;
+  padding: 3px 0;
+  font-weight: 500;
+}
+
