@@ -31,6 +31,8 @@ let finished = false;
 async function caricaPost(page = 1) {
   if (loading || finished) return; // evita chiamate duplicate o se finito
   loading = true;
+  document.getElementById('loader').classList.remove('hidden');
+
 
   try {
     const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}`, { credentials: 'include' });
@@ -204,6 +206,7 @@ async function caricaPost(page = 1) {
     
   } finally {
     loading = false;
+    document.getElementById('loader').classList.add('hidden');
   }
 }
 
