@@ -239,18 +239,15 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 //profilo//
   
-  document.getElementById('goToProfile').addEventListener('click', async (e) => {
+  document.getElementById('goToProfile').addEventListener('click', (e) => {
   e.preventDefault();
-  try {
-    const res = await fetch('/api/users/me', { credentials: 'include' });
-    if (!res.ok) throw new Error("Non autenticato");
-    const user = await res.json();
-    window.location.href = `profile.html?id=${user._id}`;
-  } catch (err) {
-    alert("Errore nel recupero profilo utente");
-    console.error("Errore:", err);
+  if (typeof loggedUserId !== 'undefined') {
+    window.location.href = `profile.html?id=${loggedUserId}`;
+  } else {
+    alert("ID utente non disponibile.");
   }
 });
+
 
 
   // Chiudi modale cliccando fuori
