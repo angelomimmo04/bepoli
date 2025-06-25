@@ -170,3 +170,20 @@
   font-weight: 500;
 }
 
+
+#profileBtn {
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-left: 10px;
+}
+
+#profileBtn:hover {
+  background-color: #005bb5;
+}
+
