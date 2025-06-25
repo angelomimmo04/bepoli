@@ -118,5 +118,30 @@
 }
 
 
+#startTracking, #stopTracking {
+  padding: 10px 20px;
+  background-color: #0073e6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 10px 5px 0 0;
+}
+
+#stopTracking {
+  background-color: #cc0000;
+}
+
+#startTracking:hover {
+  background-color: #005bb5;
+}
+
+#stopTracking:hover {
+  background-color: #990000;
+}
+
+
 
 
