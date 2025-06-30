@@ -554,28 +554,35 @@ app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
 
 // POST RICCARDO 9
 
-app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res) => {
+app.post('/api/posts', upload.single("image"), async (req, res) => {
   try {
-    const newPost = new Post({
-      userId: req.session.user.id,
-      desc: req.body.desc,
-      location: req.body.location
-      image: req.file ? {
-      data: req.file.buffer,
-      contentType: req.file.mimetype
-      }  : null,
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Utente non autenticato" });
+    }
 
-      likes: [],
-      comments: []
+    // Verifica presenza di luogo (opzionale)
+    const luogo = req.body.luogo || "Posizione sconosciuta";
+
+    const newPost = new Post({
+      userId,
+      desc: req.body.desc,
+      luogo,
+      createdAt: new Date(),
+      image: req.file ? {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      } : null
     });
 
     await newPost.save();
-    res.status(201).json({ message: "Post creato con successo" });
+    res.status(201).json({ message: "Post creato", postId: newPost._id });
   } catch (err) {
-    console.error("Errore creazione post:", err);
+    console.error("Errore nella creazione del post:", err);
     res.status(500).json({ message: "Errore creazione post" });
   }
 });
+
 
 
 
