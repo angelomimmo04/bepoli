@@ -561,9 +561,10 @@ app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res
       desc: req.body.desc,
       location: req.body.location
       image: req.file ? {
-        data: req.file.buffer,
-        contentType: req.file.mimetype
-      } : null,
+      data: req.file.buffer,
+      contentType: req.file.mimetype
+      }  : null,
+
       likes: [],
       comments: []
     });
