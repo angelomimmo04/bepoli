@@ -4,6 +4,18 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
   const form = e.target;
   const formData = new FormData(form);
 
+  // Preleva il luogo dalla localizzazione
+  const luogo = document.getElementById("location").textContent.replace("Luogo: ", "").trim();
+
+  // Se non c'è una posizione valida, blocca l'invio
+  if (!luogo || luogo === "--" || luogo.toLowerCase().includes("posizione incerta")) {
+  alert("Attiva la localizzazione prima di pubblicare un post.");
+  return;
+  }
+
+formData.append("location", luogo);
+
+
   try {
     const res = await fetch('/api/posts', {
       method: 'POST',
