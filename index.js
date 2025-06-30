@@ -559,6 +559,7 @@ app.post("/api/posts", checkFingerprint, upload.single("image"), async (req, res
     const newPost = new Post({
       userId: req.session.user.id,
       desc: req.body.desc,
+      location: req.body.location
       image: req.file ? {
         data: req.file.buffer,
         contentType: req.file.mimetype
