@@ -186,4 +186,9 @@
 #profileBtn:hover {
   background-color: #005bb5;
 }
+.post-location {
+  margin: 0;
+  font-size: 0.8em;
+  color: #666;
+}
 
