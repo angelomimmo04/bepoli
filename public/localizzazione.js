@@ -176,10 +176,7 @@
     ];
 
 
-    const zoneImages = {
-        // Puoi aggiungere immagini associate alle zone così:
-        // "Radio Frequenza Libera": "images/radio.jpg",
-    };
+    
 
     let watchId = null;
     let lastZoneName = null;
