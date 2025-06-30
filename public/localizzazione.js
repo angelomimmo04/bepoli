@@ -325,12 +325,7 @@
                 if (stabilityCounter >= stabilityThreshold) {
                     outputLocation.textContent = `Luogo: ${currentZoneName}`;
 
-                    const imagePath = zoneImages[selectedZone?.name];
-                    if (imagePath) {
-                        document.getElementById("zoneImage").style.display = "block";
-                        document.getElementById("locationImage").src = imagePath;
-                    } else {
-                        document.getElementById("zoneImage").style.display = "none";
+                   
                     }
                 }
             },
