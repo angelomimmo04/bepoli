@@ -177,7 +177,7 @@
 
 
     
-
+    let currentZoneName = null; // GLOBALE
     let watchId = null;
     let lastZoneName = null;
     let stabilityCounter = 0;
@@ -324,7 +324,8 @@
 
                 if (stabilityCounter >= stabilityThreshold) {
                     outputLocation.textContent = `Luogo: ${currentZoneName}`;
-
+                    // Rende disponibile la zona per altri script
+                    window.currentZoneName = currentZoneName;
                    
                     }
                 
