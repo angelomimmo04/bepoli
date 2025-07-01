@@ -252,99 +252,105 @@
         return 6371 * Math.sqrt(dx * dx + dy * dy);
     }
 
-    function startTracking() {
-        const outputCoords = document.getElementById("coords");
-        const outputLocation = document.getElementById("location");
-        const outputAccuracy = document.getElementById("accuracy");
+   function startTracking() {
+    const outputCoords = document.getElementById("coords");
+    const outputLocation = document.getElementById("location");
+    const outputAccuracy = document.getElementById("accuracy");
+    const locationStatus = document.getElementById("locationStatus");
 
-        if (!navigator.geolocation) {
-            outputCoords.textContent = "Geolocalizzazione non supportata dal browser.";
-            return;
-        }
-
-        if (watchId !== null) {
-            navigator.geolocation.clearWatch(watchId);
-        }
-
-        outputCoords.textContent = "Monitoraggio posizione attivo...";
-
-        watchId = navigator.geolocation.watchPosition(
-            function (position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                const accuracy = position.coords.accuracy;
-
-                outputCoords.textContent = `Coordinate: Latitudine = ${lat.toFixed(6)}, Longitudine = ${lon.toFixed(6)}`;
-                outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
-
-                if (accuracy > 25) {
-                    outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
-                    document.getElementById("zoneImage").style.display = "none";
-                    return;
-                }
-
-                let insideZones = [];
-                let nearZones = [];
-
-                for (const zone of zones) {
-                    const centerLat = zone.points.reduce((sum, p) => sum + p.lat, 0) / zone.points.length;
-                    const centerLon = zone.points.reduce((sum, p) => sum + p.lon, 0) / zone.points.length;
-
-                    const inside = isInsidePolygon(lat, lon, zone.points);
-                    const centerDist = haversine(lat, lon, centerLat, centerLon);
-                    const edgeDist = distanceToPolygon(lat, lon, zone.points);
-
-                    if (inside) {
-                        insideZones.push({ zone, centerDist });
-                    }
-                    if (edgeDist < 0.02) { // 20 metri
-                        nearZones.push({ zone, edgeDist });
-                    }
-                }
-
-                let currentZoneName = "Fuori dalle aree conosciute";
-                let selectedZone = null;
-
-                if (insideZones.length > 0) {
-                    insideZones.sort((a, b) => a.centerDist - b.centerDist);
-                    selectedZone = insideZones[0].zone;
-                    currentZoneName = selectedZone.name;
-                } else if (nearZones.length > 0) {
-                    nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
-                    selectedZone = nearZones[0].zone;
-                    currentZoneName = "Vicino a: " + selectedZone.name;
-                }
-
-                if (currentZoneName === lastZoneName) {
-                    stabilityCounter++;
-                } else {
-                    lastZoneName = currentZoneName;
-                    stabilityCounter = 1;
-                }
-
-               if (stabilityCounter >= stabilityThreshold) {
-               outputLocation.textContent = `Luogo: ${currentZoneName}`;
-               document.getElementById("locationStatus").textContent = "✅ Posizione rilevata";
-               document.getElementById("locationStatus").style.color = "green";
-               }
-
-                   
-                    }
-                
-            },
-            function (error) {
-                outputCoords.textContent = "Errore nella geolocalizzazione: " + error.message;
-                outputLocation.textContent = "--";
-                outputAccuracy.textContent = "-- metri";
-                document.getElementById("zoneImage").style.display = "none";
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-        );
+    if (!navigator.geolocation) {
+        outputCoords.textContent = "Geolocalizzazione non supportata dal browser.";
+        return;
     }
+
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+    }
+
+    outputCoords.textContent = "Monitoraggio posizione attivo...";
+
+    // ✅ Mostra messaggio di attesa all'inizio
+    locationStatus.textContent = "Attendere il rilevamento della posizione...";
+    locationStatus.style.color = "red";
+
+    watchId = navigator.geolocation.watchPosition(
+        function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            outputCoords.textContent = `Coordinate: Latitudine = ${lat.toFixed(6)}, Longitudine = ${lon.toFixed(6)}`;
+            outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
+
+            if (accuracy > 25) {
+                outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
+                locationStatus.textContent = "Segnale GPS debole, attendere...";
+                locationStatus.style.color = "orange";
+                document.getElementById("zoneImage").style.display = "none";
+                return;
+            }
+
+            let insideZones = [];
+            let nearZones = [];
+
+            for (const zone of zones) {
+                const centerLat = zone.points.reduce((sum, p) => sum + p.lat, 0) / zone.points.length;
+                const centerLon = zone.points.reduce((sum, p) => sum + p.lon, 0) / zone.points.length;
+
+                const inside = isInsidePolygon(lat, lon, zone.points);
+                const centerDist = haversine(lat, lon, centerLat, centerLon);
+                const edgeDist = distanceToPolygon(lat, lon, zone.points);
+
+                if (inside) {
+                    insideZones.push({ zone, centerDist });
+                }
+                if (edgeDist < 0.02) {
+                    nearZones.push({ zone, edgeDist });
+                }
+            }
+
+            let currentZoneName = "Fuori dalle aree conosciute";
+            let selectedZone = null;
+
+            if (insideZones.length > 0) {
+                insideZones.sort((a, b) => a.centerDist - b.centerDist);
+                selectedZone = insideZones[0].zone;
+                currentZoneName = selectedZone.name;
+            } else if (nearZones.length > 0) {
+                nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
+                selectedZone = nearZones[0].zone;
+                currentZoneName = "Vicino a: " + selectedZone.name;
+            }
+
+            if (currentZoneName === lastZoneName) {
+                stabilityCounter++;
+            } else {
+                lastZoneName = currentZoneName;
+                stabilityCounter = 1;
+            }
+
+            if (stabilityCounter >= stabilityThreshold) {
+                outputLocation.textContent = `Luogo: ${currentZoneName}`;
+                locationStatus.textContent = "✅ Posizione rilevata";
+                locationStatus.style.color = "green";
+            }
+        },
+        function (error) {
+            outputCoords.textContent = "Errore nella geolocalizzazione: " + error.message;
+            outputLocation.textContent = "--";
+            outputAccuracy.textContent = "-- metri";
+            locationStatus.textContent = "Errore nel rilevamento posizione.";
+            locationStatus.style.color = "red";
+            document.getElementById("zoneImage").style.display = "none";
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
 
     function stopTracking() {
         if (watchId !== null) {
