@@ -83,11 +83,13 @@
     </nav>
 
 
-<div class="coords-nav">
-    <p id="coords">Coordinate: --</p>
-    <p id="location">Luogo: --</p>
-    <p id="accuracy">Accuratezza: -- metri</p>
-  </div>
+   <div class="coords-nav">
+  <p id="coords">Coordinate: --</p>
+  <p id="location">Luogo: --</p>
+  <p id="accuracy">Accuratezza: -- metri</p>
+  <p id="locationStatus" style="color: red; font-size: 0.85rem;">Attendere il rilevamento della posizione...</p> 
+</div>
+
     
   </header>
 
@@ -131,7 +133,7 @@
     </form>
     <div id="createPostError" class="error-message hidden"></div>
   </section>
-
+  
   <!-- ===== FEED CONTENITORE ===== -->
   <main class="feed-container" id="feed">
     <!-- I post verranno inseriti qui dinamicamente -->
