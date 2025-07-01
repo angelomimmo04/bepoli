@@ -327,7 +327,7 @@
 
                    
                     }
-                }
+                
             },
             function (error) {
                 outputCoords.textContent = "Errore nella geolocalizzazione: " + error.message;
