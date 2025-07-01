@@ -322,10 +322,12 @@
                     stabilityCounter = 1;
                 }
 
-                if (stabilityCounter >= stabilityThreshold) {
-                    outputLocation.textContent = `Luogo: ${currentZoneName}`;
-                    // Rende disponibile la zona per altri script
-                    window.currentZoneName = currentZoneName;
+               if (stabilityCounter >= stabilityThreshold) {
+               outputLocation.textContent = `Luogo: ${currentZoneName}`;
+               document.getElementById("locationStatus").textContent = "✅ Posizione rilevata";
+               document.getElementById("locationStatus").style.color = "green";
+               }
+
                    
                     }
                 
