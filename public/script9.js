@@ -4,17 +4,15 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
   const form = e.target;
   const formData = new FormData(form);
 
-  // Preleva il luogo dalla localizzazione
-  const luogo = document.getElementById("location").textContent.replace("Luogo: ", "").trim();
+  // Usa window.currentZoneName se disponibile (valorizzata da localizzazione.js)
+  const luogo = window.currentZoneName || document.getElementById("location").textContent.replace("Luogo: ", "").trim();
 
-  // Se non c'è una posizione valida, blocca l'invio
-  if (!luogo || luogo === "--" || luogo.toLowerCase().includes("posizione incerta")) {
-  alert("Attiva la localizzazione prima di pubblicare un post.");
-  return;
+  if (!luogo || luogo === "--" || luogo.toLowerCase().includes("posizione incerta") || luogo.toLowerCase().includes("fuori")) {
+    alert("Attiva la localizzazione e attendi il rilevamento prima di pubblicare un post.");
+    return;
   }
 
-formData.append("location", luogo);
-
+  formData.append("location", luogo);
 
   try {
     const res = await fetch('/api/posts', {
@@ -26,7 +24,7 @@ formData.append("location", luogo);
     const data = await res.json();
     if (res.ok) {
       form.reset();
-      caricaPost(); // aggiorna il feed
+      caricaPost(1); // aggiorna il feed dalla prima pagina
     } else {
       alert(data.message || 'Errore nella creazione del post');
     }
