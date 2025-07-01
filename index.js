@@ -561,13 +561,13 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
       return res.status(401).json({ message: "Utente non autenticato" });
     }
 
-    // Verifica presenza di luogo (opzionale)
-    const luogo = req.body.luogo || "Posizione sconosciuta";
+    // Prendi la posizione dal form (il frontend usa "location" nei FormData)
+    const location = req.body.location || "Posizione sconosciuta";
 
     const newPost = new Post({
       userId,
       desc: req.body.desc,
-      luogo,
+      location,  // ✅ SALVA LA POSIZIONE
       createdAt: new Date(),
       image: req.file ? {
         data: req.file.buffer,
@@ -587,8 +587,6 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
 
 
 
-
-
 // === SCHEMA POST ===
 const postSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
@@ -597,6 +595,7 @@ const postSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String
   },
+  location: String, // ✅ AGGIUNTO CAMPO POSIZIONE
   createdAt: { type: Date, default: Date.now },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
   comments: [
@@ -608,6 +607,7 @@ const postSchema = new mongoose.Schema({
     }
   ]
 });
+
 
 
 const Post = mongoose.model("Post", postSchema);
