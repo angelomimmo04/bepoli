@@ -331,6 +331,7 @@
 
             if (stabilityCounter >= stabilityThreshold) {
                 outputLocation.textContent = `Luogo: ${currentZoneName}`;
+                window.currentZoneName = currentZoneName;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
             }
