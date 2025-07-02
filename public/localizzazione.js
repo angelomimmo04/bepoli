@@ -312,30 +312,36 @@
             let currentZoneName = "Fuori dalle aree conosciute";
             let selectedZone = null;
 
-            if (insideZones.length > 0) {
-                insideZones.sort((a, b) => a.centerDist - b.centerDist);
-                selectedZone = insideZones[0].zone;
-                currentZoneName = selectedZone.name;
-            } else if (nearZones.length > 0) {
-                nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
-                selectedZone = nearZones[0].zone;
-                currentZoneName = "Vicino a: " + selectedZone.name;
-            }
+if (insideZones.length > 0) {
+    insideZones.sort((a, b) => a.centerDist - b.centerDist);
+    selectedZone = insideZones[0].zone;
+    currentZoneName = selectedZone.name;
+} else if (nearZones.length > 0) {
+    nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
+    selectedZone = nearZones[0].zone;
+    currentZoneName = "Vicino a: " + selectedZone.name;
+} else {
+    currentZoneName = "Fuori dalle aree conosciute";
+}
 
-            if (currentZoneName === lastZoneName) {
-                stabilityCounter++;
-            } else {
-                lastZoneName = currentZoneName;
-                stabilityCounter = 1;
-            }
-            currentZoneName = selectedZone ? selectedZone.name : "Fuori dalle aree conosciute";
-            window.currentZoneName = currentZoneName; // ✅ IMPOSTA SEMPRE
-            if (stabilityCounter >= stabilityThreshold) {
-                outputLocation.textContent = `Luogo: ${currentZoneName}`;
-                window.currentZoneName = currentZoneName;
-                locationStatus.textContent = "✅ Posizione rilevata";
-                locationStatus.style.color = "green";
-            }
+// ✅ Imposta sempre la variabile globale
+window.currentZoneName = currentZoneName;
+
+if (currentZoneName === lastZoneName) {
+    stabilityCounter++;
+} else {
+    lastZoneName = currentZoneName;
+    stabilityCounter = 1;
+}
+
+if (stabilityCounter >= stabilityThreshold) {
+    outputLocation.textContent = `Luogo: ${currentZoneName}`;
+    locationStatus.textContent = "✅ Posizione rilevata";
+    locationStatus.style.color = "green";
+}
+
+            
+           
         },
         function (error) {
             outputCoords.textContent = "Errore nella geolocalizzazione: " + error.message;
