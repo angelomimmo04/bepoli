@@ -5,7 +5,7 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
   const formData = new FormData(form);
 
   // Usa window.currentZoneName se disponibile (valorizzata da localizzazione.js)
-  const location = window.currentZoneName || document.getElementById("location").textContent.replace("Luogo: ", "").trim();
+  const location = document.getElementById("location").textContent;
 
 if (!location || location === "--" || location.includes("incerta") || location.includes("Fuori")) {
   alert("Attiva la localizzazione prima di pubblicare.");
