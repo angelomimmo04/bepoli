@@ -182,6 +182,7 @@ let stabilityCounter = 0;
 const stabilityThreshold = 3;
 window.currentZoneName = null;
 
+
 function startTracking() {
   const outputCoords = document.getElementById("coords");
   const outputLocation = document.getElementById("location");
@@ -245,6 +246,7 @@ function startTracking() {
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 }
+
 
 function stopTracking() {
   if (watchId !== null) {
