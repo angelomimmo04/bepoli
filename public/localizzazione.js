@@ -328,7 +328,8 @@
                 lastZoneName = currentZoneName;
                 stabilityCounter = 1;
             }
-
+            currentZoneName = selectedZone ? selectedZone.name : "Fuori dalle aree conosciute";
+            window.currentZoneName = currentZoneName; // ✅ IMPOSTA SEMPRE
             if (stabilityCounter >= stabilityThreshold) {
                 outputLocation.textContent = `Luogo: ${currentZoneName}`;
                 window.currentZoneName = currentZoneName;
