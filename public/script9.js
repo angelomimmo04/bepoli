@@ -5,14 +5,14 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
   const formData = new FormData(form);
 
   // Usa window.currentZoneName se disponibile (valorizzata da localizzazione.js)
-  const location = window.currentZoneName;
+  const location = window.currentZoneName || document.getElementById("location").textContent.replace("Luogo: ", "").trim();
 
-  if (!location || location === "--" || location.toLowerCase().includes("posizione incerta") || location.toLowerCase().includes("fuori")) {
-    alert("Attiva la localizzazione e attendi il rilevamento prima di pubblicare un post.");
-    return;
-  }
+if (!location || location === "--" || location.includes("incerta") || location.includes("Fuori")) {
+  alert("Attiva la localizzazione prima di pubblicare.");
+  return;
+}
 
-  formData.append("location", location);
+formData.append("location", location);
 
   try {
     const res = await fetch('/api/posts', {
