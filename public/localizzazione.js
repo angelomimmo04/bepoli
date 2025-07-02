@@ -177,80 +177,188 @@
 
 
     
-    let currentZoneName = null; // GLOBALE
-    let watchId = null;
-    let lastZoneName = null;
-    let stabilityCounter = 0;
-    const stabilityThreshold = 3;
+let currentZoneName = null;
+let watchId = null;
+let lastZoneName = null;
+let stabilityCounter = 0;
+const stabilityThreshold = 3;
 
-    // Funzione punto nel poligono (ray-casting)
-    function isInsidePolygon(lat, lon, polygon) {
-        let inside = false;
-        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-            const xi = polygon[i].lat, yi = polygon[i].lon;
-            const xj = polygon[j].lat, yj = polygon[j].lon;
+const zones = [ /* ...inserisci qui tutte le tue zone come hai già fatto... */ ];
 
-            const intersect = ((yi > lon) !== (yj > lon)) &&
-                (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
-            if (intersect) inside = !inside;
-        }
-        return inside;
+function startTracking() {
+  const outputCoords = document.getElementById("coords");
+  const outputLocation = document.getElementById("location");
+  const outputAccuracy = document.getElementById("accuracy");
+  const locationStatus = document.getElementById("locationStatus");
+
+  if (!navigator.geolocation) {
+    outputCoords.textContent = "Geolocalizzazione non supportata dal browser.";
+    return;
+  }
+
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+  }
+
+  outputCoords.textContent = "Monitoraggio posizione attivo...";
+  outputLocation.textContent = "--";
+  outputAccuracy.textContent = "-- metri";
+  locationStatus.textContent = "📡 Attendere il rilevamento della posizione...";
+  locationStatus.style.color = "orange";
+
+  watchId = navigator.geolocation.watchPosition(
+    function (position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const accuracy = position.coords.accuracy;
+
+      outputCoords.textContent = Coordinate: Latitudine = ${lat.toFixed(6)}, Longitudine = ${lon.toFixed(6)};
+      outputAccuracy.textContent = Accuratezza: ${Math.round(accuracy)} metri;
+
+      if (accuracy > 25) {
+        outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
+        locationStatus.textContent = "📡 Segnale GPS debole, attendere...";
+        locationStatus.style.color = "orange";
+        return;
+      }
+
+      let insideZones = [];
+      let nearZones = [];
+
+      for (const zone of zones) {
+        const centerLat = zone.points.reduce((sum, p) => sum + p.lat, 0) / zone.points.length;
+        const centerLon = zone.points.reduce((sum, p) => sum + p.lon, 0) / zone.points.length;
+
+        const inside = isInsidePolygon(lat, lon, zone.points);
+        const centerDist = haversine(lat, lon, centerLat, centerLon);
+        const edgeDist = distanceToPolygon(lat, lon, zone.points);
+
+        if (inside) insideZones.push({ zone, centerDist });
+        if (edgeDist < 0.02) nearZones.push({ zone, edgeDist });
+      }
+
+      let zoneName = "Fuori dalle aree conosciute";
+      let selectedZone = null;
+
+      if (insideZones.length > 0) {
+        insideZones.sort((a, b) => a.centerDist - b.centerDist);
+        selectedZone = insideZones[0].zone;
+        zoneName = selectedZone.name;
+      } else if (nearZones.length > 0) {
+        nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
+        selectedZone = nearZones[0].zone;
+        zoneName = "Vicino a: " + selectedZone.name;
+      }
+
+      if (zoneName === lastZoneName) {
+        stabilityCounter++;
+      } else {
+        lastZoneName = zoneName;
+        stabilityCounter = 1;
+      }
+
+      window.currentZoneName = zoneName; // sempre aggiornato
+
+      if (stabilityCounter >= stabilityThreshold) {
+        outputLocation.textContent = Luogo: ${zoneName};
+        locationStatus.textContent = "✅ Posizione rilevata";
+        locationStatus.style.color = "green";
+      }
+    },
+    function (error) {
+      outputCoords.textContent = "Errore nella geolocalizzazione: " + error.message;
+      outputLocation.textContent = "--";
+      outputAccuracy.textContent = "-- metri";
+      locationStatus.textContent = "❌ Errore nel rilevamento.";
+      locationStatus.style.color = "red";
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
     }
+  );
+}
 
-    // Distanza con formula haversine in km
-    function haversine(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
+function stopTracking() {
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+    document.getElementById("coords").textContent = "Monitoraggio interrotto.";
+    document.getElementById("location").textContent = "--";
+    document.getElementById("accuracy").textContent = "-- metri";
+    document.getElementById("locationStatus").textContent = "🔴 Monitoraggio disattivato";
+    document.getElementById("locationStatus").style.color = "gray";
+  }
+}
 
-    // Distanza minima da bordo poligono in km
-    function distanceToPolygon(lat, lon, polygon) {
-        let minDist = Infinity;
-        for (let i = 0; i < polygon.length; i++) {
-            const p1 = polygon[i];
-            const p2 = polygon[(i + 1) % polygon.length];
-            const dist = pointToSegmentDistance(lat, lon, p1.lat, p1.lon, p2.lat, p2.lon);
-            if (dist < minDist) minDist = dist;
-        }
-        return minDist;
-    }
+// === Funzioni di supporto ===
 
-    // Distanza punto-segmento (in km)
-    function pointToSegmentDistance(lat, lon, lat1, lon1, lat2, lon2) {
-        const toRad = Math.PI / 180;
-        const x0 = lon * toRad, y0 = lat * toRad;
-        const x1 = lon1 * toRad, y1 = lat1 * toRad;
-        const x2 = lon2 * toRad, y2 = lat2 * toRad;
+function isInsidePolygon(lat, lon, polygon) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lat, yi = polygon[i].lon;
+    const xj = polygon[j].lat, yj = polygon[j].lon;
 
-        const A = x0 - x1, B = y0 - y1;
-        const C = x2 - x1, D = y2 - y1;
+    const intersect = ((yi > lon) !== (yj > lon)) &&
+      (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
 
-        const dot = A * C + B * D;
-        const len_sq = C * C + D * D;
-        const param = len_sq !== 0 ? dot / len_sq : -1;
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
-        let xx, yy;
-        if (param < 0) {
-            xx = x1;
-            yy = y1;
-        } else if (param > 1) {
-            xx = x2;
-            yy = y2;
-        } else {
-            xx = x1 + param * C;
-            yy = y1 + param * D;
-        }
+function distanceToPolygon(lat, lon, polygon) {
+  let minDist = Infinity;
+  for (let i = 0; i < polygon.length; i++) {
+    const p1 = polygon[i];
+    const p2 = polygon[(i + 1) % polygon.length];
+    const dist = pointToSegmentDistance(lat, lon, p1.lat, p1.lon, p2.lat, p2.lon);
+    if (dist < minDist) minDist = dist;
+  }
+  return minDist;
+}
 
-        const dx = x0 - xx;
-        const dy = y0 - yy;
-        return 6371 * Math.sqrt(dx * dx + dy * dy);
-    }
+function pointToSegmentDistance(lat, lon, lat1, lon1, lat2, lon2) {
+  const toRad = Math.PI / 180;
+  const x0 = lon * toRad, y0 = lat * toRad;
+  const x1 = lon1 * toRad, y1 = lat1 * toRad;
+  const x2 = lon2 * toRad, y2 = lat2 * toRad;
+
+  const A = x0 - x1, B = y0 - y1;
+  const C = x2 - x1, D = y2 - y1;
+
+  const dot = A * C + B * D;
+  const len_sq = C * C + D * D;
+  const param = len_sq !== 0 ? dot / len_sq : -1;
+
+  let xx, yy;
+  if (param < 0) { xx = x1; yy = y1; }
+  else if (param > 1) { xx = x2; yy = y2; }
+  else {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  }
+
+  const dx = x0 - xx;
+  const dy = y0 - yy;
+  return 6371 * Math.sqrt(dx * dx + dy * dy);
+}
+
+
+
+
 
    function startTracking() {
     const outputCoords = document.getElementById("coords");
