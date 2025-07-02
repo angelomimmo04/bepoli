@@ -207,8 +207,8 @@ function startTracking() {
             const lon = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
-            outputCoords.textContent = Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)};
-            outputAccuracy.textContent = Accuratezza: ${Math.round(accuracy)} metri;
+            outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
+            outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
 
             if (accuracy > 25) {
                 outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
@@ -230,7 +230,7 @@ function startTracking() {
             window.currentZoneName = zoneName;
 
             if (stabilityCounter >= stabilityThreshold) {
-                outputLocation.textContent = Luogo: ${zoneName};
+                outputLocation.textContent = `Luogo: ${zoneName}`;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
             }
