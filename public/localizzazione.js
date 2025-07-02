@@ -182,103 +182,101 @@ let stabilityCounter = 0;
 const stabilityThreshold = 3;
 window.currentZoneName = null;
 
-
 function startTracking() {
-  const outputCoords = document.getElementById("coords");
-  const outputLocation = document.getElementById("location");
-  const outputAccuracy = document.getElementById("accuracy");
-  const locationStatus = document.getElementById("locationStatus");
+    const outputCoords = document.getElementById("coords");
+    const outputLocation = document.getElementById("location");
+    const outputAccuracy = document.getElementById("accuracy");
+    const locationStatus = document.getElementById("locationStatus");
 
-  if (!navigator.geolocation) {
-    outputCoords.textContent = "Geolocalizzazione non supportata.";
-    return;
-  }
-
-  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-
-  outputCoords.textContent = "📡 Monitoraggio attivo...";
-  outputAccuracy.textContent = "-- metri";
-  outputLocation.textContent = "--";
-  locationStatus.textContent = "📍 Attendere il rilevamento...";
-  locationStatus.style.color = "orange";
-
-  watchId = navigator.geolocation.watchPosition(
-    (position) => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      const accuracy = position.coords.accuracy;
-
-      outputCoords.textContent = Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)};
-      outputAccuracy.textContent = Accuratezza: ${Math.round(accuracy)} metri;
-
-      if (accuracy > 25) {
-        outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
-        locationStatus.textContent = "📡 Segnale debole, attendere...";
-        locationStatus.style.color = "orange";
+    if (!navigator.geolocation) {
+        outputCoords.textContent = "Geolocalizzazione non supportata.";
         return;
-      }
+    }
 
-      const zone = getZoneFromCoords(lat, lon);
-      const zoneName = zone || "Fuori dalle aree conosciute";
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
-      if (zoneName === lastZoneName) {
-        stabilityCounter++;
-      } else {
-        lastZoneName = zoneName;
-        stabilityCounter = 1;
-      }
+    outputCoords.textContent = "📡 Monitoraggio attivo...";
+    outputAccuracy.textContent = "-- metri";
+    outputLocation.textContent = "--";
+    locationStatus.textContent = "📍 Attendere il rilevamento...";
+    locationStatus.style.color = "orange";
 
-      window.currentZoneName = zoneName;
+    watchId = navigator.geolocation.watchPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
 
-      if (stabilityCounter >= stabilityThreshold) {
-        outputLocation.textContent = Luogo: ${zoneName};
-        locationStatus.textContent = "✅ Posizione rilevata";
-        locationStatus.style.color = "green";
-      }
-    },
-    (error) => {
-      outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
-      outputLocation.textContent = "--";
-      outputAccuracy.textContent = "-- metri";
-      locationStatus.textContent = "❌ Errore posizione";
-      locationStatus.style.color = "red";
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  );
+            outputCoords.textContent = Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)};
+            outputAccuracy.textContent = Accuratezza: ${Math.round(accuracy)} metri;
+
+            if (accuracy > 25) {
+                outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
+                locationStatus.textContent = "📡 Segnale debole, attendere...";
+                locationStatus.style.color = "orange";
+                return;
+            }
+
+            const zone = getZoneFromCoords(lat, lon);
+            const zoneName = zone || "Fuori dalle aree conosciute";
+
+            if (zoneName === lastZoneName) {
+                stabilityCounter++;
+            } else {
+                lastZoneName = zoneName;
+                stabilityCounter = 1;
+            }
+
+            window.currentZoneName = zoneName;
+
+            if (stabilityCounter >= stabilityThreshold) {
+                outputLocation.textContent = Luogo: ${zoneName};
+                locationStatus.textContent = "✅ Posizione rilevata";
+                locationStatus.style.color = "green";
+            }
+        },
+        (error) => {
+            outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
+            outputLocation.textContent = "--";
+            outputAccuracy.textContent = "-- metri";
+            locationStatus.textContent = "❌ Errore posizione";
+            locationStatus.style.color = "red";
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
 }
 
-
 function stopTracking() {
-  if (watchId !== null) {
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
-    document.getElementById("coords").textContent = "Monitoraggio interrotto.";
-    document.getElementById("location").textContent = "--";
-    document.getElementById("accuracy").textContent = "-- metri";
-    document.getElementById("locationStatus").textContent = "🔴 Monitoraggio disattivato";
-    document.getElementById("locationStatus").style.color = "gray";
-  }
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        document.getElementById("coords").textContent = "Monitoraggio interrotto.";
+        document.getElementById("location").textContent = "--";
+        document.getElementById("accuracy").textContent = "-- metri";
+        document.getElementById("locationStatus").textContent = "🔴 Monitoraggio disattivato";
+        document.getElementById("locationStatus").style.color = "gray";
+    }
 }
 
 function getZoneFromCoords(lat, lon) {
-  for (const zone of zones) {
-    if (isInsidePolygon(lat, lon, zone.points)) return zone.name;
-  }
-  return null;
+    for (const zone of zones) {
+        if (isInsidePolygon(lat, lon, zone.points)) return zone.name;
+    }
+    return null;
 }
 
 function isInsidePolygon(lat, lon, polygon) {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].lat, yi = polygon[i].lon;
-    const xj = polygon[j].lat, yj = polygon[j].lon;
-    const intersect = ((yi > lon) !== (yj > lon)) &&
-      (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
-  }
-  return inside;
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].lat, yi = polygon[i].lon;
+        const xj = polygon[j].lat, yj = polygon[j].lon;
+        const intersect = ((yi > lon) !== (yj > lon)) &&
+            (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
 }
 
-// Esporta le funzioni globali
+// Rendi le funzioni disponibili globalmente
 window.startTracking = startTracking;
 window.stopTracking = stopTracking;
