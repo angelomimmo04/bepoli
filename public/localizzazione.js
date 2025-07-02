@@ -325,7 +325,7 @@ if (insideZones.length > 0) {
 }
 
 // ✅ Imposta sempre la variabile globale
-window.currentZoneName = currentZoneName;
+
 
 if (currentZoneName === lastZoneName) {
     stabilityCounter++;
@@ -338,6 +338,7 @@ if (stabilityCounter >= stabilityThreshold) {
     outputLocation.textContent = `Luogo: ${currentZoneName}`;
     locationStatus.textContent = "✅ Posizione rilevata";
     locationStatus.style.color = "green";
+    window.currentZoneName = currentZoneName;
 }
 
             
