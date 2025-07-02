@@ -176,14 +176,11 @@
     ];
 
 
-    
-let currentZoneName = null;
 let watchId = null;
 let lastZoneName = null;
 let stabilityCounter = 0;
 const stabilityThreshold = 3;
-
-const zones = [ /* ...inserisci qui tutte le tue zone come hai già fatto... */ ];
+window.currentZoneName = null;
 
 function startTracking() {
   const outputCoords = document.getElementById("coords");
@@ -192,63 +189,36 @@ function startTracking() {
   const locationStatus = document.getElementById("locationStatus");
 
   if (!navigator.geolocation) {
-    outputCoords.textContent = "Geolocalizzazione non supportata dal browser.";
+    outputCoords.textContent = "Geolocalizzazione non supportata.";
     return;
   }
 
-  if (watchId !== null) {
-    navigator.geolocation.clearWatch(watchId);
-  }
+  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
-  outputCoords.textContent = "Monitoraggio posizione attivo...";
-  outputLocation.textContent = "--";
+  outputCoords.textContent = "📡 Monitoraggio attivo...";
   outputAccuracy.textContent = "-- metri";
-  locationStatus.textContent = "📡 Attendere il rilevamento della posizione...";
+  outputLocation.textContent = "--";
+  locationStatus.textContent = "📍 Attendere il rilevamento...";
   locationStatus.style.color = "orange";
 
   watchId = navigator.geolocation.watchPosition(
-    function (position) {
+    (position) => {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
       const accuracy = position.coords.accuracy;
 
-      outputCoords.textContent = Coordinate: Latitudine = ${lat.toFixed(6)}, Longitudine = ${lon.toFixed(6)};
+      outputCoords.textContent = Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)};
       outputAccuracy.textContent = Accuratezza: ${Math.round(accuracy)} metri;
 
       if (accuracy > 25) {
         outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
-        locationStatus.textContent = "📡 Segnale GPS debole, attendere...";
+        locationStatus.textContent = "📡 Segnale debole, attendere...";
         locationStatus.style.color = "orange";
         return;
       }
 
-      let insideZones = [];
-      let nearZones = [];
-
-      for (const zone of zones) {
-        const centerLat = zone.points.reduce((sum, p) => sum + p.lat, 0) / zone.points.length;
-        const centerLon = zone.points.reduce((sum, p) => sum + p.lon, 0) / zone.points.length;
-
-        const inside = isInsidePolygon(lat, lon, zone.points);
-        const centerDist = haversine(lat, lon, centerLat, centerLon);
-        const edgeDist = distanceToPolygon(lat, lon, zone.points);
-
-        if (inside) insideZones.push({ zone, centerDist });
-        if (edgeDist < 0.02) nearZones.push({ zone, edgeDist });
-      }
-
-      let zoneName = "Fuori dalle aree conosciute";
-      let selectedZone = null;
-
-      if (insideZones.length > 0) {
-        insideZones.sort((a, b) => a.centerDist - b.centerDist);
-        selectedZone = insideZones[0].zone;
-        zoneName = selectedZone.name;
-      } else if (nearZones.length > 0) {
-        nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
-        selectedZone = nearZones[0].zone;
-        zoneName = "Vicino a: " + selectedZone.name;
-      }
+      const zone = getZoneFromCoords(lat, lon);
+      const zoneName = zone || "Fuori dalle aree conosciute";
 
       if (zoneName === lastZoneName) {
         stabilityCounter++;
@@ -257,7 +227,7 @@ function startTracking() {
         stabilityCounter = 1;
       }
 
-      window.currentZoneName = zoneName; // sempre aggiornato
+      window.currentZoneName = zoneName;
 
       if (stabilityCounter >= stabilityThreshold) {
         outputLocation.textContent = Luogo: ${zoneName};
@@ -265,18 +235,14 @@ function startTracking() {
         locationStatus.style.color = "green";
       }
     },
-    function (error) {
-      outputCoords.textContent = "Errore nella geolocalizzazione: " + error.message;
+    (error) => {
+      outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
       outputLocation.textContent = "--";
       outputAccuracy.textContent = "-- metri";
-      locationStatus.textContent = "❌ Errore nel rilevamento.";
+      locationStatus.textContent = "❌ Errore posizione";
       locationStatus.style.color = "red";
     },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 }
 
@@ -292,20 +258,30 @@ function stopTracking() {
   }
 }
 
-// === Funzioni di supporto ===
+// === FUNZIONI DI SUPPORTO ===
+
+function getZoneFromCoords(lat, lon) {
+  for (const zone of zones) {
+    if (isInsidePolygon(lat, lon, zone.points)) return zone.name;
+  }
+  return null;
+}
 
 function isInsidePolygon(lat, lon, polygon) {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const xi = polygon[i].lat, yi = polygon[i].lon;
     const xj = polygon[j].lat, yj = polygon[j].lon;
-
     const intersect = ((yi > lon) !== (yj > lon)) &&
       (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
     if (intersect) inside = !inside;
   }
   return inside;
 }
+
+// Per sicurezza puoi esportare le funzioni se usi ES modules
+window.startTracking = startTracking;
+window.stopTracking = stopTracking;
 
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
