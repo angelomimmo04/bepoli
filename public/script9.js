@@ -12,7 +12,8 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
     return;
   }
 
-  formData.append("location", window.currentZoneName || "Posizione sconosciuta");
+  console.log("🌍 Zona rilevata prima del post:", window.currentZoneName);
+formData.append("location", window.currentZoneName || "Posizione sconosciuta");
   
 
   try {
