@@ -180,6 +180,7 @@ let watchId = null;
 let lastZoneName = null;
 let stabilityCounter = 0;
 const stabilityThreshold = 3;
+let lastLoadedZoneName = null;
 window.currentZoneName = null;
 
 function startTracking() {
@@ -239,9 +240,12 @@ console.log("📌 Zona trovata da getZoneFromCoords:", zone);
                 locationStatus.style.color = "green";
                 window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
 
-                // Qui chiami la funzione per ricaricare i post filtrati dalla nuova zona
-    if (typeof onUserLocationActivated === "function") {
-      onUserLocationActivated(zoneName);
+                if (zoneName !== lastLoadedZoneName) {
+        lastLoadedZoneName = zoneName;
+
+        if (typeof onUserLocationActivated === "function") {
+            onUserLocationActivated(zoneName);
+        }
     }
             }
         },
