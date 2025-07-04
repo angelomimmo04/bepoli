@@ -642,6 +642,7 @@ app.get("/api/posts", async (req, res) => {
         nome: post.userId.nome
       },
       desc: post.desc,
+      location: post.location,
       createdAt: post.createdAt,
       imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
       likes: post.likes.length,
@@ -729,6 +730,7 @@ app.get("/api/posts", async (req, res) => {
             nome: post.user.nome
           },
           desc: post.desc,
+          location: post.location,
           createdAt: post.createdAt,
           imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
           likes: post.likes.length,
