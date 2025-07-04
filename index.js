@@ -567,7 +567,7 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
     const newPost = new Post({
       userId,
       desc: req.body.desc,
-      location: req.body.location  // ✅ SALVA LA POSIZIONE
+      location: req.body.location,  // ✅ SALVA LA POSIZIONE
       createdAt: new Date(),
       image: req.file ? {
         data: req.file.buffer,
