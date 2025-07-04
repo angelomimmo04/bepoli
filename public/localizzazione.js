@@ -234,6 +234,7 @@ function startTracking() {
                 outputLocation.textContent = `Luogo: ${zoneName}`;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
+                window.currentZoneName = zoneName;
             }
         },
         (error) => {
