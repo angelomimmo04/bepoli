@@ -41,6 +41,9 @@ const pageSize = 10;
 let loading = false;
 let finished = false;
 
+let currentLocationFilter = "Fuori dalle aree conosciute"; // default se posizione non attiva
+
+
 async function caricaPost(page = 1) {
   if (loading || finished) return; // evita chiamate duplicate o se finito
   loading = true;
@@ -48,7 +51,9 @@ async function caricaPost(page = 1) {
 
 
   try {
-    const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}`, { credentials: 'include' });
+    const location = encodeURIComponent(window.currentZoneName || "");
+const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}&location=${location}`, { credentials: 'include' });
+
     if (!res.ok) throw new Error("Errore fetch");
 
     const posts = await res.json();
@@ -241,7 +246,16 @@ document.getElementById('loadMore').addEventListener('click', () => {
 });
 
 // Carica prima pagina all’avvio
-caricaPost(1);
+// Carica prima pagina con filtro default (posizione sconosciuta)
+caricaPost(1, currentLocationFilter);
+
+// Quando l’utente attiva la posizione
+function onUserLocationActivated(zoneName) {
+  currentLocationFilter = zoneName || "Fuori dalle aree conosciute";
+  finished = false;
+  currentPage = 1;
+  caricaPost(1, currentLocationFilter);
+}
 
 
 // === MODALE PROFILO ===
