@@ -564,10 +564,15 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
 
     const location = req.body.location || "Posizione sconosciuta";
 
+    console.log("📩 Ricevuto post da frontend:", {
+      location: location,
+      desc: req.body.desc
+    });
+
     const newPost = new Post({
       userId,
       desc: req.body.desc,
-      location,
+      location, // ✅ salva qui la posizione ricevuta
       createdAt: new Date(),
       image: req.file ? {
         data: req.file.buffer,
@@ -578,11 +583,12 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
     await newPost.save();
     res.status(201).json(newPost);
 
-  } catch (err) {
-    console.error("Errore creazione post:", err);
+  } catch (error) {
+    console.error("Errore creazione post:", error);
     res.status(500).json({ message: "Errore del server" });
   }
 });
+
 
 
 
