@@ -209,8 +209,9 @@ function startTracking() {
             
             //const lat = position.coords.latitude;
             //const lon = position.coords.longitude;
-            const lat = 41.108830
-            const lon = 16.879780
+            const lat = 41.108826
+            const lon = 16.879754
+           
            
             
             
