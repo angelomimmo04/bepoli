@@ -209,6 +209,7 @@ function startTracking() {
 
             outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
             outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
+            outputAccuracy.textContent = `Luogo: ${zoneName}`;
 
             if (accuracy > 25) {
                 outputLocation.textContent = "Segnale GPS debole, posizione incerta...";
