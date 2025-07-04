@@ -203,13 +203,21 @@ function startTracking() {
 
     watchId = navigator.geolocation.watchPosition(
         (position) => {
+          
+            
+            
             //const lat = position.coords.latitude;
             //const lon = position.coords.longitude;
+           
+            
             const lat = 41.108750
             const lon = 16.879650
             
-            console.log("Latitudine:", lat, "Longitudine:", lon);
-            const accuracy = position.coords.accuracy;
+           console.log("Latitudine:", lat, "Longitudine:", lon);
+           const accuracy = position.coords.accuracy;
+            console.log("📍 Coordinate attuali:", lat, lon);
+const zone = getZoneFromCoords(lat, lon);
+console.log("📌 Zona trovata da getZoneFromCoords:", zone);
 
             outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
             outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
@@ -260,22 +268,26 @@ function stopTracking() {
 }
 
 function getZoneFromCoords(lat, lon) {
-    for (const zone of zones) {
-        if (isInsidePolygon(lat, lon, zone.points)) return zone.name;
-    }
-    return null;
+  for (const zone of zones) {
+    const inside = isInsidePolygon(lat, lon, zone.points);
+    console.log(🔎 Controllo zona "${zone.name}": ${inside});
+    if (inside) return zone.name;
+  }
+  return null;
 }
 
 function isInsidePolygon(lat, lon, polygon) {
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const xi = polygon[i].lat, yi = polygon[i].lon;
-        const xj = polygon[j].lat, yj = polygon[j].lon;
-        const intersect = ((yi > lon) !== (yj > lon)) &&
-            (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-    return inside;
+  console.log("📐 Check polygon:", polygon);
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lat, yi = polygon[i].lon;
+    const xj = polygon[j].lat, yj = polygon[j].lon;
+
+    const intersect = ((yi > lon) !== (yj > lon)) &&
+      (lat < (xj - xi) * (lon - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
 // Rendi le funzioni disponibili globalmente
