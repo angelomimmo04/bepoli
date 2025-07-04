@@ -621,13 +621,11 @@ const Post = mongoose.model("Post", postSchema);
 app.get("/api/posts", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const pageSize = 10;
-  const location = req.query.location;
+  const location = req.query.location || "Fuori dalle aree conosciute"; // fallback su "Fuori dalle aree conosciute"
 
   try {
-    const query = {};
-    if (location && location !== "Fuori dalle aree conosciute") {
-      query.location = location;
-    }
+    // FILTRO SEMPRE applicato in base a location ricevuta
+    const query = { location };
 
     const posts = await Post.find(query)
       .sort({ createdAt: -1 })
@@ -636,6 +634,7 @@ app.get("/api/posts", async (req, res) => {
       .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
 
+    // Mappatura risposta come già facevi
     return res.json(posts.map(post => ({
       _id: post._id,
       userId: {
@@ -658,8 +657,9 @@ app.get("/api/posts", async (req, res) => {
         }
       }))
     })));
+
   } catch (err) {
-    console.log("ram database piena ma tiro avanti");
+    // fallback aggregate (come avevi prima, con filtro applicato anche qui)
     if (
       err.code === 292 ||
       err.codeName === "QueryExceededMemoryLimitNoDiskUseAllowed" ||
@@ -667,6 +667,7 @@ app.get("/api/posts", async (req, res) => {
     ) {
       try {
         const aggPipeline = [
+          { $match: { location } }, // filtro sempre presente
           { $sort: { createdAt: -1 } },
           { $skip: (page - 1) * pageSize },
           { $limit: pageSize },
@@ -718,12 +719,6 @@ app.get("/api/posts", async (req, res) => {
           { $project: { commentUsers: 0 } }
         ];
 
-        if (location && location !== "Fuori dalle aree conosciute") {
-          aggPipeline.unshift({
-            $match: { location: location }
-          });
-        }
-
         const posts = await Post.aggregate(aggPipeline).allowDiskUse(true);
 
         const formattedPosts = posts.map(post => ({
@@ -760,6 +755,7 @@ app.get("/api/posts", async (req, res) => {
     return res.status(500).json({ message: "Errore caricamento post" });
   }
 });
+
 
 
 
