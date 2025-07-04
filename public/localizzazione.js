@@ -222,7 +222,7 @@ console.log("📌 Zona trovata da getZoneFromCoords:", zone);
             outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
             outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
 
-            const zone = getZoneFromCoords(lat, lon);
+            //const zone = getZoneFromCoords(lat, lon);
             const zoneName = zone || "Fuori dalle aree conosciute";
 
             if (zoneName === lastZoneName) {
