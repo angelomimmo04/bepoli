@@ -270,7 +270,7 @@ function stopTracking() {
 function getZoneFromCoords(lat, lon) {
   for (const zone of zones) {
     const inside = isInsidePolygon(lat, lon, zone.points);
-    console.log(🔎 Controllo zona "${zone.name}": ${inside});
+    console.log(`🔎 Controllo zona "${zone.name}": ${inside}`);
     if (inside) return zone.name;
   }
   return null;
