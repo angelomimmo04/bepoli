@@ -554,6 +554,7 @@ app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
 
 // POST RICCARDO 9
 
+
 app.post('/api/posts', upload.single("image"), async (req, res) => {
   try {
     const userId = req.session.user?.id;
@@ -561,31 +562,27 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
       return res.status(401).json({ message: "Utente non autenticato" });
     }
 
-    // Prendi la posizione dal form (il frontend usa "location" nei FormData)
     const location = req.body.location || "Posizione sconosciuta";
 
-const newPost = new Post({
-  userId,
-  desc: req.body.desc,
-  location,  // ✅ usa la variabile già pronta
-  createdAt: new Date(),
-  image: req.file ? {
-    data: req.file.buffer,
-    contentType: req.file.mimetype
-  } : null
-});
-    
+    const newPost = new Post({
+      userId,
+      desc: req.body.desc,
+      location,
+      createdAt: new Date(),
+      image: req.file ? {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      } : null
     });
 
     await newPost.save();
-    res.status(201).json({ message: "Post creato", postId: newPost._id });
+    res.status(201).json(newPost);
+
   } catch (err) {
-    console.error("Errore nella creazione del post:", err);
-    res.status(500).json({ message: "Errore creazione post" });
+    console.error("Errore creazione post:", err);
+    res.status(500).json({ message: "Errore del server" });
   }
 });
-
-
 
 
 
