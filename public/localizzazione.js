@@ -207,8 +207,8 @@ function startTracking() {
             const lon = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
-            outputCoords.textContent = Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)};
-            outputAccuracy.textContent = Accuratezza: ${Math.round(accuracy)} metri;
+            outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
+            outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
 
             const zone = getZoneFromCoords(lat, lon);
             const zoneName = zone || "Fuori dalle aree conosciute";
