@@ -217,23 +217,27 @@ function startTracking() {
                 locationStatus.style.color = "orange";
                 return;
             }
-
             const zone = getZoneFromCoords(lat, lon);
-            const zoneName = zone || "Fuori dalle aree conosciute";
+const zoneName = zone || null;
 
-            if (zoneName === lastZoneName) {
-                stabilityCounter++;
-            } else {
-                lastZoneName = zoneName;
-                stabilityCounter = 1;
-            }
+if (zoneName === lastZoneName) {
+    stabilityCounter++;
+} else {
+    lastZoneName = zoneName;
+    stabilityCounter = 1;
+}
 
-            if (stabilityCounter >= stabilityThreshold) {
-                outputLocation.textContent = `Luogo: ${zoneName}`;
-                locationStatus.textContent = "✅ Posizione rilevata";
-                locationStatus.style.color = "green";
-                window.currentZoneName = zoneName;
-            }
+if (stabilityCounter >= stabilityThreshold && zoneName) {
+    outputLocation.textContent = Luogo: ${zoneName};
+    locationStatus.textContent = "✅ Posizione rilevata";
+    locationStatus.style.color = "green";
+    window.currentZoneName = zoneName;
+} else {
+    window.currentZoneName = null;
+}
+
+
+            
         },
         (error) => {
             outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
