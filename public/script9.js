@@ -101,7 +101,7 @@ async function caricaPost(page = 1) {
 
       const locationEl = clone.querySelector('.post-location');
 if (locationEl) {
-  locationEl.textContent = Luogo: ${post.location || "Posizione sconosciuta"};
+  locationEl.textContent = `Luogo: ${post.location || "Posizione sconosciuta"}`;
 }
       
 
