@@ -148,36 +148,7 @@ if (locationEl) {
         }
       });
 
-      //NON STA NIENTE
-
-      const noPostsMessageEl = document.getElementById('no-posts-message');
-
-if (posts.length === 0) {
-  console.log('Nessun post trovato')
-  // Se non ci sono post per la posizione selezionata
-  if (currentLocationFilter === "Fuori dalle aree conosciute") {
-    noPostsMessageEl.textContent = "⚠ Non sei in una zona conosciuta o attiva, quindi non ci sono post da mostrare.";
-  } else {
-    noPostsMessageEl.textContent = `⚠ Nessun post trovato per la posizione: "${currentLocationFilter}"`;
-  }
-  noPostsMessageEl.style.display = 'block';
-
-  // Nascondi bottone "Carica altri"
-  document.getElementById('loadMore').style.display = 'none';
-
-  // Se è la prima pagina, svuota il feed
-  if (page === 1) {
-    document.getElementById('feed').innerHTML = '';
-  }
-
-  finished = true; // blocca caricamenti ulteriori
-} else {
-  // Ci sono post: nascondi il messaggio
-  noPostsMessageEl.style.display = 'none';
-  // Mostra o nascondi bottone carica altri
-  document.getElementById('loadMore').style.display = posts.length < pageSize ? 'none' : '';
-  finished = posts.length < pageSize;
-}
+      
 
       // Commenti
       const commentToggleBtn = clone.querySelector('.comment-toggle-button');
