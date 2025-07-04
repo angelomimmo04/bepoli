@@ -44,15 +44,14 @@ let finished = false;
 let currentLocationFilter = "Fuori dalle aree conosciute"; // default se posizione non attiva
 
 
-async function caricaPost(page = 1, locationFilter = "Fuori dalle aree conosciute") {
-  if (loading || finished) return; // evita chiamate duplicate o se finito
+async function caricaPost(page = 1) {
+  if (loading || finished) return;
   loading = true;
   document.getElementById('loader').classList.remove('hidden');
 
-
   try {
-    const location = encodeURIComponent(window.currentZoneName || "");
-const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}&location=${location}`, { credentials: 'include' });
+    const location = encodeURIComponent(currentLocationFilter || "Fuori dalle aree conosciute");
+    const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}&location=${location}`, { credentials: 'include' });
 
     if (!res.ok) throw new Error("Errore fetch");
 
@@ -247,7 +246,7 @@ document.getElementById('loadMore').addEventListener('click', () => {
 
 // Carica prima pagina all’avvio
 // Carica prima pagina con filtro default (posizione sconosciuta)
-caricaPost(1, currentLocationFilter);
+caricaPost(1);
 
 // Quando l’utente attiva la posizione
 function onUserLocationActivated(zoneName) {
