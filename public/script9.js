@@ -12,7 +12,7 @@ if (!location || location === "--" || location.includes("incerta") || location.i
   return;
 }
 
-formData.append("location", location);
+formData.append("location", window.currentZoneName || "Posizione sconosciuta");
 
   try {
     const res = await fetch('/api/posts', {
