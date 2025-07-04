@@ -12,7 +12,8 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
     return;
   }
 
-  formData.append("location", zone); // ✅ invia la zona attuale
+  formData.append("location", window.currentZoneName || "Posizione sconosciuta");
+  
 
   try {
     const res = await fetch('/api/posts', {
