@@ -153,6 +153,7 @@ if (locationEl) {
       const noPostsMessageEl = document.getElementById('no-posts-message');
 
 if (posts.length === 0) {
+  console.log('Nessun post trovato')
   // Se non ci sono post per la posizione selezionata
   if (currentLocationFilter === "Fuori dalle aree conosciute") {
     noPostsMessageEl.textContent = "⚠ Non sei in una zona conosciuta o attiva, quindi non ci sono post da mostrare.";
