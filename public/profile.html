@@ -3,199 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="style-profilo.css" rel="stylesheet" />
   <title>Profilo utente</title>
   <link rel="icon" href="https://raw.githubusercontent.com/angelomimmo04/bepoli/refs/heads/master/public/logobepoli.png">
+  <link href="style-profilo.css" rel="stylesheet" />
   <style>
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
+    /* --- Stili modale + post --- */
+    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,.5);}
+    .modal-content { background:#fff; margin:10% auto; padding:20px; border-radius:8px; width:80%; max-width:500px; }
+    .close-btn { float:right; font-size:24px; cursor:pointer; }
+    #modalList { list-style:none; padding:0; }
+    #modalList li { padding:10px 0; border-bottom:1px solid #ddd; }
+    #modalList li a { text-decoration:none; color:black; }
 
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 500px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .close-btn {
-      float: right;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #modalList {
-      list-style: none;
-      padding: 0;
-    }
-
-    #modalList li {
-      padding: 10px 0;
-      border-bottom: 1px solid #ddd;
-    }
-
-    #modalList li a {
-      text-decoration: none;
-      color: black;
-    }
-
-    #modalList li a:hover {
-      text-decoration: none;
-    }
-
-    #posts-container {
-      margin: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-    }
-
-    .post-card {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      background: white;
-    }
-
-    .post-card img {
-      width: 100%;
-      border-radius: 8px;
-      object-fit: cover;
-      max-height: 300px;
-    }
-
-    .post-meta {
-      font-size: 0.9em;
-      color: #555;
-    }
-
-    .post-desc {
-      margin: 10px 0;
-    }
-
-    #loadMorePosts {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      background-color: white;
-      color: black;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+    #posts-container { margin:20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:16px; }
+    .post-card { border:1px solid #ccc; border-radius:10px; padding:10px; background:#fff; }
+    .post-card img { width:100%; border-radius:8px; object-fit:cover; max-height:300px; }
+    .post-meta { font-size:0.9em; color:#555; }
+    .post-desc { margin:10px 0; }
+    #loadMorePosts { display:block; margin:20px auto; padding:10px 20px; font-size:1rem; border:1px solid #ccc; background:#fff; cursor:pointer; border-radius:5px; }
   </style>
 </head>
 <body>
-  <header>
-    <a href="prova18.html">
-      <img src="logobepoli.png" alt="Logo" id="logo" />
-    </a>
-  </header>
 
-  <nav class="leftnav" id="mainnav">
-    <ul>
-      <li><a href="prova18.html">home</a></li>
-      <li><a href="#">messaggi</a></li>
-      <li><a href="#">notifiche</a></li>
-      <li><a href="#">esplora</a></li>
-      <li><a href="profile.html">profilo</a></li>
-      <li><a href="#">crea</a></li>
-    </ul>
-  </nav>
+<header>
+  <a href="prova18.html"><img src="logobepoli.png" alt="Logo" id="logo" /></a>
+</header>
 
-  <div id="info">
-    <div id="base">
-      <img src="fotoprofilo.png" alt="Profilo utente" id="profile" />
-      <div id="gigi">
-        <p id="username">loading...</p>
+<nav class="leftnav" id="mainnav">
+  <ul>
+    <li><a href="prova18.html">home</a></li>
+    <li><a href="#">messaggi</a></li>
+    <li><a href="#">notifiche</a></li>
+    <li><a href="#">esplora</a></li>
+    <li><a href="profile.html">profilo</a></li>
+    <li><a href="#">crea</a></li>
+  </ul>
+</nav>
 
-        <div id="social">
-          <div><p>post: <span id="postCount">0</span></p></div>
-          <span id="followerCount" style="cursor:pointer;">Follower: 0</span>
-          <span id="followingCount" style="cursor:pointer;">Seguiti: 0</span>
-
-          <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
-          <button id="followBtn" class="btn" style="display:none;">Segui</button>
-        </div>
-
-        <h1 id="name">nome utente</h1>
-        <p id="bio">Bio utente</p>
+<div id="info">
+  <div id="base">
+    <img src="fotoprofilo.png" alt="Profilo utente" id="profile" />
+    <div id="gigi">
+      <p id="username">loading...</p>
+      <div id="social">
+        <div><p>Post: <span id="postCount">0</span></p></div>
+        <span id="followerCount" style="cursor:pointer;">Follower: 0</span>
+        <span id="followingCount" style="cursor:pointer;">Seguiti: 0</span>
+        <a href="modificaprofilo.html" id="editBtn" class="btn">Modifica profilo</a>
+        <button id="followBtn" class="btn" style="display:none;">Segui</button>
       </div>
+      <h1 id="name">nome utente</h1>
+      <p id="bio">Bio utente</p>
     </div>
   </div>
+</div>
 
-  <div id="post-section">
-    <div id="posts-container"></div>
-    <button id="loadMorePosts">Carica altri</button>
+<div id="post-section">
+  <div id="posts-container"></div>
+  <button id="loadMorePosts">Carica altri</button>
+</div>
+
+<!-- MODALE -->
+<div id="modalFollow" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <ul id="modalList"></ul>
   </div>
+</div>
 
-  <!-- MODALE PER FOLLOWER/SEGUENTI -->
-  <div id="modalFollow" class="modal">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h2 id="modalTitle"></h2>
-      <ul id="modalList"></ul>
-    </div>
-  </div>
-
-  <script>
+<script>
 window.onload = async function () {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
-  let isOwnProfile = false;
-  let user;
+  let user, isOwnProfile = false;
 
   try {
     if (id) {
-      const res = await fetch(`/api/user-public/${id}`);
-      if (!res.ok) throw new Error("Utente non trovato");
+      const res = await fetch(`/api/user/${id}`);
+      if (!res.ok) throw new Error();
       user = await res.json();
-      isOwnProfile = false;
     } else {
-      const res = await fetch("/api/user", {
-        credentials: "include",
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error("Non autenticato");
+      const res = await fetch(`/api/user`, { credentials: "include" });
+      if (!res.ok) throw new Error();
       user = await res.json();
       isOwnProfile = true;
     }
-  } catch (err) {
-    alert("Utente non trovato o accesso non autorizzato.");
+  } catch {
+    alert("Accesso negato o utente non trovato.");
     window.location.href = "login.html";
     return;
   }
 
-  const userId = user._id || user.id;
-
-  // Info profilo
-  document.title = user.username + "'s profile";
-  document.getElementById("name").textContent = user.nome;
+  const userId = user._id;
+  document.title = `${user.username} | Profilo`;
   document.getElementById("username").textContent = user.username;
+  document.getElementById("name").textContent = user.nome;
   document.getElementById("bio").textContent = user.bio || "Nessuna bio";
+  document.getElementById("followerCount").textContent = `Follower: ${user.followers.length}`;
+  document.getElementById("followingCount").textContent = `Seguiti: ${user.following.length}`;
+  document.getElementById("profile").src = `/api/user-photo/${userId}`;
 
-  document.getElementById("followerCount").textContent = "Follower: " + (user.followersCount || 0);
-  document.getElementById("followingCount").textContent = "Seguiti: " + (user.followingCount || 0);
-  document.getElementById("followerCount").onclick = () => apriListaFollow("followers", userId);
-  document.getElementById("followingCount").onclick = () => apriListaFollow("following", userId);
-
-  const profileImg = document.getElementById("profile");
-  profileImg.src = `/api/user-photo/${userId}`;
-  profileImg.onerror = () => { profileImg.src = "fotoprofilo.png"; };
+  document.getElementById("followerCount").onclick = () => openModal("Follower", user.followers);
+  document.getElementById("followingCount").onclick = () => openModal("Seguiti", user.following);
 
   if (isOwnProfile) {
     document.getElementById("editBtn").style.display = "inline-block";
@@ -204,7 +114,6 @@ window.onload = async function () {
     const followBtn = document.getElementById("followBtn");
     followBtn.style.display = "inline-block";
     followBtn.textContent = "Caricamento...";
-
     try {
       const res = await fetch(`/api/follow-info/${userId}`, { credentials: "include" });
       const data = await res.json();
@@ -213,95 +122,62 @@ window.onload = async function () {
         const res = await fetch(`/api/follow/${userId}`, {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
         });
         const result = await res.json();
-        if (res.ok) {
-          followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-          document.getElementById("followerCount").textContent = "Follower: " + result.followersCount;
-        } else {
-          alert(result.message || "Errore");
-        }
+        followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
+        document.getElementById("followerCount").textContent = `Follower: ${result.followersCount}`;
       };
-    } catch {
-      followBtn.textContent = "Errore";
-    }
+    } catch { followBtn.textContent = "Errore"; }
   }
-
-  // Sessione
-  sessionStorage.setItem("user", JSON.stringify({
-    _id: user._id || user.id,
-    nome: user.nome,
-    username: user.username,
-    bio: user.bio,
-  }));
 
   // Paginazione post
-  let postPage = 1;
-  const postLimit = 9;
-  let finePost = false;
-  const postContainer = document.getElementById("posts-container");
-  const loadMorePosts = document.getElementById("loadMorePosts");
-  const loadedPostIds = new Set();
+  let page = 1, limit = 9, loaded = 0, fine = false;
+  const btnLoad = document.getElementById("loadMorePosts");
+  const cont = document.getElementById("posts-container");
 
-  async function caricaPost() {
-    if (finePost) return;
-
-    loadMorePosts.disabled = true;
-    loadMorePosts.textContent = "Caricamento...";
-
-    const res = await fetch(`/api/user/${userId}/posts?page=${postPage}&limit=${postLimit}`, {
-      credentials: "include",
-    });
-    if (!res.ok) {
-      console.error("Errore caricamento post");
-      loadMorePosts.disabled = false;
-      loadMorePosts.textContent = "Carica altri";
-      return;
-    }
-
+  async function loadPosts() {
+    if (fine) return;
+    btnLoad.disabled = true;
+    btnLoad.textContent = "Caricamento...";
+    const res = await fetch(`/api/user/${userId}/posts?page=${page}&limit=${limit}`);
     const posts = await res.json();
-    if (!Array.isArray(posts) || posts.length === 0) {
-      finePost = true;
-      loadMorePosts.style.display = "none";
-      return;
-    }
-
     posts.forEach(post => {
-      if (loadedPostIds.has(post._id)) return; // Evita duplicati
-
-      loadedPostIds.add(post._id);
       const div = document.createElement("div");
       div.className = "post-card";
-      div.innerHTML = `
-        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="post image">` : ""}
+      div.innerHTML = `${post.imageUrl ? `<img src="${post.imageUrl}" alt="">` : ""}
         <div class="post-desc">${post.desc || ""}</div>
-        <div class="post-meta">❤️ ${post.likes} | 💬 ${post.comments}</div>
-      `;
-      postContainer.appendChild(div);
+        <div class="post-meta">❤️ ${post.likes} | 💬 ${post.comments}</div>`;
+      cont.appendChild(div);
     });
-
-    postPage++;
-    if (posts.length < postLimit) {
-      finePost = true;
-      loadMorePosts.style.display = "none";
-    } else {
-      loadMorePosts.style.display = "block";
-      loadMorePosts.disabled = false;
-      loadMorePosts.textContent = "Carica altri";
-    }
-
-    document.getElementById("postCount").textContent = loadedPostIds.size;
+    loaded += posts.length;
+    document.getElementById("postCount").textContent = loaded;
+    if (posts.length < limit) { fine = true; btnLoad.style.display = "none"; }
+    else { page++; btnLoad.disabled = false; btnLoad.textContent = "Carica altri"; }
   }
 
-  loadMorePosts.onclick = caricaPost;
-  caricaPost();
+  btnLoad.onclick = loadPosts;
+  loadPosts();
+
+  function openModal(title, list) {
+    document.getElementById("modalTitle").textContent = title;
+    const ul = document.getElementById("modalList");
+    ul.innerHTML = "";
+    list.forEach(u => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="profile.html?id=${u._id}">${u.username}</a>`;
+      ul.appendChild(li);
+    });
+    document.getElementById("modalFollow").style.display = "block";
+  }
+
+  document.querySelector(".close-btn").onclick = () => {
+    document.getElementById("modalFollow").style.display = "none";
+  };
+  window.onclick = e => {
+    if (e.target == document.getElementById("modalFollow"))
+      document.getElementById("modalFollow").style.display = "none";
+  };
 };
-</script>
-
-
-</body>
-</html>
 </script>
 
 </body>
