@@ -875,43 +875,10 @@ app.get("/api/posts/:id/comments", async (req, res) => {
 
 
 
-app.get("/api/user/:id", async (req, res) => {
+app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
   try {
-    const user = await Utente.findById(req.params.id)
-      .populate("followers", "username nome")
-      .populate("following", "username nome");
-
-    if (!user) {
-      return res.status(404).json({ message: "Utente non trovato" });
-    }
-
-    // Conta i post totali di questo utente
-    const totalPosts = await Post.countDocuments({ userId: req.params.id });
-
-    res.json({
-      _id: user._id,
-      username: user.username,
-      nome: user.nome,
-      followers: user.followers,
-      following: user.following,
-      totalPosts // 👈 numero fisso dei post
-    });
-  } catch (err) {
-    console.error("Errore caricamento utente:", err);
-    res.status(500).json({ message: "Errore caricamento utente" });
-  }
-});
-
-
-app.get("/api/user/:id/posts", async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 9;
-
     const posts = await Post.find({ userId: req.params.id })
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
       .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
 
@@ -937,11 +904,10 @@ app.get("/api/user/:id/posts", async (req, res) => {
       }))
     })));
   } catch (err) {
-    console.error("Errore caricamento post:", err);
+    console.error("Errore caricamento post utente:", err);
     res.status(500).json({ message: "Errore caricamento post utente" });
   }
 });
-
 
 
 
