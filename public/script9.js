@@ -282,14 +282,14 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 //profilo//
   
-  document.getElementById('goToProfile').addEventListener('click', (e) => {
-  e.preventDefault();
-  if (typeof loggedUserId !== 'undefined') {
-    window.location.href = `profile.html?id=${loggedUserId}`;
-  } else {
-    alert("ID utente non disponibile.");
-  }
-});
+  //document.getElementById('goToProfile').addEventListener('click', (e) => {
+  //e.preventDefault();
+  //if (typeof loggedUserId !== 'undefined') {
+  //  window.location.href = `profile.html?id=${loggedUserId}`;
+  //} else {
+  //  alert("ID utente non disponibile.");
+  //}
+//});
 
 
 
