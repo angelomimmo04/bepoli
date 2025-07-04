@@ -260,8 +260,8 @@ function startTracking() {
         (position) => {
             //const lat = position.coords.latitude;
             //const lon = position.coords.longitude;
-            const lat = 41.108814
-            const lon = 16.879763
+            const lat = 41.108902
+            const lon = 16.879695
             const accuracy = position.coords.accuracy;
 
             outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
