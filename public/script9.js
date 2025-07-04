@@ -98,11 +98,12 @@ async function caricaPost(page = 1) {
       wrapper.appendChild(profileImg);
       wrapper.appendChild(linkProfilo);
       const posizioneP = document.createElement('p');
-      posizioneP.textContent = post.location || "Posizione sconosciuta";
-      posizioneP.style.margin = '0';
-      posizioneP.style.fontSize = '0.8em';
-      posizioneP.style.color = '#666';
-      wrapper.appendChild(posizioneP);
+
+      const locationEl = clone.querySelector('.post-location');
+if (locationEl) {
+  locationEl.textContent = Luogo: ${post.location || "Posizione sconosciuta"};
+}
+      
 
       nomeSpan.replaceWith(wrapper);
 
