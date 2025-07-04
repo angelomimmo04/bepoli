@@ -66,6 +66,7 @@ async function caricaPost(page = 1) {
     if (page === 1) feed.innerHTML = '';
 
     posts.forEach(post => {
+      console.log("📦 Post ricevuto:", post);
       const clone = template.content.cloneNode(true);
 
       // === Dati autore ===
