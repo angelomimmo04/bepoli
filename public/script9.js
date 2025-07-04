@@ -44,7 +44,7 @@ let finished = false;
 let currentLocationFilter = "Fuori dalle aree conosciute"; // default se posizione non attiva
 
 
-async function caricaPost(page = 1) {
+async function caricaPost(page = 1, locationFilter = "Fuori dalle aree conosciute") {
   if (loading || finished) return; // evita chiamate duplicate o se finito
   loading = true;
   document.getElementById('loader').classList.remove('hidden');
@@ -241,7 +241,7 @@ if (locationEl) {
 // Bottone carica altri
 document.getElementById('loadMore').addEventListener('click', () => {
   if (!loading && !finished) {
-    caricaPost(currentPage + 1);
+    caricaPost(currentPage + 1, currentLocationFilter);
   }
 });
 
