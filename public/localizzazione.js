@@ -221,12 +221,13 @@ function startTracking() {
                 stabilityCounter = 1;
             }
 
-            window.currentZoneName = zoneName;
+        
 
             if (stabilityCounter >= stabilityThreshold) {
                 outputLocation.textContent = `Luogo: ${zoneName}`;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
+                window.currentZoneName = zoneName;
             }
         },
         (error) => {
