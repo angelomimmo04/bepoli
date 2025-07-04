@@ -564,15 +564,17 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
     // Prendi la posizione dal form (il frontend usa "location" nei FormData)
     const location = req.body.location || "Posizione sconosciuta";
 
-    const newPost = new Post({
-      userId,
-      desc: req.body.desc,
-      location: req.body.location,  // ✅ SALVA LA POSIZIONE
-      createdAt: new Date(),
-      image: req.file ? {
-        data: req.file.buffer,
-        contentType: req.file.mimetype
-      } : null
+const newPost = new Post({
+  userId,
+  desc: req.body.desc,
+  location,  // ✅ usa la variabile già pronta
+  createdAt: new Date(),
+  image: req.file ? {
+    data: req.file.buffer,
+    contentType: req.file.mimetype
+  } : null
+});
+    
     });
 
     await newPost.save();
