@@ -64,7 +64,7 @@
       const parsedUser = JSON.parse(user);
       if (parsedUser && parsedUser.email) {
         sessionStorage.setItem("playLogoAnimation", "true");
-        window.location.href = "prova18.html";
+        window.location.href = "home.html";
       }
     } catch (e) {
       console.log("Utente non loggato o sessione malformata");
@@ -156,7 +156,7 @@
       await fetchAuthToken();  // <-- CHIAMATA per prendere il token JWT
       sessionStorage.setItem("playLogoAnimation", "true");
 
-      startLogoTransition("prova18.html");
+      startLogoTransition("home.html");
     })
     .catch(err => {
       console.error("Errore Google login:", err);
@@ -185,7 +185,7 @@
         sessionStorage.setItem("user", JSON.stringify(data.user));
         await fetchAuthToken();  // <-- CHIAMATA per prendere il token JWT
         sessionStorage.setItem("playLogoAnimation", "true");
-        startLogoTransition("prova18.html");
+        startLogoTransition("home.html");
       } else {
         alert("Errore: " + data.message);
       }
