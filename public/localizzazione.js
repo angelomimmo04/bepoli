@@ -1,4 +1,4 @@
-//let watchId = null;
+let watchId = null;
 
 let lastZoneName = null;
 let stabilityCounter = 0;
