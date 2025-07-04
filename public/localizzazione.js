@@ -237,7 +237,7 @@ console.log("📌 Zona trovata da getZoneFromCoords:", zone);
                 outputLocation.textContent = `Luogo: ${zoneName}`;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
-                window.currentZoneName = zoneName;
+                window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
 
                 // Qui chiami la funzione per ricaricare i post filtrati dalla nuova zona
     if (typeof onUserLocationActivated === "function") {
