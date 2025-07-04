@@ -84,6 +84,18 @@
     .post-desc {
       margin: 10px 0;
     }
+
+    #loadMorePosts {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      background-color: white;
+      color: black;
+      cursor: pointer;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
@@ -125,10 +137,10 @@
     </div>
   </div>
 
- <div id="post-section">
-  <div id="posts-container"></div>
-</div>
-
+  <div id="post-section">
+    <div id="posts-container"></div>
+    <button id="loadMorePosts">Carica altri</button>
+  </div>
 
   <!-- MODALE PER FOLLOWER/SEGUENTI -->
   <div id="modalFollow" class="modal">
@@ -140,129 +152,156 @@
   </div>
 
   <script>
-  window.onload = async function () {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    window.onload = async function () {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
 
-    let isOwnProfile = false;
-    let user;
-
-    try {
-      if (id) {
-        const res = await fetch(`/api/user-public/${id}`);
-        if (!res.ok) throw new Error("Utente non trovato");
-        user = await res.json();
-        isOwnProfile = false;
-      } else {
-        const res = await fetch("/api/user", {
-          credentials: "include",
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res.ok) throw new Error("Non autenticato");
-        user = await res.json();
-        isOwnProfile = true;
-      }
-    } catch (err) {
-      alert("Utente non trovato o accesso non autorizzato.");
-      window.location.href = "login.html";
-      return;
-    }
-
-    const userId = user._id || user.id;
-
-    document.getElementById("followerCount").onclick = () =>
-      apriListaFollow("followers", userId);
-    document.getElementById("followingCount").onclick = () =>
-      apriListaFollow("following", userId);
-
-    document.title = user.username + "'s profile";
-    document.getElementById("name").textContent = user.nome;
-    document.getElementById("username").textContent = user.username;
-    document.getElementById("bio").textContent = user.bio || "Nessuna bio";
-
-    document.getElementById("followerCount").textContent = "Follower: " + (user.followersCount || 0);
-    document.getElementById("followingCount").textContent = "Seguiti: " + (user.followingCount || 0);
-
-    const profileImg = document.getElementById("profile");
-    profileImg.src = `/api/user-photo/${userId}`;
-    profileImg.onerror = () => {
-      profileImg.src = "fotoprofilo.png";
-    };
-
-    if (isOwnProfile) {
-      document.getElementById("editBtn").style.display = "inline-block";
-    } else {
-      document.getElementById("editBtn").style.display = "none";
-      document.getElementById("followBtn").style.display = "inline-block";
-
-      const followBtn = document.getElementById("followBtn");
-      followBtn.textContent = "Caricamento...";
+      let isOwnProfile = false;
+      let user;
 
       try {
-        const followRes = await fetch(`/api/follow-info/${userId}`, {
-          credentials: "include",
-        });
-        const followData = await followRes.json();
-
-        followBtn.textContent = followData.isFollowing ? "Smetti di seguire" : "Segui";
-        followBtn.onclick = async () => {
-          const res = await fetch(`/api/follow/${userId}`, {
-            method: "POST",
+        if (id) {
+          const res = await fetch(`/api/user-public/${id}`);
+          if (!res.ok) throw new Error("Utente non trovato");
+          user = await res.json();
+          isOwnProfile = false;
+        } else {
+          const res = await fetch("/api/user", {
             credentials: "include",
+            method: "GET",
             headers: { "Content-Type": "application/json" },
           });
-          const result = await res.json();
-          if (res.ok) {
-            followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
-            document.getElementById("followerCount").textContent = "Follower: " + (result.followersCount || 0);
-          } else {
-            alert("Errore: " + result.message);
-          }
-        };
-      } catch (error) {
-        followBtn.textContent = "Errore";
+          if (!res.ok) throw new Error("Non autenticato");
+          user = await res.json();
+          isOwnProfile = true;
+        }
+      } catch (err) {
+        alert("Utente non trovato o accesso non autorizzato.");
+        window.location.href = "login.html";
+        return;
       }
-    }
 
-    const { _id, nome, username, bio } = user;
-    sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
+      const userId = user._id || user.id;
 
-    // ⬇️ CARICA I POST ⬇️
-    try {
-      const res = await fetch(`/api/user/${userId}/posts`, {
-        credentials: "include"
-      });
-      const posts = await res.json();
+      document.getElementById("followerCount").onclick = () => apriListaFollow("followers", userId);
+      document.getElementById("followingCount").onclick = () => apriListaFollow("following", userId);
 
-      document.getElementById("postCount").textContent = posts.length;
-      const container = document.getElementById("posts-container");
-      posts.forEach(post => {
-        const div = document.createElement("div");
-        div.className = "post-card";
+      document.title = user.username + "'s profile";
+      document.getElementById("name").textContent = user.nome;
+      document.getElementById("username").textContent = user.username;
+      document.getElementById("bio").textContent = user.bio || "Nessuna bio";
 
-        div.innerHTML = `
-          ${post.imageUrl ? `<img src="${post.imageUrl}" alt="post image" />` : ""}
-          <div class="post-desc">${post.desc || ""}</div>
-          <div class="post-meta">❤️ ${post.likes} | 💬 ${post.comments}</div>
-        `;
-        container.appendChild(div);
-      });
-    } catch (err) {
-      console.error("Errore nel caricamento post", err);
-    }
+      document.getElementById("followerCount").textContent = "Follower: " + (user.followersCount || 0);
+      document.getElementById("followingCount").textContent = "Seguiti: " + (user.followingCount || 0);
 
-    // MODALE
-    const modal = document.getElementById("modalFollow");
-    const closeBtn = document.querySelector(".close-btn");
+      const profileImg = document.getElementById("profile");
+      profileImg.src = `/api/user-photo/${userId}`;
+      profileImg.onerror = () => {
+        profileImg.src = "fotoprofilo.png";
+      };
 
-    closeBtn.onclick = () => (modal.style.display = "none");
-    window.onclick = (event) => {
-      if (event.target === modal) {
-        modal.style.display = "none";
+      if (isOwnProfile) {
+        document.getElementById("editBtn").style.display = "inline-block";
+      } else {
+        document.getElementById("editBtn").style.display = "none";
+        document.getElementById("followBtn").style.display = "inline-block";
+
+        const followBtn = document.getElementById("followBtn");
+        followBtn.textContent = "Caricamento...";
+
+        try {
+          const followRes = await fetch(`/api/follow-info/${userId}`, {
+            credentials: "include",
+          });
+          const followData = await followRes.json();
+
+          followBtn.textContent = followData.isFollowing ? "Smetti di seguire" : "Segui";
+          followBtn.onclick = async () => {
+            const res = await fetch(`/api/follow/${userId}`, {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            });
+            const result = await res.json();
+            if (res.ok) {
+              followBtn.textContent = result.following ? "Smetti di seguire" : "Segui";
+              document.getElementById("followerCount").textContent = "Follower: " + (result.followersCount || 0);
+            } else {
+              alert("Errore: " + result.message);
+            }
+          };
+        } catch (error) {
+          followBtn.textContent = "Errore";
+        }
       }
+
+      const { _id, nome, username, bio } = user;
+      sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
+
+      // ⬇️ Paginazione post ⬇️
+      let postPage = 1;
+      const postLimit = 9;
+      let finePost = false;
+
+      const postContainer = document.getElementById("posts-container");
+      const loadMorePosts = document.getElementById("loadMorePosts");
+      loadMorePosts.style.display = "none";
+
+      async function caricaPost() {
+        if (finePost) return;
+
+        const res = await fetch(`/api/user/${userId}/posts?page=${postPage}&limit=${postLimit}`, {
+          credentials: "include"
+        });
+        if (!res.ok) {
+          console.error("Errore nel caricamento post");
+          return;
+        }
+
+        const posts = await res.json();
+        if (!Array.isArray(posts) || posts.length === 0) {
+          finePost = true;
+          loadMorePosts.style.display = "none";
+          return;
+        }
+
+        posts.forEach(post => {
+          const div = document.createElement("div");
+          div.className = "post-card";
+          div.innerHTML = `
+            ${post.imageUrl ? `<img src="${post.imageUrl}" alt="post image" />` : ""}
+            <div class="post-desc">${post.desc || ""}</div>
+            <div class="post-meta">❤️ ${post.likes} | 💬 ${post.comments}</div>
+          `;
+          postContainer.appendChild(div);
+        });
+
+        postPage++;
+
+        if (posts.length < postLimit) {
+          finePost = true;
+          loadMorePosts.style.display = "none";
+        } else {
+          loadMorePosts.style.display = "block";
+        }
+
+        document.getElementById("postCount").textContent = postContainer.children.length;
+      }
+
+      loadMorePosts.onclick = caricaPost;
+      caricaPost();
+
+      // MODALE
+      const modal = document.getElementById("modalFollow");
+      const closeBtn = document.querySelector(".close-btn");
+
+      closeBtn.onclick = () => (modal.style.display = "none");
+      window.onclick = (event) => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
     };
-  };
 
 async function apriListaFollow(tipo, userId) {
       let page = 1;
