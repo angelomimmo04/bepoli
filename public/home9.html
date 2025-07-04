@@ -23,6 +23,12 @@
       animation: logoEntrance 1s ease-out;
     }
 
+    /* Logo piccolo */
+    .logo {
+      height: 50px; /* Riduci a piacere */
+      width: auto;
+    }
+
     /* === Modal === */
     .modal {
       display: none;
@@ -89,13 +95,14 @@
 </head>
 
 <body>
-  <!-- === HEADER CON LOGO ANIMATO === -->
+  <!-- === HEADER CON LOGO ANIMATO E RIDOTTO === -->
   <header class="header">
     <a href="prova18.html">
       <img src="logobepoli.png" alt="Logo" class="logo" id="logo">
     </a>
     <nav class="nav">
-      <button id="goToProfile" class="profile-button">Profilo</button>
+      <!-- Profilo come testo/link -->
+      <a href="profile.html" class="profile-link">Profilo</a>
       <a href="#" class="active">Home</a>
       <a href="#">Logout</a>
       <a href="#" onclick="inviaDatiUtente()">Invia dati utente</a>
