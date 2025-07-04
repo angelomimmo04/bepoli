@@ -215,80 +215,8 @@ function startTracking() {
            
             
             
-            
-           console.log("Latitudine:", lat, "Longitudine:", lon);
-           const accuracy = position.coords.accuracy;
-            console.log("📍 Coordinate attuali:", lat, lon);
-const zone = getZoneFromCoords(lat, lon);
-console.log("📌 Zona trovata da getZoneFromCoords:", zone);
-
-            outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
-            outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
-
-            //const zone = getZoneFromCoords(lat, lon);
-            const zoneName = zone || "Fuori dalle aree conosciute";
-
-            if (zoneName === lastZoneName) {
-                stabilityCounter++;
-            } else {
-                lastZoneName = zoneName;
-                stabilityCounter = 1;
-            }
-
-        
-
-            if (stabilityCounter >= stabilityThreshold) {
-                outputLocation.textContent = `Luogo: ${zoneName}`;
-                locationStatus.textContent = "✅ Posizione rilevata";
-                locationStatus.style.color = "green";
-                window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
-
-                if (zoneName !== lastLoadedZoneName) {
-        lastLoadedZoneName = zoneName;
-
-        if (typeof onUserLocationActivated === "function") {
-            onUserLocationActivated(zoneName);
-        }
-    }
-            }
-        },
-        (error) => {
-            outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
-            outputLocation.textContent = "--";
-            outputAccuracy.textContent = "-- metri";
-            locationStatus.textContent = "❌ Errore posizione";
-            locationStatus.style.color = "red";
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-}
-
-
-
-
-function stopTracking() {
-    if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        document.getElementById("coords").textContent = "Monitoraggio interrotto.";
-        document.getElementById("location").textContent = "--";
-        document.getElementById("accuracy").textContent = "-- metri";
-        document.getElementById("locationStatus").textContent = "🔴 Monitoraggio disattivato";
-        document.getElementById("locationStatus").style.color = "gray";
-    }
-}
-
-function getZoneFromCoords(lat, lon) {
-  for (const zone of zones) {
-    const inside = isInsidePolygon(lat, lon, zone.points);
-    console.log(`🔎 Controllo zona "${zone.name}": ${inside}`);
-    if (inside) return zone.name;
-  }
-  return null;
-}
-
+ // Funzione punto nel poligono (ray-casting)
 function isInsidePolygon(lat, lon, polygon) {
-  console.log("📐 Check polygon:", polygon);
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const xi = polygon[i].lat, yi = polygon[i].lon;
@@ -300,6 +228,142 @@ function isInsidePolygon(lat, lon, polygon) {
   }
   return inside;
 }
+
+// Distanza punto-segmento (in km)
+function pointToSegmentDistance(lat, lon, lat1, lon1, lat2, lon2) {
+  const toRad = Math.PI / 180;
+  const x0 = lon * toRad, y0 = lat * toRad;
+  const x1 = lon1 * toRad, y1 = lat1 * toRad;
+  const x2 = lon2 * toRad, y2 = lat2 * toRad;
+
+  const A = x0 - x1, B = y0 - y1;
+  const C = x2 - x1, D = y2 - y1;
+
+  const dot = A * C + B * D;
+  const len_sq = C * C + D * D;
+  const param = len_sq !== 0 ? dot / len_sq : -1;
+
+  let xx, yy;
+  if (param < 0) {
+    xx = x1;
+    yy = y1;
+  } else if (param > 1) {
+    xx = x2;
+    yy = y2;
+  } else {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  }
+
+  const dx = x0 - xx;
+  const dy = y0 - yy;
+  return 6371 * Math.sqrt(dx * dx + dy * dy);
+}
+
+// Distanza minima da bordo poligono in km
+function distanceToPolygon(lat, lon, polygon) {
+  let minDist = Infinity;
+  for (let i = 0; i < polygon.length; i++) {
+    const p1 = polygon[i];
+    const p2 = polygon[(i + 1) % polygon.length];
+    const dist = pointToSegmentDistance(lat, lon, p1.lat, p1.lon, p2.lat, p2.lon);
+    if (dist < minDist) minDist = dist;
+  }
+  return minDist;
+}
+
+// Start tracking modificato con inside + near
+function startTracking() {
+  const outputCoords = document.getElementById("coords");
+  const outputLocation = document.getElementById("location");
+  const outputAccuracy = document.getElementById("accuracy");
+  const locationStatus = document.getElementById("locationStatus");
+
+  if (!navigator.geolocation) {
+    outputCoords.textContent = "Geolocalizzazione non supportata.";
+    return;
+  }
+
+  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+
+  outputCoords.textContent = "📡 Monitoraggio attivo...";
+  outputAccuracy.textContent = "-- metri";
+  outputLocation.textContent = "--";
+  locationStatus.textContent = "📍 Attendere il rilevamento...";
+  locationStatus.style.color = "orange";
+
+  watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const accuracy = position.coords.accuracy;
+
+      outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
+      outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
+
+      let insideZones = [];
+      let nearZones = [];
+
+      for (const zone of zones) {
+        const centerLat = zone.points.reduce((sum, p) => sum + p.lat, 0) / zone.points.length;
+        const centerLon = zone.points.reduce((sum, p) => sum + p.lon, 0) / zone.points.length;
+
+        const inside = isInsidePolygon(lat, lon, zone.points);
+        const edgeDist = distanceToPolygon(lat, lon, zone.points);
+
+        if (inside) {
+          insideZones.push({ zone, edgeDist });
+        } else if (edgeDist < 0.02) { // 20 metri
+          nearZones.push({ zone, edgeDist });
+        }
+      }
+
+      let currentZoneName = "Fuori dalle aree conosciute";
+      let selectedZone = null;
+
+      if (insideZones.length > 0) {
+        // Scegli la zona con distanza minore dal bordo (se più zone inside)
+        insideZones.sort((a, b) => a.edgeDist - b.edgeDist);
+        selectedZone = insideZones[0].zone;
+        currentZoneName = selectedZone.name;
+      } else if (nearZones.length > 0) {
+        nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
+        selectedZone = nearZones[0].zone;
+        currentZoneName = "Vicino a: " + selectedZone.name;
+      }
+
+      if (currentZoneName === lastZoneName) {
+        stabilityCounter++;
+      } else {
+        lastZoneName = currentZoneName;
+        stabilityCounter = 1;
+      }
+
+      if (stabilityCounter >= stabilityThreshold) {
+        outputLocation.textContent = `Luogo: ${currentZoneName}`;
+        locationStatus.textContent = "✅ Posizione rilevata";
+        locationStatus.style.color = "green";
+        window.currentZoneName = currentZoneName;
+
+        if (currentZoneName !== lastLoadedZoneName) {
+          lastLoadedZoneName = currentZoneName;
+          if (typeof onUserLocationActivated === "function") {
+            onUserLocationActivated(currentZoneName);
+          }
+        }
+      }
+    },
+    (error) => {
+      outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
+      outputLocation.textContent = "--";
+      outputAccuracy.textContent = "-- metri";
+      locationStatus.textContent = "❌ Errore posizione";
+      locationStatus.style.color = "red";
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
+
 
 // Rendi le funzioni disponibili globalmente
 window.startTracking = startTracking;
