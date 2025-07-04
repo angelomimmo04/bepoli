@@ -223,7 +223,7 @@ function startTracking() {
             window.currentZoneName = zoneName;
 
             if (stabilityCounter >= stabilityThreshold) {
-                outputLocation.textContent = Luogo: ${zoneName};
+                outputLocation.textContent = `Luogo: ${zoneName}`;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
             }
