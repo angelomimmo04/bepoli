@@ -4,16 +4,15 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
   const form = e.target;
   const formData = new FormData(form);
 
-  // Usa window.currentZoneName se disponibile (valorizzata da localizzazione.js)
-  const location = document.getElementById("location").textContent;
+  const locationText = document.getElementById("location").textContent;
+  const zone = window.currentZoneName;
 
-if (!location || location === "--" || location.includes("incerta") || location.includes("Fuori")) {
-  alert("Attiva la localizzazione prima di pubblicare.");
-  return;
-}
+  if (!zone || zone === "Fuori dalle aree conosciute") {
+    alert("⚠ Attiva la localizzazione e attendi il rilevamento prima di pubblicare.");
+    return;
+  }
 
-formData.append("location", window.currentZoneName || "Posizione sconosciuta");
-console.log("Zona rilevata al momento del post:", window.currentZoneName); 
+  formData.append("location", zone); // ✅ invia la zona attuale
 
   try {
     const res = await fetch('/api/posts', {
@@ -25,7 +24,7 @@ console.log("Zona rilevata al momento del post:", window.currentZoneName);
     const data = await res.json();
     if (res.ok) {
       form.reset();
-      caricaPost(1); // aggiorna il feed dalla prima pagina
+      caricaPost(1);
     } else {
       alert(data.message || 'Errore nella creazione del post');
     }
@@ -33,6 +32,7 @@ console.log("Zona rilevata al momento del post:", window.currentZoneName);
     alert('Errore di rete');
   }
 });
+
 
 let currentPage = 1;
 const pageSize = 10;
@@ -103,7 +103,7 @@ async function caricaPost(page = 1) {
 
       const locationEl = clone.querySelector('.post-location');
 if (locationEl) {
-  locationEl.textContent = `Luogo: ${post.location || "Posizione sconosciuta"}`;
+  locationEl.textContent = Luogo: ${post.location || "Posizione sconosciuta"};
 }
       
 
