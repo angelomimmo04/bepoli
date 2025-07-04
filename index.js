@@ -877,8 +877,13 @@ app.get("/api/posts/:id/comments", async (req, res) => {
 
 app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
     const posts = await Post.find({ userId: req.params.id })
       .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
       .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
 
