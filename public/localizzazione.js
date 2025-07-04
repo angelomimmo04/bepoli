@@ -238,6 +238,11 @@ console.log("📌 Zona trovata da getZoneFromCoords:", zone);
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
                 window.currentZoneName = zoneName;
+
+                // Qui chiami la funzione per ricaricare i post filtrati dalla nuova zona
+    if (typeof onUserLocationActivated === "function") {
+      onUserLocationActivated(zoneName);
+    }
             }
         },
         (error) => {
