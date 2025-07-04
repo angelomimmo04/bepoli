@@ -13,6 +13,7 @@ if (!location || location === "--" || location.includes("incerta") || location.i
 }
 
 formData.append("location", window.currentZoneName || "Posizione sconosciuta");
+console.log("Zona rilevata al momento del post:", window.currentZoneName); 
 
   try {
     const res = await fetch('/api/posts', {
