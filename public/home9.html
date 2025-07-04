@@ -5,121 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Simulazione Home Feed con Creazione Post</title>
   <link rel="stylesheet" href="style9.css">
- <style>
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 40px 20px;
-    box-sizing: border-box;
-  }
-
-  .modal-content {
-    background-color: #fff;
-    margin: auto;
-    padding: 0;
-    border-radius: 12px;
-    max-width: 900px;
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-  }
-
-  .modal-content iframe {
-    flex-grow: 1;
-    width: 100%;
-    border: none;
-  }
-
-  .close-btn {
-    font-size: 26px;
-    font-weight: bold;
-    color: #333;
-    padding: 10px;
-    cursor: pointer;
-    align-self: flex-end;
-  }
-
-  .close-btn:hover {
-    color: red;
-  }
-
-
-
-
-
-
-</style>
 
   <style>
-  
-  .coords-nav {
-  margin-left: auto;
-  text-align: right;
-  font-size: 0.85rem;
-  color: #555;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-</style>
+    /* === Animazione logo === */
+    @keyframes logoEntrance {
+      0% {
+        transform: translateX(-150vw) rotate(-720deg);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+    }
 
+    .logo-entrance {
+      animation: logoEntrance 1s ease-out;
+    }
+
+    /* === Modal === */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 40px 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 0;
+      border-radius: 12px;
+      max-width: 900px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content iframe {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
+    }
+
+    .close-btn {
+      font-size: 26px;
+      font-weight: bold;
+      color: #333;
+      padding: 10px;
+      cursor: pointer;
+      align-self: flex-end;
+    }
+
+    .close-btn:hover {
+      color: red;
+    }
+
+    /* === Coordinate nav === */
+    .coords-nav {
+      margin-left: auto;
+      text-align: right;
+      font-size: 0.85rem;
+      color: #555;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .camera-hint {
+      font-size: 0.85rem;
+      color: #555;
+    }
+  </style>
 </head>
+
 <body>
+  <!-- === HEADER CON LOGO ANIMATO === -->
   <header class="header">
-    <div class="logo">BePoli</div>
+    <a href="prova18.html">
+      <img src="logobepoli.png" alt="Logo" class="logo" id="logo">
+    </a>
     <nav class="nav">
       <button id="goToProfile" class="profile-button">Profilo</button>
       <a href="#" class="active">Home</a>
       <a href="#">Logout</a>
+      <a href="#" onclick="inviaDatiUtente()">Invia dati utente</a>
     </nav>
 
-
-   <div class="coords-nav">
-  <p id="coords">Coordinate: --</p>
-  <p id="location">Luogo: --</p>
-  <p id="locationStatus" style="color: red; font-size: 0.85rem;">Attendere il rilevamento della posizione...</p>
-  <p id="accuracy">Accuratezza: -- metri</p>
-   
-</div>
-
-    
+    <div class="coords-nav">
+      <p id="coords">Coordinate: --</p>
+      <p id="location">Luogo: --</p>
+      <p id="locationStatus" style="color: red; font-size: 0.85rem;">Attendere il rilevamento della posizione...</p>
+      <p id="accuracy">Accuratezza: -- metri</p>
+    </div>
   </header>
 
-<div class="monitor-buttons">
-  <button class="monitor-btn start" onclick="startTracking()">
-    <span class="icon">▶</span> Avvia Monitoraggio
-  </button>
-  <button class="monitor-btn stop" onclick="stopTracking()">
-    <span class="icon">⛔</span> Ferma Monitoraggio
-  </button>
-</div>
+  <!-- === BOTTONI MONITORAGGIO === -->
+  <div class="monitor-buttons">
+    <button class="monitor-btn start" onclick="startTracking()">
+      <span class="icon">▶</span> Avvia Monitoraggio
+    </button>
+    <button class="monitor-btn stop" onclick="stopTracking()">
+      <span class="icon">⛔</span> Ferma Monitoraggio
+    </button>
+  </div>
 
+  <div id="zoneImage" style="display: none;">
+    <img id="locationImage" src="" alt="Immagine zona" />
+  </div>
 
-  
-</div>
-<div id="zoneImage" style="display: none;">
-  <img id="locationImage" src="" alt="Immagine zona" />
-</div>
-
-
-
-
-
-
-
-
-  
-
-  <!-- ===== FORM PER CREARE UN NUOVO POST ===== -->
+  <!-- === FORM CREAZIONE POST === -->
   <section class="create-post-section">
     <form id="createPostForm" enctype="multipart/form-data">
       <textarea
@@ -137,32 +141,27 @@
     </form>
     <div id="createPostError" class="error-message hidden"></div>
   </section>
-  
-  <!-- ===== FEED CONTENITORE ===== -->
+
+  <!-- === FEED === -->
   <main class="feed-container" id="feed">
     <!-- I post verranno inseriti qui dinamicamente -->
   </main>
 
   <div class="load-more-wrapper">
-  <button id="loadMore">Carica altri post</button>
-  <div id="loader" class="loader hidden"></div>
+    <button id="loadMore">Carica altri post</button>
+    <div id="loader" class="loader hidden"></div>
+  </div>
 
-
-
-
-  <!-- ===== TEMPLATE POST ===== -->
+  <!-- === TEMPLATE POST === -->
   <template id="post-template">
-  <article class="post-card">
-    <header class="post-header">
-      <div class="post-user-info">
-        <span class="post-username">Username</span>
-      </div>
-      <p class="post-location" style="margin: 0; font-size: 0.8em; color: #666;"></p>
-      
-      <time class="post-date" datetime="">Data</time>
-    </header>
-    
-
+    <article class="post-card">
+      <header class="post-header">
+        <div class="post-user-info">
+          <span class="post-username">Username</span>
+        </div>
+        <p class="post-location" style="margin: 0; font-size: 0.8em; color: #666;"></p>
+        <time class="post-date" datetime="">Data</time>
+      </header>
 
       <div class="post-image-container">
         <img class="post-image" src="" alt="Immagine del post" />
@@ -192,14 +191,58 @@
     </article>
   </template>
 
-
-    <script src="localizzazione.js"></script>
+  <!-- === SCRIPT === -->
+  <script src="localizzazione.js"></script>
   <script src="script9.js" defer></script>
 
+  <script>
+    // Animazione logo se attivata
+    window.addEventListener("DOMContentLoaded", () => {
+      const playAnimation = sessionStorage.getItem("playLogoAnimation");
+      if (playAnimation === "true") {
+        const logo = document.getElementById("logo");
+        logo.classList.add("logo-entrance");
+        sessionStorage.removeItem("playLogoAnimation");
+      }
+    });
 
+    // Controllo utente loggato
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (user) {
+      console.log("Utente loggato:", user);
+    } else {
+      alert("Devi prima effettuare il login.");
+      window.location.href = "login.html";
+    }
 
+    // Funzione invia dati utente
+    async function inviaDatiUtente() {
+      try {
+        const res = await fetch("/api/auth-token", {
+          method: "GET",
+          credentials: "include"
+        });
 
+        if (!res.ok) {
+          console.error("Utente non autenticato.");
+          return;
+        }
 
- 
+        const { token } = await res.json();
+        const sito2 = window.open(`https://bepoliby-1-2.onrender.com?token=${token}`, "_blank");
+
+        if (!sito2) {
+          console.error("La finestra è stata bloccata dal browser.");
+          return;
+        }
+
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log("Dati utente:", payload);
+
+      } catch (err) {
+        console.error("Errore:", err);
+      }
+    }
+  </script>
 </body>
 </html>
