@@ -26,6 +26,8 @@ formData.append("location", window.currentZoneName || "Posizione sconosciuta");
     const data = await res.json();
     if (res.ok) {
       form.reset();
+      finished = false;
+      currentPage = 1;
       caricaPost(1);
     } else {
       alert(data.message || 'Errore nella creazione del post');
