@@ -621,18 +621,20 @@ const Post = mongoose.model("Post", postSchema);
 app.get("/api/posts", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const pageSize = 10;
+  const location = req.query.location;
 
   try {
-    // Primo tentativo con find() classico
+    const query = {};
+    if (location && location !== "Fuori dalle aree conosciute") {
+      query.location = location;
+    }
 
-    const posts = await Post.find()
-
+    const posts = await Post.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .populate("userId", "username nome _id")
       .populate("comments.userId", "username nome");
-    
 
     return res.json(posts.map(post => ({
       _id: post._id,
@@ -658,18 +660,16 @@ app.get("/api/posts", async (req, res) => {
     })));
   } catch (err) {
     console.log("ram database piena ma tiro avanti");
-    // Se errore è di memoria, fallback a aggregate con allowDiskUse:true
     if (
-    err.code === 292 ||
-    err.codeName === "QueryExceededMemoryLimitNoDiskUseAllowed" ||
-    err.message.includes("Sort exceeded memory limit")
-  )  {
+      err.code === 292 ||
+      err.codeName === "QueryExceededMemoryLimitNoDiskUseAllowed" ||
+      err.message.includes("Sort exceeded memory limit")
+    ) {
       try {
         const aggPipeline = [
           { $sort: { createdAt: -1 } },
           { $skip: (page - 1) * pageSize },
           { $limit: pageSize },
-          // Populate userId
           {
             $lookup: {
               from: 'utentes',
@@ -679,7 +679,6 @@ app.get("/api/posts", async (req, res) => {
             }
           },
           { $unwind: '$user' },
-          // Populate comments.userId
           {
             $lookup: {
               from: 'utentes',
@@ -719,9 +718,14 @@ app.get("/api/posts", async (req, res) => {
           { $project: { commentUsers: 0 } }
         ];
 
+        if (location && location !== "Fuori dalle aree conosciute") {
+          aggPipeline.unshift({
+            $match: { location: location }
+          });
+        }
+
         const posts = await Post.aggregate(aggPipeline).allowDiskUse(true);
 
-        // Mappa per formattare come prima
         const formattedPosts = posts.map(post => ({
           _id: post._id,
           userId: {
@@ -752,14 +756,11 @@ app.get("/api/posts", async (req, res) => {
       }
     }
 
-    // Altri errori
     console.error("Errore caricamento post:", err);
     return res.status(500).json({ message: "Errore caricamento post" });
-
-
-    
   }
 });
+
 
 
 
