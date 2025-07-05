@@ -238,95 +238,23 @@ function distanceToPolygon(lat, lon, polygon) {
 }
 
 function startTracking() {
-    const outputCoords = document.getElementById("coords");
-    const outputLocation = document.getElementById("location");
-    const outputAccuracy = document.getElementById("accuracy");
-    const locationStatus = document.getElementById("locationStatus");
+  const outputCoords = document.getElementById("coords");
+  const outputLocation = document.getElementById("location");
+  const outputAccuracy = document.getElementById("accuracy");
+  const locationStatus = document.getElementById("locationStatus");
 
-    if (!navigator.geolocation) {
-        outputCoords.textContent = "Geolocalizzazione non supportata.";
-        return;
-    }
+  outputCoords.textContent = "📡 Monitoraggio simulato attivo...";
+  outputAccuracy.textContent = "-- metri";
+  outputLocation.textContent = "--";
+  locationStatus.textContent = "📍 Attendere il rilevamento (simulato)...";
+  locationStatus.style.color = "orange";
 
-    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+  watchId = "SIMULATED"; // o qualunque valore, per sapere che è attivo
 
-    outputCoords.textContent = "📡 Monitoraggio attivo...";
-    outputAccuracy.textContent = "-- metri";
-    outputLocation.textContent = "--";
-    locationStatus.textContent = "📍 Attendere il rilevamento...";
-    locationStatus.style.color = "orange";
-
-    watchId = navigator.geolocation.watchPosition(
-        (position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            //const lat = 41.108082
-            //const lon = 16.879843
-            
-            const accuracy = position.coords.accuracy;
-
-            outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
-            outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
-
-            let insideZones = [];
-            let nearZones = [];
-
-            for (const zone of zones) {
-                const inside = isInsidePolygon(lat, lon, zone.points);
-                const edgeDist = distanceToPolygon(lat, lon, zone.points);
-
-                if (inside) {
-                    insideZones.push({ zone, edgeDist });
-                } else if (edgeDist < 0.02) { // 20 metri
-                    nearZones.push({ zone, edgeDist });
-                }
-            }
-
-            let currentZoneName = "Fuori dalle aree conosciute";
-            let selectedZone = null;
-
-            if (insideZones.length > 0) {
-                // Scegli la zona con distanza minore dal bordo (se più zone inside)
-                insideZones.sort((a, b) => a.edgeDist - b.edgeDist);
-                selectedZone = insideZones[0].zone;
-                currentZoneName = selectedZone.name;
-            } else if (nearZones.length > 0) {
-                nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
-                selectedZone = nearZones[0].zone;
-                currentZoneName = "Vicino a: " + selectedZone.name;
-            }
-
-            if (currentZoneName === lastZoneName) {
-                stabilityCounter++;
-            } else {
-                lastZoneName = currentZoneName;
-                stabilityCounter = 1;
-            }
-
-            if (stabilityCounter >= stabilityThreshold) {
-                outputLocation.textContent = `Luogo: ${currentZoneName}`;
-                locationStatus.textContent = "✅ Posizione rilevata";
-                locationStatus.style.color = "green";
-                window.currentZoneName = currentZoneName;
-
-                if (currentZoneName !== lastLoadedZoneName) {
-                    lastLoadedZoneName = currentZoneName;
-                    if (typeof onUserLocationActivated === "function") {
-                        onUserLocationActivated(currentZoneName);
-                    }
-                }
-            }
-        },
-        (error) => {
-            outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
-            outputLocation.textContent = "--";
-            outputAccuracy.textContent = "-- metri";
-            locationStatus.textContent = "❌ Errore posizione";
-            locationStatus.style.color = "red";
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+  // Non avviare il vero watchPosition!
+  // La simulazione userà handleSimulatedPosition
 }
+
 
 function stopTracking() {
     if (watchId !== null) {
