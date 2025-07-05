@@ -345,6 +345,77 @@ function stopTracking() {
     locationStatus.style.color = "gray";
 }
 
+
+
+
+
+
+<script>
+  // Array di coordinate di test: [lat, lon]
+  const testCoordinates = [
+    [41.108692, 16.879609], // Radio Frequenza Libera
+    [41.108673, 16.879576], // Cortile
+    [41.108799, 16.879576], // Aula Magna
+    [41.108756, 16.879479], // Atrio
+    [41.107916, 16.879212], // Student
+    [41.109250, 16.877026], // Entrata Re David
+    [41.107868, 16.880086]  // Entrata Orabona
+  ];
+
+  let currentTestIndex = 0;
+
+  function simulatePosition() {
+    if (currentTestIndex >= testCoordinates.length) {
+      currentTestIndex = 0; // Riparti da capo
+    }
+
+    const [lat, lon] = testCoordinates[currentTestIndex];
+    currentTestIndex++;
+
+    console.log(`Simulazione coordinate: Lat=${lat}, Lon=${lon}`);
+
+    // Simula una posizione invocando manualmente la callback del watchPosition
+    if (typeof navigator.geolocation !== "undefined" && watchId !== null) {
+      const fakePosition = {
+        coords: {
+          latitude: lat,
+          longitude: lon,
+          accuracy: 5 // Simula buona precisione
+        }
+      };
+      // Chiamo la funzione interna come se fosse un evento di geolocalizzazione
+      if (typeof handleSimulatedPosition === "function") {
+        handleSimulatedPosition(fakePosition);
+      }
+    }
+  }
+
+  // Wrapper: salviamo la callback originale per poterla chiamare
+  let realCallback = null;
+  if (navigator.geolocation && navigator.geolocation.watchPosition) {
+    const realWatchPosition = navigator.geolocation.watchPosition;
+    navigator.geolocation.watchPosition = function (success, error, options) {
+      realCallback = success;
+      return realWatchPosition.call(navigator.geolocation, success, error, options);
+    };
+  }
+
+  // Intercettiamo e la usiamo per la simulazione
+  window.handleSimulatedPosition = function (fakePosition) {
+    if (realCallback) {
+      realCallback(fakePosition);
+    }
+  };
+
+  // Ogni 30 secondi cambia coordinate
+  setInterval(simulatePosition, 30 * 1000);
+</script>
+
+
+
+
+
+
 // Esportiamo globalmente
 window.startTracking = startTracking;
 window.stopTracking = stopTracking;
