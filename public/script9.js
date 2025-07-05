@@ -52,7 +52,7 @@ async function caricaPost(page = 1) {
   document.getElementById('loader').classList.remove('hidden');
 
   try {
-    const location = encodeURIComponent(currentLocationFilter || "Fuori dalle aree conosciute");
+    const location = encodeURIComponent(currentLocationFilter || "");
     const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}&location=${location}`, { credentials: 'include' });
 
     if (!res.ok) throw new Error("Errore fetch");
