@@ -350,7 +350,7 @@ function stopTracking() {
 
 
 
-<script>
+
   // Array di coordinate di test: [lat, lon]
   const testCoordinates = [
     [41.108692, 16.879609], // Radio Frequenza Libera
@@ -409,7 +409,7 @@ function stopTracking() {
 
   // Ogni 30 secondi cambia coordinate
   setInterval(simulatePosition, 30 * 1000);
-</script>
+
 
 
 
