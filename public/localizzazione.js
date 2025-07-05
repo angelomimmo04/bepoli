@@ -238,23 +238,95 @@ function distanceToPolygon(lat, lon, polygon) {
 }
 
 function startTracking() {
-  const outputCoords = document.getElementById("coords");
-  const outputLocation = document.getElementById("location");
-  const outputAccuracy = document.getElementById("accuracy");
-  const locationStatus = document.getElementById("locationStatus");
+    const outputCoords = document.getElementById("coords");
+    const outputLocation = document.getElementById("location");
+    const outputAccuracy = document.getElementById("accuracy");
+    const locationStatus = document.getElementById("locationStatus");
 
-  outputCoords.textContent = "📡 Monitoraggio simulato attivo...";
-  outputAccuracy.textContent = "-- metri";
-  outputLocation.textContent = "--";
-  locationStatus.textContent = "📍 Attendere il rilevamento (simulato)...";
-  locationStatus.style.color = "orange";
+    if (!navigator.geolocation) {
+        outputCoords.textContent = "Geolocalizzazione non supportata.";
+        return;
+    }
 
-  watchId = "SIMULATED"; // o qualunque valore, per sapere che è attivo
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
-  // Non avviare il vero watchPosition!
-  // La simulazione userà handleSimulatedPosition
+    outputCoords.textContent = "📡 Monitoraggio attivo...";
+    outputAccuracy.textContent = "-- metri";
+    outputLocation.textContent = "--";
+    locationStatus.textContent = "📍 Attendere il rilevamento...";
+    locationStatus.style.color = "orange";
+
+    watchId = navigator.geolocation.watchPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            //const lat = 41.108082
+            //const lon = 16.879843
+            
+            const accuracy = position.coords.accuracy;
+
+            outputCoords.textContent = `Coordinate: Lat = ${lat.toFixed(6)}, Lon = ${lon.toFixed(6)}`;
+            outputAccuracy.textContent = `Accuratezza: ${Math.round(accuracy)} metri`;
+
+            let insideZones = [];
+            let nearZones = [];
+
+            for (const zone of zones) {
+                const inside = isInsidePolygon(lat, lon, zone.points);
+                const edgeDist = distanceToPolygon(lat, lon, zone.points);
+
+                if (inside) {
+                    insideZones.push({ zone, edgeDist });
+                } else if (edgeDist < 0.02) { // 20 metri
+                    nearZones.push({ zone, edgeDist });
+                }
+            }
+
+            let currentZoneName = "Fuori dalle aree conosciute";
+            let selectedZone = null;
+
+            if (insideZones.length > 0) {
+                // Scegli la zona con distanza minore dal bordo (se più zone inside)
+                insideZones.sort((a, b) => a.edgeDist - b.edgeDist);
+                selectedZone = insideZones[0].zone;
+                currentZoneName = selectedZone.name;
+            } else if (nearZones.length > 0) {
+                nearZones.sort((a, b) => a.edgeDist - b.edgeDist);
+                selectedZone = nearZones[0].zone;
+                currentZoneName = "Vicino a: " + selectedZone.name;
+            }
+
+            if (currentZoneName === lastZoneName) {
+                stabilityCounter++;
+            } else {
+                lastZoneName = currentZoneName;
+                stabilityCounter = 1;
+            }
+
+            if (stabilityCounter >= stabilityThreshold) {
+                outputLocation.textContent = `Luogo: ${currentZoneName}`;
+                locationStatus.textContent = "✅ Posizione rilevata";
+                locationStatus.style.color = "green";
+                window.currentZoneName = currentZoneName;
+
+                if (currentZoneName !== lastLoadedZoneName) {
+                    lastLoadedZoneName = currentZoneName;
+                    if (typeof onUserLocationActivated === "function") {
+                        onUserLocationActivated(currentZoneName);
+                    }
+                }
+            }
+        },
+        (error) => {
+            outputCoords.textContent = "Errore geolocalizzazione: " + error.message;
+            outputLocation.textContent = "--";
+            outputAccuracy.textContent = "-- metri";
+            locationStatus.textContent = "❌ Errore posizione";
+            locationStatus.style.color = "red";
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
 }
-
 
 function stopTracking() {
     if (watchId !== null) {
@@ -272,77 +344,6 @@ function stopTracking() {
     locationStatus.textContent = "⏹️ Monitoraggio fermato";
     locationStatus.style.color = "gray";
 }
-
-
-
-
-
-
-
-  // Array di coordinate di test: [lat, lon]
-  const testCoordinates = [
-    [41.108692, 16.879609], // Radio Frequenza Libera
-    [41.108673, 16.879576], // Cortile
-    [41.108799, 16.879576], // Aula Magna
-    [41.108756, 16.879479], // Atrio
-    [41.107916, 16.879212], // Student
-    [41.109250, 16.877026], // Entrata Re David
-    [41.107868, 16.880086]  // Entrata Orabona
-  ];
-
-  let currentTestIndex = 0;
-
-  function simulatePosition() {
-    if (currentTestIndex >= testCoordinates.length) {
-      currentTestIndex = 0; // Riparti da capo
-    }
-
-    const [lat, lon] = testCoordinates[currentTestIndex];
-    currentTestIndex++;
-
-    console.log(`Simulazione coordinate: Lat=${lat}, Lon=${lon}`);
-
-    // Simula una posizione invocando manualmente la callback del watchPosition
-    if (typeof navigator.geolocation !== "undefined" && watchId !== null) {
-      const fakePosition = {
-        coords: {
-          latitude: lat,
-          longitude: lon,
-          accuracy: 5 // Simula buona precisione
-        }
-      };
-      // Chiamo la funzione interna come se fosse un evento di geolocalizzazione
-      if (typeof handleSimulatedPosition === "function") {
-        handleSimulatedPosition(fakePosition);
-      }
-    }
-  }
-
-  // Wrapper: salviamo la callback originale per poterla chiamare
-  let realCallback = null;
-  if (navigator.geolocation && navigator.geolocation.watchPosition) {
-    const realWatchPosition = navigator.geolocation.watchPosition;
-    navigator.geolocation.watchPosition = function (success, error, options) {
-      realCallback = success;
-      return realWatchPosition.call(navigator.geolocation, success, error, options);
-    };
-  }
-
-  // Intercettiamo e la usiamo per la simulazione
-  window.handleSimulatedPosition = function (fakePosition) {
-    if (realCallback) {
-      realCallback(fakePosition);
-    }
-  };
-
-  // Ogni 30 secondi cambia coordinate
-  setInterval(simulatePosition, 30 * 1000);
-
-
-
-
-
-
 
 // Esportiamo globalmente
 window.startTracking = startTracking;
