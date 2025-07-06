@@ -335,8 +335,7 @@ function startTracking() {
 }
 
 function stopTracking() {
-    currentZoneName = null;
-    window.currentZoneName = currentZoneName;
+    
     if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
