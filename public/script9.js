@@ -263,6 +263,12 @@ function onUserLocationActivated(zoneName) {
   caricaPost(1, currentLocationFilter);
 }
 
+function onUserLocationStopped(zoneName) {
+  currentLocationFilter = zoneName || "Fuori dalle aree conosciute";
+  finished = false;
+  currentPage = 1;
+  caricaPost(1, currentLocationFilter);
+}
 
 
 
