@@ -306,6 +306,7 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
     if (selectedLocation) {
       console.log("🌍 Filtro posizione scelto:", selectedLocation);
       currentLocationFilter = selectedLocation; // aggiorna filtro globale
+      e.target.value = "";
       finished = false; // reset fine caricamento
       currentPage = 1;  // reset pagina
       caricaPost(1);    // ricarica i post filtrati
@@ -315,16 +316,16 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
 
 
 function aggiornaVisibilitaElementi() {
-  const form = document.getElementById('createPostForm');
+  //const form = document.getElementById('createPostForm');
   const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
 console.log(currentLocationFilter);
   if (currentLocationFilter === "Fuori dalle aree conosciute") {
-    form.style.display = 'none';
+    //form.style.display = 'none';
     select.style.display = 'block';
     label.style.display = 'block';
   } else {
-    form.style.display = 'block';
+    //form.style.display = 'block';
     select.style.display = 'none';
     label.style.display = 'none';
   }
