@@ -787,7 +787,7 @@ app.get("/api/post-image/:id", async (req, res) => {
 
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "home9.html"));
+  res.sendFile(path.join(__dirname, "public", "home.html"));
 });
 
 
