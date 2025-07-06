@@ -238,8 +238,7 @@ function distanceToPolygon(lat, lon, polygon) {
 }
 
 function startTracking() {
-    currentZoneName = null;
-    window.currentZoneName = currentZoneName;
+    
     const outputCoords = document.getElementById("coords");
     const outputLocation = document.getElementById("location");
     const outputAccuracy = document.getElementById("accuracy");
