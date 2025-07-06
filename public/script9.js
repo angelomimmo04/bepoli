@@ -311,7 +311,7 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
       finished = false; // reset fine caricamento
       currentPage = 1;  // reset pagina
       caricaPost(1);    // ricarica i post filtrati
-      currentLocationFilter = "Fuori dalle aree conosciute";
+      //currentLocationFilter = "Fuori dalle aree conosciute";
     }
   });
 
