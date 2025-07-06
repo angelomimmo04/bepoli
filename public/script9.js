@@ -309,7 +309,18 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
   });
 
 
+function aggiornaVisibilitaElementi() {
+  const form = document.getElementById('createPostForm');
+  const select = document.getElementById('locationSelect');
 
+  if (currentLocationFilter === "Fuori dalle aree conosciute") {
+    form.style.display = 'none';
+    select.style.display = 'block';
+  } else {
+    form.style.display = 'block';
+    select.style.display = 'none';
+  }
+}
   
 
 
