@@ -309,6 +309,7 @@ function startTracking() {
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
                 window.currentZoneName = currentZoneName;
+                window.aggiornaVisibilitaElementi();
 
                 if (currentZoneName !== lastLoadedZoneName) {
                     lastLoadedZoneName = currentZoneName;
