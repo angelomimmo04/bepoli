@@ -239,6 +239,7 @@ function distanceToPolygon(lat, lon, polygon) {
 
 function startTracking() {
     currentZoneName = null;
+    window.currentZoneName = currentZoneName;
     const outputCoords = document.getElementById("coords");
     const outputLocation = document.getElementById("location");
     const outputAccuracy = document.getElementById("accuracy");
@@ -336,6 +337,7 @@ function startTracking() {
 
 function stopTracking() {
     currentZoneName = null;
+    window.currentZoneName = currentZoneName;
     if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
