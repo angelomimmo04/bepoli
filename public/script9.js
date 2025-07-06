@@ -295,6 +295,25 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+document.getElementById('locationSelect').addEventListener('change', (e) => {
+    const selectedLocation = e.target.value;
+
+    if (selectedLocation) {
+      console.log("🌍 Filtro posizione scelto:", selectedLocation);
+      currentLocationFilter = selectedLocation; // aggiorna filtro globale
+      finished = false; // reset fine caricamento
+      currentPage = 1;  // reset pagina
+      caricaPost(1);    // ricarica i post filtrati
+    }
+  });
+
+
+
+  
+
+
+
   // Chiudi modale cliccando fuori
   window.addEventListener('click', (event) => {
     const modal = document.getElementById('profileModal');
