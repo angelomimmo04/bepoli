@@ -308,12 +308,14 @@ function startTracking() {
                 outputLocation.textContent = `Luogo: ${currentZoneName}`;
                 locationStatus.textContent = "✅ Posizione rilevata";
                 locationStatus.style.color = "green";
+                console.log(currentZoneName);
                 window.currentZoneName = currentZoneName;
                 window.aggiornaVisibilitaElementi();
 
                 if (currentZoneName !== lastLoadedZoneName) {
                     lastLoadedZoneName = currentZoneName;
                     if (typeof onUserLocationActivated === "function") {
+                        console.log(currentZoneName);
                         onUserLocationActivated(currentZoneName);
                     }
                 }
