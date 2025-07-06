@@ -321,7 +321,7 @@ function aggiornaVisibilitaElementi() {
     select.style.display = 'none';
   }
 }
-  
+  window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
 
 
 
