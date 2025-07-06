@@ -351,7 +351,8 @@ function stopTracking() {
     locationStatus.textContent = "⏹️ Monitoraggio fermato";
     locationStatus.style.color = "gray";
 
-    onUserLocationActivated(currentZoneName);
+    currentZoneName = null;
+    onUserLocationStopped(currentZoneName);
 
     window.aggiornaVisibilitaElementi();
 
