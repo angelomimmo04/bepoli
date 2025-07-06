@@ -312,14 +312,17 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
 
 function aggiornaVisibilitaElementi() {
   const form = document.getElementById('createPostForm');
+  const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
 console.log(currentLocationFilter);
   if (currentLocationFilter === "Fuori dalle aree conosciute") {
     form.style.display = 'none';
     select.style.display = 'block';
+    label.style.display = 'block';
   } else {
     form.style.display = 'block';
     select.style.display = 'none';
+    label.style.display = 'none';
   }
 }
   window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
