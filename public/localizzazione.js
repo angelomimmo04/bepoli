@@ -326,6 +326,10 @@ function startTracking() {
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
+
+
+    window.aggiornaVisibilitaElementi();
+
 }
 
 function stopTracking() {
@@ -343,6 +347,10 @@ function stopTracking() {
     outputAccuracy.textContent = "-- metri";
     locationStatus.textContent = "⏹️ Monitoraggio fermato";
     locationStatus.style.color = "gray";
+
+
+    window.aggiornaVisibilitaElementi();
+
 }
 
 // Esportiamo globalmente
