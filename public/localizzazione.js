@@ -312,7 +312,7 @@ function startTracking() {
                 console.log(currentZoneName);
                 window.currentZoneName = currentZoneName;
                 
-                if (currentZoneName===null){
+                if (currentZoneName==="Fuori dalle aree conosciute"){
                     window.aggiornaVisibilitaElementi("si");
                 } else {
                     window.aggiornaVisibilitaElementi("no");
