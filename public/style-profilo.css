@@ -217,7 +217,7 @@ main {
         justify-content: center; /* centra in orizzontale */
         align-items: center;     /* centra in verticale */
         margin: 0 auto;          /* centra come blocco */
-        width: 100%;             /* assicura che occupi tutto lo spazio disponibile */
+        width: 50%;             /* assicura che occupi tutto lo spazio disponibile */
     }
 
     #logo {
