@@ -18,26 +18,59 @@ header{
     margin-top: 0rem;
     margin-right:  4rem;
 }
-#mainnav{
-    grid-column:1;
-    grid-row:3/6;
-    margin-top: 4rem;
-    margin-left: 2rem;
+#mainnav {
+  grid-column: 1;
+  grid-row: 3 / 6;
+  margin-top: 4rem;
+  margin-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-#info{
+#mainnav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
+}
 
-    overflow-x: auto; /*gestisce il fatto che va oltre la parte sua*/
+#mainnav a:hover {
+  background-color: #3498db;
+  color: white;
+}
 
+
+/*#info{
+
+    /* overflow-x: auto; /*gestisce il fatto che va oltre la parte sua*/
+
+    overflow-x: hidden;
     display: flow;
 
-    /*gap: 1vw; la distanza tra le varie cose dentro*/
+    /*gap: 1vw; la distanza tra le varie cose dentro
 
     grid-column: 2;
     grid-row: 1/4;
     margin-top: 0.5rem;
     margin-left: 10rem;
 }
+*/
+
+
+#info {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  margin-top: 0.5rem;
+  margin-left: 10rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+
+
 #base{
     overflow-x: auto;
 
@@ -57,14 +90,15 @@ header{
 
 
 }
-#profile{
-
-    height: 25vh;
-    width: 25vh;
-    border-radius: 50%; /*per fargli mettere le immagini tonde*/
-    object-fit:  cover; /*ci fa ritagliare l'immagine mantenendo le proporzioni e in maniera che occupi l'intereo contenitore*/
-    border:  2px black;
+#profile {
+  width: 25vh;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid black;
+  display: block;
 }
+
 #name{
     margin-left: 1rem;
     font-size: 1rem;
@@ -73,7 +107,9 @@ header{
 #username{
     margin-left: 1rem;
 }
-#bio {
+
+
+/*  bio {
     margin-left: 1rem;
     width: 100%;
     max-width: 100ch;
@@ -86,6 +122,23 @@ header{
     box-sizing: border-box;
     
 }
+*/
+
+
+
+#bio {
+  margin-left: 1rem;
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  resize: vertical;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+
 
 
 main{
@@ -179,6 +232,18 @@ main{
   font-size: 14px;
   text-align: right;
 }
+
+
+
+#base, #social {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+
+
 
 
 @media (max-width: 1024px) {
