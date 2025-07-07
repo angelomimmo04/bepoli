@@ -264,11 +264,7 @@ function onUserLocationActivated(zoneName) {
   caricaPost(1, currentLocationFilter);
 }
 
-function onUserLocationStopped(zoneName) {
-  //window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
-  // lo bugga currentLocationFilter = "Fuori dalle aree conosciute";
-  currentLocationFilter = "Fuori dalle aree conosciute";
-}
+
 
 
 
