@@ -264,12 +264,6 @@ function onUserLocationActivated(zoneName) {
   caricaPost(1, currentLocationFilter);
 }
 
-function onUserLocationStopped(zoneName) {
-  currentLocationFilter = zoneName || "Fuori dalle aree conosciute";
-  finished = false;
-  currentPage = 1;
-  caricaPost(1, currentLocationFilter);
-}
 
 
 
@@ -320,22 +314,25 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
   });
 
 
-function aggiornaVisibilitaElementi() {
-  //const form = document.getElementById('createPostForm');
+function aggiornaVisibilitaElementi(valore) {
   const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
-console.log(currentLocationFilter);
-  if (currentLocationFilter === "Fuori dalle aree conosciute") {
-    //form.style.display = 'none';
+
+  console.log(valore);
+
+  if (valore === "si") {
+    // Se valore è "si", mostra select e label
     select.style.display = 'block';
     label.style.display = 'block';
-  } else {
-    //form.style.display = 'block';
+  } else if (valore === "no") {
+    // Se valore è "no", nascondi select e label
     select.style.display = 'none';
     label.style.display = 'none';
-  }
+
 }
-  window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
+
+window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
+
 
 
 
