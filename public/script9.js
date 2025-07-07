@@ -313,24 +313,22 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
   });
 
 
-function aggiornaVisibilitaElementi(valore) {
+function aggiornaVisibilitaElementi() {
+  //const form = document.getElementById('createPostForm');
   const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
-
-  console.log(valore);
-
-  if (valore === "si") {
-    // Se valore è "si", mostra select e label
+console.log(currentLocationFilter);
+  if (currentLocationFilter === "Fuori dalle aree conosciute") {
+    //form.style.display = 'none';
     select.style.display = 'block';
     label.style.display = 'block';
-  } else if (valore === "no") {
-    // Se valore è "no", nascondi select e label
+  } else {
+    //form.style.display = 'block';
     select.style.display = 'none';
     label.style.display = 'none';
-
+  }
 }
-
-window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
+  window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
 
 
 
