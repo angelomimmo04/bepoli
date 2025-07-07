@@ -318,6 +318,8 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
 function aggiornaVisibilitaElementi(valore) {
   const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
+  const p = document.querySelector('p.camera-hint');
+  const button = document.querySelector('post-submit-button');
 
   console.log(valore);
 
@@ -325,10 +327,14 @@ function aggiornaVisibilitaElementi(valore) {
     // Se valore è "si", mostra select e label
     select.style.display = 'block';
     label.style.display = 'block';
+    p.textContent = "⚠️ Senza posizione puoi vedere i post, ma non pubblicarli";
+    button.style.visibility = 'hidden';
   } else if (valore === "no") {
     // Se valore è "no", nascondi select e label
     select.style.display = 'none';
     label.style.display = 'none';
+    p.textContent = "📸 Puoi scattare una foto o selezionarne una dalla galleria";
+    button.style.visibility = 'visible';
 
 }
 };
