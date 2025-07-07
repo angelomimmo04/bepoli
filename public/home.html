@@ -262,7 +262,7 @@
     }
 
     // Funzione invia dati utente
-    async function inviaDatiUtente() {
+    window.inviaDatiUtente = async function () {
       try {
         const res = await fetch("/api/auth-token", {
           method: "GET",
