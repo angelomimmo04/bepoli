@@ -319,7 +319,7 @@ function aggiornaVisibilitaElementi(valore) {
   const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
   const p = document.querySelector('p.camera-hint');
-  const button = document.querySelector('post-submit-button');
+  const button = document.querySelector('.post-submit-button');
 
   console.log(valore);
 
