@@ -10,6 +10,19 @@ header {
     text-align: center;
 }
 
+
+
+#social{
+    overflow-x: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 1rem; /*la distanza tra le varie cose dentro*/
+    margin-left: 1.5rem;
+
+
+}
+
 #logo {
     height: 25vh;
     width: auto;
@@ -195,18 +208,56 @@ main {
 }
 
 
-/* MOBILE FIXES */
+
+
 @media (max-width: 768px) {
+    #base {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center; /* centra in orizzontale */
+        align-items: center;     /* centra in verticale */
+        margin: 0 auto;          /* centra come blocco */
+        width: 100%;             /* assicura che occupi tutto lo spazio disponibile */
+    }
+
     #logo {
-        display: none; /* Nasconde il logo */
+        display: none; /* Ok */
     }
 
-    .profile-container {
-        flex-direction: row; /* Mantiene orizzontale anche su mobile */
-        width: 90%;
+    #mainnav {
+        display: none; /* Ok */
     }
 
-    .profile-info {
-        flex: 1;
+    #profile {
+        width: 20vh; /* Puoi regolare se troppo grande */
     }
+
+    #bio {
+        flex: 1; /* Fa usare lo spazio rimanente */
+    }
+
+
+    #info {
+        grid-column: 1/3;
+        grid-row: 1 / 4;
+        margin-top: 0.5rem;
+        margin-left: auto;
+        max-width: 100%;
+    }
+
+    #post-section {
+        grid-column: 1/3;
+        grid-row: 4 / 9;
+        margin-left: auto;
+    }
+    #social{
+        flex-wrap: nowrap; /* Non permette di andare a capo */
+        flex-direction: row; /* Assicurati che sia in riga */
+    }
+
+    #gigi{
+        width: 80%;
+    }
+
+
 }
