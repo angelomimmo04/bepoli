@@ -73,6 +73,16 @@ body { background-color: #f2f2f2; color: #333; line-height: 1.5; }
     gap: 2px;
 }
 
+.logo {
+      height: 18vh;
+    width: auto;  /*metto auto perchè visto che scelgo l'altezza non modifico le proporzioni dell'immagine*/
+      /* ===
+    margin-top: 0rem;
+    margin-right:  4rem;
+    height: 50px; 
+      width: auto; === */
+    }
+
 /* caricamento foto */
 .camera-hint {
     font-size: 0.9rem;
@@ -255,5 +265,10 @@ body { background-color: #f2f2f2; color: #333; line-height: 1.5; }
     }
     #locationStatus{
         font-size: 0.6rem;
+    }
+
+    .logo {
+      height: 10vh;
+    width: auto;
     }
 }
