@@ -230,7 +230,7 @@ main {
     }
 
     #profile {
-        width: 20vh; /* Puoi regolare se troppo grande */
+        width: 15vh; /* Puoi regolare se troppo grande */
     }
 
     #bio {
@@ -281,15 +281,15 @@ main {
         margin-top: 0;
         font-size: 0.7rem;
     }
-    .btn{
-        font-size: 0.5rem;
-        width: 8px;
-        margin-left: 0.2rem;
+    #editBtn {
+        font-size: 0.5rem; /* 0.2rem è minuscolo! */
+        white-space: nowrap;
+        display: inline-block;
+        text-align: center;
+        padding: 5px 8px;
+        margin-left: 0.3rem;
     }
-    #editBtn{
-        margin: 0;
-        font-size: 0.3rem;
-    }
-    
+
+
 
 }
