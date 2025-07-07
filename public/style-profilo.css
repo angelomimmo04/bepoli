@@ -217,7 +217,8 @@ main {
         justify-content: center; /* centra in orizzontale */
         align-items: center;     /* centra in verticale */
         margin: 0 auto;          /* centra come blocco */
-        width: 50%;             /* assicura che occupi tutto lo spazio disponibile */
+        width: 100%;             /* assicura che occupi tutto lo spazio disponibile */
+
     }
 
     #logo {
@@ -256,8 +257,39 @@ main {
     }
 
     #gigi{
-        width: 50%;
+        width: 100%;
     }
 
+    #username{
+        margin-left:  1rem;
+        margin-bottom: 0.1rem;
+        font-size: 0.7rem;
+    }
+    #social{
+        margin-top: 0rem;
+        margin-bottom:  0rem;
+        gap: 1vw;
+        font-size: 0.7rem;
+        margin-left: 1rem;
+    }
+    #name{
+        margin-top: 0;
+        margin-bottom: 0.2rem;
+        font-size: 0.7rem;
+    }
+    #bio{
+        margin-top: 0;
+        font-size: 0.7rem;
+    }
+    .btn{
+        font-size: 0.5rem;
+        width: 8px;
+        margin-left: 0.2rem;
+    }
+    #editBtn{
+        margin: 0;
+        font-size: 0.3rem;
+    }
+    
 
 }
