@@ -354,7 +354,10 @@ function stopTracking() {
     locationStatus.style.color = "gray";
 
     currentZoneName = null;
-    onUserLocationStopped(currentZoneName);
+    
+    window.currentLocationFilter = "Fuori dalle aree conosciute";
+    window.currentZoneName = currentZoneName;
+    
 
     window.aggiornaVisibilitaElementi();
 
