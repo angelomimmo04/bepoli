@@ -311,7 +311,13 @@ function startTracking() {
                 locationStatus.style.color = "green";
                 console.log(currentZoneName);
                 window.currentZoneName = currentZoneName;
-                window.aggiornaVisibilitaElementi("no");
+                
+                if (currentZoneName===null){
+                    window.aggiornaVisibilitaElementi("si");
+                } else {
+                    window.aggiornaVisibilitaElementi("no");
+                }
+                
 
                 if (currentZoneName !== lastLoadedZoneName) {
                     window.lastLoadedZoneName = currentZoneName;
