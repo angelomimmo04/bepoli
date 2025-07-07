@@ -310,14 +310,14 @@ function startTracking() {
                 locationStatus.style.color = "green";
                 console.log(currentZoneName);
                 window.currentZoneName = currentZoneName;
-                window.aggiornaVisibilitaElementi();
+                window.aggiornaVisibilitaElementi("si");
 
                 if (currentZoneName !== lastLoadedZoneName) {
                     lastLoadedZoneName = currentZoneName;
                     if (typeof onUserLocationActivated === "function") {
                         console.log(currentZoneName);
                         onUserLocationActivated(currentZoneName);
-                        window.aggiornaVisibilitaElementi();
+                        window.aggiornaVisibilitaElementi("si");
                     }
                 }
             }
@@ -328,12 +328,13 @@ function startTracking() {
             outputAccuracy.textContent = "-- metri";
             locationStatus.textContent = "❌ Errore posizione";
             locationStatus.style.color = "red";
+            window.aggiornaVisibilitaElementi("no");
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
 
 
-    window.aggiornaVisibilitaElementi();
+    
 
 }
 
@@ -355,10 +356,8 @@ function stopTracking() {
     locationStatus.style.color = "gray";
 
     currentZoneName = null;
-    
-    onUserLocationActivated(currentZoneName);
+    window.aggiornaVisibilitaElementi("si");
 
-    window.aggiornaVisibilitaElementi();
 
 }
 
