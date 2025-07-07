@@ -1,23 +1,21 @@
 body {
-    display: grid; /*dico il tipo di display che voglio*/
-    grid-template-columns: 20vw 70vw 10vw;
-    grid-template-rows: 10vh 10vh 10vh 10vh 10vh 10vh 10vh 30vh;  /*dico il numero di colonne e righe che voglio e dico quanto devono essere grandi e la somma deve fare 100*/
-
+  display: grid;
+  grid-template-columns: 20vw 70vw 10vw;
+  grid-template-rows: 10vh 10vh 10vh 10vh 10vh 10vh 10vh 30vh;
 }
 
-header{
-    grid-column: 1;
-    grid-row: 1; /*qui gli sto dicendo che parte dall'inizio della riga1 fino all'inizio della terza (quindi la fine della2)*/
-    text-align: center;  /*qui dico dove voglio che sia l'elemento header*/
-
+header {
+  grid-column: 1;
+  grid-row: 1;
+  text-align: center;
 }
 
-#logo{
-    height: 25vh;
-    width: auto;  /*metto auto perchè visto che scelgo l'altezza non modifico le proporzioni dell'immagine*/
-    margin-top: 0rem;
-    margin-right:  4rem;
+#logo {
+  height: 25vh;
+  width: auto;
+  margin: 0 4rem 0 0;
 }
+
 #mainnav {
   grid-column: 1;
   grid-row: 3 / 6;
@@ -29,6 +27,7 @@ header{
 }
 
 #mainnav a {
+  display: block;
   text-decoration: none;
   color: #333;
   font-weight: bold;
@@ -42,54 +41,29 @@ header{
   color: white;
 }
 
-
-/*#info{
-
-    /* overflow-x: auto; /*gestisce il fatto che va oltre la parte sua*/
-
-    overflow-x: hidden;
-    display: flow;
-
-    /*gap: 1vw; la distanza tra le varie cose dentro
-
-    grid-column: 2;
-    grid-row: 1/4;
-    margin-top: 0.5rem;
-    margin-left: 10rem;
-}
-*/
-
-
 #info {
   grid-column: 2;
   grid-row: 1 / 4;
   margin-top: 0.5rem;
   margin-left: 10rem;
   max-width: 100%;
-  overflow: hidden;
 }
 
-
-
-#base{
-    overflow-x: auto;
-
-
-    display: flex;
-    align-items: center;
-    gap: 1vW; /*la distanza tra le varie cose dentro*/
-
+#base {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  flex-wrap: wrap;
 }
-#social{
-    overflow-x: auto;
 
-    display: flex;
-    align-items: center;
-    gap: 1rem; /*la distanza tra le varie cose dentro*/
-    margin-left: 1.5rem;
-
-
+#social {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1.5rem;
+  flex-wrap: wrap;
 }
+
 #profile {
   width: 25vh;
   aspect-ratio: 1/1;
@@ -99,32 +73,14 @@ header{
   display: block;
 }
 
-#name{
-    margin-left: 1rem;
-    font-size: 1rem;
-
-}
-#username{
-    margin-left: 1rem;
+#name {
+  margin-left: 1rem;
+  font-size: 1rem;
 }
 
-
-/*  bio {
-    margin-left: 1rem;
-    width: 100%;
-    max-width: 100ch;
-    min-height: 36px;
-    resize: vertical;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: pre-wrap;
-    font-family: sans-serif;
-    box-sizing: border-box;
-    
+#username {
+  margin-left: 1rem;
 }
-*/
-
-
 
 #bio {
   margin-left: 1rem;
@@ -138,59 +94,46 @@ header{
   box-sizing: border-box;
 }
 
-
-
-
-main{
-    grid-column:2;
-    grid-row:4/9;
-
-
-
-
-}
-#gigi{
-    display: flow;
-
+main {
+  grid-column: 2;
+  grid-row: 4 / 9;
 }
 
-
-
-.horizontal_scroll { /* . è l'identidicativo delle classi*/
-
-    height: 8rem;
-    display: flex;
-    align-items: center;
-    gap: 1vW; /*la distanza tra le varie cose dentro*/
-    grid-column: 2;
-    grid-row: 4/5;
-    margin-top: -2rem;
-    margin-left: 25rem;
-
+.horizontal_scroll {
+  height: 8rem;
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  grid-column: 2;
+  grid-row: 4 / 5;
+  margin-top: -2rem;
+  margin-left: 25rem;
 }
 
-.story img{ /*significa tutte le img delle story*/
-    height: 10vh;
-    width: 5vW;
-    border-radius: 50%; /*per fargli mettere le immagini tonde*/
-    object-fit:  cover; /*ci fa ritagliare l'immagine mantenendo le proporzioni e in maniera che occupi l'intereo contenitore*/
-    border:  2px solid cornflowerblue;
+.story img {
+  height: 10vh;
+  width: 5vw;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid cornflowerblue;
 }
-.story p{
-    font-size: 0.9rem;
-    color: #333;
-    margin: 0;
-    text-align: center;
+
+.story p {
+  font-size: 0.9rem;
+  color: #333;
+  margin: 0;
+  text-align: center;
 }
-.story{
-    height: 5vh;
-    width: 6vW;
-    border-radius: 50%;
+
+.story {
+  height: 5vh;
+  width: 6vw;
+  border-radius: 50%;
 }
 
 #post-section {
   grid-column: 2;
-  grid-row: 4/9;
+  grid-row: 4 / 9;
   margin-left: 5rem;
   margin-top: 2rem;
   width: 100%;
@@ -210,7 +153,7 @@ main{
   border: 1px solid #ccc;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
@@ -233,18 +176,82 @@ main{
   text-align: right;
 }
 
-
-/*
-#base, #social {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
 }
 
-*/
+.btn.following {
+  background-color: #bfbfbf;
+}
 
+.btn.not-following {
+  background-color: blue;
+}
 
+/* VERSIONE RESPONSIVE */
+
+@media (max-width: 768px) {
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    order: 1;
+    margin: 1rem 0;
+  }
+
+  #info {
+    order: 2;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  #profile {
+    margin: 0 auto 1rem auto;
+  }
+
+  #base,
+  #social {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  #bio {
+    margin: 1rem auto;
+    max-width: 90%;
+  }
+
+  main {
+    order: 3;
+    width: 100%;
+  }
+
+  #post-section {
+    margin: 2rem auto;
+    width: 90%;
+  }
+
+  #posts-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .horizontal_scroll {
+    display: none; /* oppure metti display: flex per tenerlo */
+  }
+
+  #mainnav {
+    display: none; /* lo nascondi su mobile */
+  }
+}
 
 @media (max-width: 1024px) {
   #posts-container {
@@ -256,55 +263,9 @@ main{
   #posts-container {
     grid-template-columns: 1fr;
   }
-    #post-section {
-  
-  margin-left: 0rem;
-  
-  width: 100%;
-}
-}
 
-
-
-@media (max-width: 768px) {
-    /*serve a dire che in particolati condizioni magari alcune cose non si devono vedere*/
-    header,
-    nav{
-        display: none;
-    }
+  #post-section {
+    margin-left: 0;
+    width: 100%;
+  }
 }
-
-@media (max-width: 768px){
-    #info,.horizontal_scroll,main{
-        grid-column: 1/3;
-    }
-}
-@media (max-width: 768px){
-    #info{
-        margin-left: 2rem;
-    }
-    .horizontal_scroll{
-        margin-left: 13rem;
-    }
-}
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.btn.following {
-  background-color: #bfbfbf;
-  color: white;
-}
-
-.btn.not-following {
-  background-color: blue;
-  color: white;
-}
-
