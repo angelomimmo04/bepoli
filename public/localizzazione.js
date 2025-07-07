@@ -317,6 +317,7 @@ function startTracking() {
                     if (typeof onUserLocationActivated === "function") {
                         console.log(currentZoneName);
                         onUserLocationActivated(currentZoneName);
+                        window.aggiornaVisibilitaElementi();
                     }
                 }
             }
