@@ -270,5 +270,6 @@ body { background-color: #f2f2f2; color: #333; line-height: 1.5; }
     .logo {
       height: 10vh;
     width: auto;
+        margin-top: -3rem;
     }
 }
