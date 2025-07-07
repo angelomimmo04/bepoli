@@ -194,82 +194,19 @@ main {
     background-color: blue;
 }
 
-/* VERSIONE RESPONSIVE */
 
+/* MOBILE FIXES */
 @media (max-width: 768px) {
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    #logo {
+        display: none; /* Nasconde il logo */
+    }
 
-  header {
-    order: 1;
-    margin: 1rem 0;
-    text-align: center;
-  }
+    .profile-container {
+        flex-direction: row; /* Mantiene orizzontale anche su mobile */
+        width: 90%;
+    }
 
-  #logo {
-    height: auto;
-    max-width: 80%;
-    margin: 0 auto;
-  }
-
-  #info {
-    order: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 1rem auto;
-    text-align: center;
-    width: 90%;
-  }
-
-  #profile {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 1rem auto;
-    border-radius: 50%;
-  }
-
-  #base {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  #social {
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 1rem 0;
-  }
-
-  #bio {
-    margin: 1rem 0;
-    max-width: 90%;
-  }
-
-  main {
-    order: 3;
-    width: 100%;
-  }
-
-  #post-section {
-    width: 90%;
-    margin: 2rem auto;
-  }
-
-  #posts-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .horizontal_scroll {
-    display: none; /* Nascondi stories su mobile */
-  }
-
-  #mainnav {
-    display: none; /* Nascondi nav laterale su mobile */
-  }
+    .profile-info {
+        flex: 1;
+    }
 }
