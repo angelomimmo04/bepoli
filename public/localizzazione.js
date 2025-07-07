@@ -356,9 +356,7 @@ function stopTracking() {
 
     currentZoneName = null;
     
-    window.currentLocationFilter = "Fuori dalle aree conosciute";
-    window.currentZoneName = currentZoneName;
-    
+    onUserLocationActivated(currentZoneName);
 
     window.aggiornaVisibilitaElementi();
 
