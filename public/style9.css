@@ -250,26 +250,28 @@ body { background-color: #f2f2f2; color: #333; line-height: 1.5; }
 
     #logo.logo{
        display: flex;
-        
+
     }
     .nav{
         display: flex;
-        margin-bottom: -9rem;
-        margin-left: -6rem;
+        margin-bottom: -7rem;
+        margin-left: -6.5rem;
         font-size: 0.7rem;
     }
 
     .coords-nav{
         padding: 0;
         font-size: 0.6rem;
+        margin-right: -1rem;
     }
     #locationStatus{
         font-size: 0.6rem;
     }
 
-    .logo {
-      height: 10vh;
-    width: auto;
+    .logo{
+            height: 10vh;
+            width: auto;  /*metto auto perchè visto che scelgo l'altezza non modifico le proporzioni dell'immagine*/
         margin-top: -3rem;
+
     }
 }
