@@ -419,6 +419,40 @@ async function apriListaFollow(tipo, userId) {
         modal.style.display = "none";
       }
     };
+
+
+
+
+
+
+
+     window.inviaDatiUtente = async function () {
+      try {
+        const res = await fetch("/api/auth-token", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        if (!res.ok) {
+          console.error("Utente non autenticato.");
+          return;
+        }
+
+        const { token } = await res.json();
+        const sito2 = window.open(`https://bepoliby-1-2.onrender.com?token=${token}`, "_blank");
+
+        if (!sito2) {
+          console.error("La finestra è stata bloccata dal browser.");
+          return;
+        }
+
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log("Dati utente:", payload);
+
+      } catch (err) {
+        console.error("Errore:", err);
+      }
+    }
   
 
     
