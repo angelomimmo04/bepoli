@@ -267,7 +267,7 @@ function onUserLocationActivated(zoneName) {
 function onUserLocationStopped(zoneName) {
   //window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
   // lo bugga currentLocationFilter = "Fuori dalle aree conosciute";
-  location = "Fuori dalle aree conosciute";
+  currentLocationFilter = "Fuori dalle aree conosciute";
 }
 
 
@@ -322,7 +322,7 @@ function aggiornaVisibilitaElementi() {
   const label = document.getElementById('abc123');
   const select = document.getElementById('locationSelect');
 console.log(currentLocationFilter);
-  if (location === "Fuori dalle aree conosciute") {
+  if (currentLocationFilter === "Fuori dalle aree conosciute") {
     //form.style.display = 'none';
     select.style.display = 'block';
     label.style.display = 'block';
