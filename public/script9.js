@@ -330,6 +330,7 @@ function aggiornaVisibilitaElementi(valore) {
     label.style.display = 'none';
 
 }
+};
 
 window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
 
