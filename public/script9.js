@@ -258,7 +258,7 @@ caricaPost(1);
 // Quando l’utente attiva la posizione
 function onUserLocationActivated(zoneName) {
   currentLocationFilter = zoneName || "Fuori dalle aree conosciute";
-  //window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
+  window.currentZoneName = zoneName || "Fuori dalle aree conosciute";
   finished = false;
   currentPage = 1;
   caricaPost(1, currentLocationFilter);
