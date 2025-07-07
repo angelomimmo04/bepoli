@@ -3,7 +3,8 @@ let watchId = null;
 let lastZoneName = null;
 let stabilityCounter = 0;
 const stabilityThreshold = 3;
-let lastLoadedZoneName = null;
+//let lastLoadedZoneName = null;
+window.lastLoadedZoneName = null;
 window.currentZoneName = null;
 
 const zones = [
@@ -313,7 +314,7 @@ function startTracking() {
                 window.aggiornaVisibilitaElementi("no");
 
                 if (currentZoneName !== lastLoadedZoneName) {
-                    lastLoadedZoneName = currentZoneName;
+                    window.lastLoadedZoneName = currentZoneName;
                     if (typeof onUserLocationActivated === "function") {
                         console.log(currentZoneName);
                         onUserLocationActivated(currentZoneName);
