@@ -625,7 +625,7 @@ app.get("/api/posts", async (req, res) => {
 
   // 🪄 Normalizza il nome base
   let baseLocationName;
-  if (location.startsWith("Vicino a ")) {
+  if (location.startsWith("Vicino a: ")) {
     baseLocationName = location.replace("Vicino a: ", "");
   } else {
     baseLocationName = location;
