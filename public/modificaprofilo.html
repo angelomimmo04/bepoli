@@ -18,8 +18,8 @@
 <form id="updateForm" enctype="multipart/form-data">
     <input type="hidden" name="userId" id="userId" />
     <label for="bioInput" class="testo">Bio:</label>
-    <textarea name="bio" id="bioInput" maxlength="150"></textarea>
-    <div id="charCount">0/150</div>
+    <textarea name="bio" id="bioInput" maxlength="66"></textarea>
+    <div id="charCount">0/66</div>
 
     <label for="profilePicInput" class="testo">Carica immagine profilo:</label><br />
     <input type="file" id="profilePicInput" name="profilePic" accept="image/*" /><br /><br />
@@ -77,7 +77,7 @@
             const maxLength = 66;
 
             function updateCharCount() {
-                charCount.textContent = `${bioInput.value.length}/150`;
+                charCount.textContent = `${bioInput.value.length}/66`;
             }
 
             bioInput.value = user.bio || "";
