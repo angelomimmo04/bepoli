@@ -774,8 +774,20 @@ app.get("/api/posts", async (req, res) => {
 
 
 
-app.get("/api/post-image/:id/:size?", async (req, res) => {
+
+
+app.get("/api/post-image/:id", async (req, res) => {
+  const { id } = req.params;
+  const size = undefined; // default no resize
+  await sendPostImage(id, size, res);
+});
+
+app.get("/api/post-image/:id/:size", async (req, res) => {
   const { id, size } = req.params;
+  await sendPostImage(id, size, res);
+});
+
+async function sendPostImage(id, size, res) {
   try {
     const post = await Post.findById(id);
     if (post?.image?.data) {
@@ -799,8 +811,7 @@ app.get("/api/post-image/:id/:size?", async (req, res) => {
     console.error("Errore immagine:", err);
     res.status(500).send("Errore immagine");
   }
-});
-
+}
 
 
 app.get("/", (req, res) => {
