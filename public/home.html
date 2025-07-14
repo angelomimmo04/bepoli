@@ -193,18 +193,20 @@
         <time class="post-date" datetime="">Data</time>
       </header>
 
-      <div class="post-image-container">
-        <img
-  src="/api/post-image/ID/medium"
-  srcset="
-    /api/post-image/ID/small 400w,
-    /api/post-image/ID/medium 800w,
-    /api/post-image/ID/large 1200w
-  "
-  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  alt="immagine post"
-  class="post-image"
-/>
+     <div class="post-image-container">
+  <img
+    src="/api/post-image/{{post._id}}/medium"
+    srcset="
+      /api/post-image/{{post._id}}/small 400w,
+      /api/post-image/{{post._id}}/medium 800w,
+      /api/post-image/{{post._id}}/large 1200w
+    "
+    sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    alt="immagine post"
+    class="post-image"
+  />
+
+
 
       </div>
 
