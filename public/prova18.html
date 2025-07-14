@@ -109,32 +109,41 @@
 
 
 async function inviaDatiUtente() {
+  // Apro subito la finestra vuota per non farla bloccare
+  const sito2 = window.open("", "_blank");
+  if (!sito2) {
+    console.error("La finestra è stata bloccata dal browser.");
+    return;
+  }
+
   try {
-    // 1. Recupera il JWT dal backend (sito principale)
+    // Recupera il JWT dal backend (sito principale)
     const res = await fetch("/api/auth-token", {
       method: "GET",
       credentials: "include"
     });
 
     if (!res.ok) {
+      sito2.close();
       console.error("Utente non autenticato.");
       return;
     }
 
     const { token } = await res.json();
 
-    // 2. Apri il sito 2 in una nuova finestra, passando il token nell'URL
-    const sito2 = window.open(`https://bepoliby-1-2.onrender.com?token=${token}`, "_blank");
+    // Ora carica il sito2 con il token nell'URL
+    sito2.location.href = `https://bepoliby-1-2.onrender.com?token=${token}`;
 
-    if (!sito2) {
-      console.error("La finestra è stata bloccata dal browser.");
-      return;
-    }
-
-    // (Facoltativo) 3. Decodifica per loggare i dati
+    // (Facoltativo) decodifica per loggare i dati
     const payload = JSON.parse(atob(token.split('.')[1]));
     const { id, username, nome } = payload;
     console.log("Dati utente:", { id, username, nome });
+
+  } catch (error) {
+    sito2.close();
+    console.error("Errore nel recupero del token:", error);
+  }
+}
 
     // (Opzionale) 4. Invia anche via postMessage se vuoi usare entrambi i metodi
     /*
