@@ -127,21 +127,12 @@ if (locationEl) {
       clone.querySelector('.comment-count').textContent = post.comments;
 
       const imageEl = clone.querySelector('.post-image');
-if (post._id && post.image) {
-  // Usa il tuo id per generare srcset con diverse dimensioni
-  imageEl.src = `/api/post-image/${post._id}/medium`; // default medium
-  imageEl.srcset = `
-    /api/post-image/${post._id}/small 400w,
-    /api/post-image/${post._id}/medium 800w,
-    /api/post-image/${post._id}/large 1200w
-  `;
-  imageEl.sizes = `(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw`;
-  imageEl.style.display = '';
-  imageEl.alt = post.desc || "Immagine post";
-} else {
-  imageEl.style.display = 'none';
-}
-
+      if (post.imageUrl) {
+        imageEl.src = post.imageUrl;
+        imageEl.style.display = '';
+      } else {
+        imageEl.style.display = 'none';
+      }
 
       // Like
       const likeButton = clone.querySelector('.like-button');
@@ -364,4 +355,3 @@ window.aggiornaVisibilitaElementi = aggiornaVisibilitaElementi;
     }
   });
 });
-
