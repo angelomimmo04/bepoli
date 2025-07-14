@@ -22,6 +22,7 @@ const client = new OAuth2Client(CLIENT_ID);
 
 
 const jwt = require('jsonwebtoken');
+const sharp = require("sharp");
 
 
 
@@ -771,19 +772,35 @@ app.get("/api/posts", async (req, res) => {
 
 
 
-app.get("/api/post-image/:id", async (req, res) => {
+
+
+app.get("/api/post-image/:id/:size?", async (req, res) => {
+  const { id, size } = req.params;
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(id);
     if (post?.image?.data) {
+      const buffer = post.image.data;
+      let resizedBuffer = buffer;
+
+      if (size === "small") {
+        resizedBuffer = await sharp(buffer).resize({ width: 400 }).toBuffer();
+      } else if (size === "medium") {
+        resizedBuffer = await sharp(buffer).resize({ width: 800 }).toBuffer();
+      } else if (size === "large") {
+        resizedBuffer = await sharp(buffer).resize({ width: 1200 }).toBuffer();
+      }
+
       res.contentType(post.image.contentType);
-      res.send(post.image.data);
+      res.send(resizedBuffer);
     } else {
       res.status(404).send("Nessuna immagine");
     }
-  } catch {
+  } catch (err) {
+    console.error("Errore immagine:", err);
     res.status(500).send("Errore immagine");
   }
 });
+
 
 
 app.get("/", (req, res) => {
