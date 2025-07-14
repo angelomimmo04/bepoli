@@ -194,7 +194,17 @@
       </header>
 
       <div class="post-image-container">
-        <img class="post-image" src="" alt="Immagine del post" />
+        <img
+  src="/api/post-image/ID/medium"
+  srcset="
+    /api/post-image/ID/small 400w,
+    /api/post-image/ID/medium 800w,
+    /api/post-image/ID/large 1200w
+  "
+  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  alt="Post"
+/>
+
       </div>
 
       <div class="post-actions">
