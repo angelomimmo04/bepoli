@@ -54,7 +54,6 @@ async function caricaPost(page = 1) {
   try {
     const baseLocation = currentLocationFilter.replace(/^Vicino a:\s*/, '').trim();
     const location = encodeURIComponent(baseLocation || "Fuori dalle aree conosciute");
-    //const location = encodeURIComponent(currentLocationFilter || "Fuori dalle aree conosciute");
     const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}&location=${location}`, { credentials: 'include' });
 
     if (!res.ok) throw new Error("Errore fetch");
@@ -76,7 +75,7 @@ async function caricaPost(page = 1) {
     if (page === 1) feed.innerHTML = '';
 
     posts.forEach(post => {
-      console.log("📦 Post ricevuto:", post);
+      console.log("Post ricevuto:", post);
       const clone = template.content.cloneNode(true);
 
       // === Dati autore ===
@@ -287,18 +286,6 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('profileModal').style.display = 'none';
     });
   }
-//profilo//
-  
-  //document.getElementById('goToProfile').addEventListener('click', (e) => {
-  //e.preventDefault();
-  //if (typeof loggedUserId !== 'undefined') {
-  //  window.location.href = `profile.html?id=${loggedUserId}`;
-  //} else {
-  //  alert("ID utente non disponibile.");
-  //}
-//});
-
-
 
 
 document.getElementById('locationSelect').addEventListener('change', (e) => {
@@ -311,7 +298,6 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
       finished = false; // reset fine caricamento
       currentPage = 1;  // reset pagina
       caricaPost(1);    // ricarica i post filtrati
-      //currentLocationFilter = "Fuori dalle aree conosciute";
       window.lastLoadedZoneName = null;
     }
   });
