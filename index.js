@@ -33,10 +33,10 @@ const jwt = require('jsonwebtoken');
 
 
 
-// === PARTE RICCARDO 9 ===
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-// === FINE PARTE RICCARDO 9 ===
+
 
 const app = express();
 app.set('trust proxy', 1);
@@ -78,7 +78,7 @@ app.use(cors({
 
 app.use(cookieParser());
 
-// ✅ Middleware importante per iframe
+// Middleware 
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
@@ -106,12 +106,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const csrfProtection = csrf({ cookie: false });
 
-// --- DB ---
+// DB 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connesso a MongoDB"))
   .catch(err => console.error("❌ Connessione fallita:", err));
 
-// --- Schemi ---
+// Schemi 
 const utenteSchema = new mongoose.Schema({
   nome: String,
   username: { type: String, unique: true },
@@ -129,7 +129,7 @@ const Utente = mongoose.model("Utente", utenteSchema);
 
 
 
-// --- Rotte ---
+// Rotte
 app.get("/csrf-token", (req, res, next) => {
   req.session.touch();
   next();
@@ -161,18 +161,7 @@ app.get("/api/auth-token", checkFingerprint, (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-// 🔐 Login tradizionale
+// Login tradizionale
 app.post("/login", csrfProtection, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ message: "Dati mancanti" });
@@ -195,7 +184,7 @@ app.post("/login", csrfProtection, async (req, res) => {
   }
 });
 
-// 🔐 Login con Google
+// Login con Google
 app.post("/auth/google", async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: "Token mancante" });
@@ -230,7 +219,7 @@ app.post("/auth/google", async (req, res) => {
   }
 });
 
-// 📝 Registrazione
+// Registrazione
 app.post("/register", csrfProtection, async (req, res) => {
   const { nome, username, password } = req.body;
   if (!nome || !username || !password)
@@ -255,7 +244,7 @@ app.post("/register", csrfProtection, async (req, res) => {
   }
 });
 
-// 📷 Upload immagine e bio
+// Upload immagine e bio
 app.post("/api/update-profile", checkFingerprint, csrfProtection, upload.single("profilePic"), async (req, res) => {
   const userId = req.session.user.id;
   const updateData = {};
@@ -272,7 +261,7 @@ app.post("/api/update-profile", checkFingerprint, csrfProtection, upload.single(
   }
 });
 
-// 📸 Foto profilo
+// Foto profilo
 app.get("/api/user-photo/:userId", async (req, res) => {
   try {
     const user = await Utente.findById(req.params.userId);
@@ -313,7 +302,7 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
 });
 
 
-//salva utente come visto
+// salva utente come visto
 
 app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
   const userId = req.session.user.id;
@@ -361,7 +350,7 @@ app.get("/api/recent-users", checkFingerprint, async (req, res) => {
 });
 
 
-// 🔽 Lista dei follower
+// Lista dei follower
 app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -398,7 +387,7 @@ app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
 });
 
 
-// 🔼 Lista dei seguiti
+// Lista dei seguiti
 app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -439,7 +428,7 @@ app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
 
 
 
-// 👤 Profilo pubblico
+// Profilo pubblico
 app.get("/api/user-public/:id", async (req, res) => {
   try {
     const user = await Utente.findById(req.params.id).select("username nome bio followers following");
@@ -459,7 +448,7 @@ app.get("/api/user-public/:id", async (req, res) => {
 });
 
 
-// ➕➖ Follow/Unfollow
+// Follow/Unfollow
 app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
   const followerId = req.session.user.id;
   const targetId = req.params.id;
@@ -498,7 +487,7 @@ app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
 });
 
 
-// ℹ️ Info follow
+// ℹInfo follow
 app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
   const viewerId = req.session.user.id;
   const targetId = req.params.id;
@@ -524,7 +513,7 @@ app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
 });
 
 
-// 👤 Utente autenticato
+// Utente autenticato
 app.get("/api/user", checkFingerprint, async (req, res) => {
   try {
     const user = await Utente.findById(req.session.user.id).select("username nome bio followers following");
@@ -543,7 +532,7 @@ app.get("/api/user", checkFingerprint, async (req, res) => {
   }
 });
 
-// 🚪 Logout
+// Logout
 app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).json({ message: "Errore logout" });
@@ -552,7 +541,7 @@ app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
   });
 });
 
-// POST RICCARDO 9
+// POST 
 
 
 app.post('/api/posts', upload.single("image"), async (req, res) => {
@@ -572,7 +561,7 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
     const newPost = new Post({
       userId,
       desc: req.body.desc,
-      location, // ✅ salva qui la posizione ricevuta
+      location, // salva qui la posizione ricevuta
       createdAt: new Date(),
       image: req.file ? {
         data: req.file.buffer,
@@ -592,7 +581,7 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
 
 
 
-// === SCHEMA POST ===
+// SCHEMA POST 
 const postSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
   desc: String,
@@ -600,7 +589,7 @@ const postSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String
   },
-  location: String, // ✅ AGGIUNTO CAMPO POSIZIONE
+  location: String, // AGGIUNTO CAMPO POSIZIONE
   createdAt: { type: Date, default: Date.now },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
   comments: [
@@ -623,7 +612,7 @@ app.get("/api/posts", async (req, res) => {
   const pageSize = 10;
   const location = req.query.location || "Fuori dalle aree conosciute";
 
-  // 🪄 Normalizza il nome base
+  // Normalizza il nome base
   let baseLocationName;
   if (location.startsWith("Vicino a: ")) {
     baseLocationName = location.replace("Vicino a: ", "");
@@ -631,7 +620,7 @@ app.get("/api/posts", async (req, res) => {
     baseLocationName = location;
   }
 
-  // 🔍 Cercheremo sia la versione base sia la versione "Vicino a ..."
+  // Cercheremo sia la versione base sia la versione "Vicino a ..."
   const locationsToFind = [baseLocationName, "Vicino a: " + baseLocationName];
 
   try {
@@ -792,7 +781,7 @@ app.get("/", (req, res) => {
 
 
 
-// Like a post
+// Like al post
 app.post("/api/posts/:id/like", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -868,7 +857,7 @@ app.get("/api/posts/:id/comments", async (req, res) => {
 
 
 
-/////////FINE POST RICCARDO
+// FINE POST 
 
 
 
@@ -919,7 +908,7 @@ app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
 
 
 
-// --- Avvio server ---
+// Avvio server 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server attivo su porta ${PORT}`);
