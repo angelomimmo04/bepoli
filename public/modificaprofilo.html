@@ -39,10 +39,10 @@
     let csrfToken = "";
 
     window.onload = async function () {
-        let user = null; // ✅ Definita visibile a tutto il blocco
+        let user = null; // Definita visibile a tutto il blocco
 
         try {
-            // 1. Verifica utente loggato
+            // Verifica utente loggato
             const userRes = await fetch('https://bepoli.onrender.com/api/user', {
                 credentials: 'include'
             });
@@ -59,7 +59,7 @@
             const { _id, nome, username, bio } = user;
             sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 
-            // 2. Recupera CSRF token
+            // Recupera CSRF token
             const csrfRes = await fetch('https://bepoli.onrender.com/csrf-token', {
                 credentials: 'include'
             });
@@ -71,7 +71,7 @@
                 console.warn('CSRF token non ricevuto');
             }
 
-            // 3. Setup form
+            // Setup form
             const bioInput = document.getElementById("bioInput");
             const charCount = document.getElementById("charCount");
             const maxLength = 66;
