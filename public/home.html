@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style9.css">
 
   <style>
-    /* === Animazione logo === */
+    /*  Animazione logo  */
     @keyframes logoEntrance {
       0% {
         transform: translateX(-150vw) rotate(-720deg);
@@ -27,7 +27,7 @@
     
     
 
-    /* === Modal === */
+    /*  Modal  */
     .modal {
       display: none;
       position: fixed;
@@ -87,7 +87,7 @@
 </head>
 
 <body>
-  <!-- === HEADER CON LOGO ANIMATO E RIDOTTO === -->
+  <!-- HEADER CON LOGO ANIMATO E RIDOTTO -->
   <header class="header">
     <a href="home.html">
       <img src="logobepoli.png" alt="Logo" class="logo" id="logo">
@@ -98,7 +98,6 @@
       <a href="home.html" class="active">Home</a>
       <a href="search.html">Cerca</a>
       <a href="#" onclick="inviaDatiUtente()">Messaggi</a>
-      <!--<a href="#">Logout</a>-->
     </nav>
 
     <div class="coords-nav">
@@ -109,7 +108,7 @@
     </div>
   </header>
 
-  <!-- === BOTTONI MONITORAGGIO === -->
+  <!-- BOTTONI MONITORAGGIO -->
   <div class="monitor-buttons">
     <button class="monitor-btn start" onclick="startTracking()">
       <span class="icon">▶</span> Avvia Monitoraggio
@@ -118,7 +117,7 @@
       <span class="icon">⛔</span> Ferma Monitoraggio
     </button>
 
-    <!-- === MENU A TENDINA POSIZIONE === -->
+    <!-- MENU A TENDINA POSIZIONE -->
 <div class="location-filter">
   <label for="locationSelect" id="abc123">Scegli posizione:</label>
   <select id="locationSelect">
@@ -153,7 +152,7 @@
     <img id="locationImage" src="" alt="Immagine zona" />
   </div>
 
-  <!-- === FORM CREAZIONE POST === -->
+  <!-- FORM CREAZIONE POST -->
   <section class="create-post-section">
     <form id="createPostForm" enctype="multipart/form-data">
       <textarea
@@ -172,7 +171,7 @@
     <div id="createPostError" class="error-message hidden"></div>
   </section>
 
-  <!-- === FEED === -->
+  <!-- FEED -->
   <main class="feed-container" id="feed">
     <!-- I post verranno inseriti qui dinamicamente -->
   </main>
@@ -182,7 +181,7 @@
     <div id="loader" class="loader hidden"></div>
   </div>
 
-  <!-- === TEMPLATE POST === -->
+  <!-- TEMPLATE POST -->
   <template id="post-template">
     <article class="post-card">
       <header class="post-header">
@@ -221,7 +220,7 @@
     </article>
   </template>
 
-  <!-- === SCRIPT === -->
+  <!-- SCRIPT -->
   <script src="localizzazione.js"></script>
   <script src="script9.js" defer></script>
 
