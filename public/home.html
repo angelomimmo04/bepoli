@@ -245,34 +245,37 @@
       window.location.href = "login.html";
     }
 
-    // Funzione invia dati utente
-    window.inviaDatiUtente = async function () {
-      try {
-        const res = await fetch("/api/auth-token", {
-          method: "GET",
-          credentials: "include"
-        });
+window.inviaDatiUtente = function () {
+  // ✅ Apri subito una finestra vuota per non farla bloccare
+  const popup = window.open("", "_blank");
 
-        if (!res.ok) {
-          console.error("Utente non autenticato.");
-          return;
-        }
+  if (!popup) {
+    console.error("Popup bloccato dal browser.");
+    return;
+  }
 
-        const { token } = await res.json();
-        const sito2 = window.open(`https://bepoliby-1-2.onrender.com?token=${token}`, "_blank");
+  // Poi fai la richiesta asincrona
+  fetch("/api/auth-token", {
+    method: "GET",
+    credentials: "include"
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Utente non autenticato.");
+      return res.json();
+    })
+    .then(({ token }) => {
+      popup.location.href = `https://bepoliby-1-2.onrender.com?token=${token}`;
 
-        if (!sito2) {
-          console.error("La finestra è stata bloccata dal browser.");
-          return;
-        }
+      // (Facoltativo) logga i dati
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      console.log("Dati utente:", payload);
+    })
+    .catch(err => {
+      popup.close(); // Chiudi se c'è stato errore
+      console.error("Errore:", err);
+    });
+};
 
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log("Dati utente:", payload);
-
-      } catch (err) {
-        console.error("Errore:", err);
-      }
-    }
   </script>
 </body>
 </html>
