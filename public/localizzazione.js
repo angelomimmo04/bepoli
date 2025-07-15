@@ -252,10 +252,10 @@ function startTracking() {
 
     if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
-    outputCoords.textContent = "📡 Monitoraggio attivo...";
+    outputCoords.textContent = "Monitoraggio attivo...";
     outputAccuracy.textContent = "-- metri";
     outputLocation.textContent = "--";
-    locationStatus.textContent = "📍 Attendere il rilevamento...";
+    locationStatus.textContent = "Attendere il rilevamento...";
     locationStatus.style.color = "orange";
 
     watchId = navigator.geolocation.watchPosition(
