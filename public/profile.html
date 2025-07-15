@@ -226,7 +226,7 @@
     const { _id, nome, username, bio } = user;
     sessionStorage.setItem("user", JSON.stringify({ _id, nome, username, bio }));
 
-    // ⬇️ CARICA I POST ⬇️
+    // CARICA I POST 
     try {
       const res = await fetch(`/api/user/${userId}/posts`, {
         credentials: "include"
