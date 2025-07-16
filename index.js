@@ -553,7 +553,7 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
 
     const location = req.body.location || "Posizione sconosciuta";
 
-    console.log("📩 Ricevuto post da frontend:", {
+    console.log("Ricevuto post da frontend:", {
       location: location,
       desc: req.body.desc
     });
