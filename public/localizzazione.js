@@ -265,7 +265,7 @@ function startTracking() {
             //const lat = 41.108082
             //const lon = 16.879843
             const lat = 41.108138
-            cont lon 16.879759
+            const lon 16.879759
             
             
             const accuracy = position.coords.accuracy;
