@@ -238,14 +238,14 @@
     // Controllo utente loggato
     const user = JSON.parse(sessionStorage.getItem("user"));
     if (user) {
-      console.log("Utente loggato:", user);
+      console.log("Utente loggato:");
     } else {
       alert("Devi prima effettuare il login.");
       window.location.href = "login.html";
     }
 
 window.inviaDatiUtente = function () {
-  // ✅ Apri subito una finestra vuota per non farla bloccare
+  // Apri subito una finestra vuota per non farla bloccare
   const popup = window.open("", "_blank");
 
   if (!popup) {
@@ -265,9 +265,9 @@ window.inviaDatiUtente = function () {
     .then(({ token }) => {
       popup.location.href = `https://bepoliby-1-2.onrender.com?token=${token}`;
 
-      // (Facoltativo) logga i dati
+      //  logga i dati
       const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log("Dati utente:", payload);
+      console.log("Dati utente");
     })
     .catch(err => {
       popup.close(); // Chiudi se c'è stato errore
