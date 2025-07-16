@@ -129,7 +129,7 @@ const Utente = mongoose.model("Utente", utenteSchema);
 
 
 
-// Rotte
+// Rotte Questo fa sì che la pagina di login sia la prima cosa che gli utenti vedono quando accedono all'applicazione
 app.get("/csrf-token", (req, res, next) => {
   req.session.touch();
   next();
@@ -143,7 +143,7 @@ app.get("/", (req, res) => {
 
 
 
-//PASSAGGIO DATI
+//PASSAGGIO DATI 
 app.get("/api/auth-token", checkFingerprint, (req, res) => {
   if (!req.session.user) return res.status(401).json({ message: "Non autenticato" });
 
