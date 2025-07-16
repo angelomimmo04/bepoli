@@ -12,7 +12,7 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
     return;
   }
 
-  console.log("🌍 Zona rilevata prima del post:", window.currentZoneName);
+  console.log("Zona rilevata prima del post:", window.currentZoneName);
 formData.append("location", window.currentZoneName || "Posizione sconosciuta");
   
 
@@ -75,7 +75,7 @@ async function caricaPost(page = 1) {
     if (page === 1) feed.innerHTML = '';
 
     posts.forEach(post => {
-      console.log("Post ricevuto:", post);
+      console.log("Post ricevuto");
       const clone = template.content.cloneNode(true);
 
       // === Dati autore ===
@@ -292,7 +292,7 @@ document.getElementById('locationSelect').addEventListener('change', (e) => {
     const selectedLocation = e.target.value;
 
     if (selectedLocation) {
-      console.log("🌍 Filtro posizione scelto:", selectedLocation);
+      console.log("Filtro posizione scelto:", selectedLocation);
       currentLocationFilter = selectedLocation; // aggiorna filtro globale
       e.target.value = "";
       finished = false; // reset fine caricamento
