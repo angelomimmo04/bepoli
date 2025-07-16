@@ -128,13 +128,13 @@
         return res.json();
       })
       .then(data => {
-        console.log("✅ Login Google OK:", data);
+        console.log("Login Google OK:", data);
         sessionStorage.setItem("user", JSON.stringify(data.user));
         alert("Login effettuato con successo!");
         window.location.href = "home.html";
       })
       .catch(err => {
-        console.error("❌ Errore durante login con Google:", err);
+        console.error("Errore durante login con Google:", err);
         alert("Errore durante il login con Google");
       });
   }
