@@ -108,8 +108,8 @@ const csrfProtection = csrf({ cookie: false });
 
 // DB 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connesso a MongoDB"))
-  .catch(err => console.error("❌ Connessione fallita:", err));
+  .then(() => console.log("Connesso a MongoDB"))
+  .catch(err => console.error("Connessione fallita:", err));
 
 // Schemi 
 const utenteSchema = new mongoose.Schema({
@@ -276,7 +276,7 @@ app.get("/api/user-photo/:userId", async (req, res) => {
   }
 });
 
-// 🔍 Ricerca utenti
+// Ricerca utenti
 app.get("/api/search-users", checkFingerprint, async (req, res) => {
   const query = req.query.q;
   const page = parseInt(req.query.page) || 1;
@@ -620,7 +620,7 @@ app.get("/api/posts", async (req, res) => {
     baseLocationName = location;
   }
 
-  // Cercheremo sia la versione base sia la versione "Vicino a ..."
+  // Cerchereemo sia la versione base sia la versione "Vicino a ..."
   const locationsToFind = [baseLocationName, "Vicino a: " + baseLocationName];
 
   try {
@@ -911,5 +911,5 @@ app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
 // Avvio server 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server attivo su porta ${PORT}`);
+  console.log(`Server attivo su porta ${PORT}`);
 });
