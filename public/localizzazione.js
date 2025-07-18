@@ -260,10 +260,10 @@ function startTracking() {
 
     watchId = navigator.geolocation.watchPosition(
         (position) => {
-            //const lat = position.coords.latitude;
-            //const lon = position.coords.longitude;
-            const lat = 41.109318
-            const lon = 16.879477
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            //const lat = 41.109318
+            //const lon = 16.879477
             
             
             
