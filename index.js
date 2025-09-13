@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -12,43 +10,91 @@ const session = require("express-session");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 const { OAuth2Client } = require("google-auth-library");
+const jwt = require("jsonwebtoken");
 
 const CLIENT_ID = '42592859457-ausft7g5gohk7mf96st2047ul9rk8o0v.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
 
-
-
-
-
-
-const jwt = require('jsonwebtoken');
-
-
-
-
-
-
-
-
-
-
-
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
 const app = express();
 app.set('trust proxy', 1);
-app.use(express.static(path.join(__dirname, 'public')));
 
+// --- Middleware ---
+app.use(cors({
+  origin: 'https://bepoli.onrender.com',
+  credentials: true
+}));
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// --- Funzione Fingerprint ---
+// Sicurezza COOP/COEP
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  next();
+});
+
+// Session
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  rolling: true,
+  cookie: {
+    maxAge: 1000 * 60 * 30,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
+}));
+
+// CSRF
+const csrfProtection = csrf({ cookie: false });
+
+// --- DB ---
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Connesso a MongoDB"))
+  .catch(err => console.error("Connessione fallita:", err));
+
+// --- Schemi Utente e Post ---
+const utenteSchema = new mongoose.Schema({
+  nome: String,
+  username: { type: String, unique: true },
+  password: String,
+  bio: String,
+  profilePic: { data: Buffer, contentType: String },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
+  utentiRecenti: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }]
+});
+const Utente = mongoose.model("Utente", utenteSchema);
+
+const postSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
+  desc: String,
+  image: { data: Buffer, contentType: String },
+  location: String,
+  createdAt: { type: Date, default: Date.now },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
+  comments: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
+      text: String,
+      location: String,
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
+});
+const Post = mongoose.model("Post", postSchema);
+
+// --- Middleware Fingerprint ---
 function getFingerprint(req) {
   return req.headers['user-agent'] || '';
 }
 
-// --- Middleware fingerprint ---
 function checkFingerprint(req, res, next) {
   if (!req.session.user) return res.status(401).json({ message: "Non autorizzato" });
 
@@ -70,96 +116,23 @@ function checkFingerprint(req, res, next) {
   }
 }
 
-// --- Middleware ---
-app.use(cors({
-  origin: 'https://bepoli.onrender.com',
-  credentials: true
-}));
+// --- Rotte API ---
 
-app.use(cookieParser());
-
-// Middleware 
-app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-  next();
-});
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  rolling: true,
-  cookie: {
-    maxAge: 1000 * 60 * 30, // 30 minuti
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
-  }
-}));
-
-
-
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-
-const csrfProtection = csrf({ cookie: false });
-
-// DB 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("Connesso a MongoDB"))
-  .catch(err => console.error("Connessione fallita:", err));
-
-// Schemi 
-const utenteSchema = new mongoose.Schema({
-  nome: String,
-  username: { type: String, unique: true },
-  password: String,
-  bio: String,
-  profilePic: {
-    data: Buffer,
-    contentType: String
-  },
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
-  utentiRecenti: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }]
-});
-const Utente = mongoose.model("Utente", utenteSchema);
-
-
-
-// Rotte Questo fa sì che la pagina di login sia la prima cosa che gli utenti vedono quando accedono all'applicazione
-app.get("/csrf-token", (req, res, next) => {
-  req.session.touch();
-  next();
-}, csrfProtection, (req, res) => {
+// CSRF token
+app.get("/csrf-token", checkFingerprint, csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/login.html"));
-});
-
-
-
-//PASSAGGIO DATI 
+// Auth token JWT
 app.get("/api/auth-token", checkFingerprint, (req, res) => {
-  if (!req.session.user) return res.status(401).json({ message: "Non autenticato" });
-
   const payload = {
     id: req.session.user.id,
     username: req.session.user.username,
     nome: req.session.user.nome
   };
-
-  const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "15m" // valido per 15 minuti
-  });
-
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "15m" });
   res.json({ token });
 });
-
 
 // Login tradizionale
 app.post("/login", csrfProtection, async (req, res) => {
@@ -171,20 +144,15 @@ app.post("/login", csrfProtection, async (req, res) => {
     if (!utente || !(await bcrypt.compare(password, utente.password)))
       return res.status(400).json({ message: "Username o password errati" });
 
-    req.session.user = {
-      id: utente._id,
-      nome: utente.nome,
-      username: utente.username
-    };
+    req.session.user = { id: utente._id, nome: utente.nome, username: utente.username };
     req.session.fingerprint = getFingerprint(req);
-
-    res.status(200).json({ message: "Login riuscito", user: req.session.user });
-  } catch (err) {
+    res.json({ message: "Login riuscito", user: req.session.user });
+  } catch {
     res.status(500).json({ message: "Errore server" });
   }
 });
 
-// Login con Google
+// Login Google
 app.post("/auth/google", async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) return res.status(400).json({ message: "Token mancante" });
@@ -205,16 +173,10 @@ app.post("/auth/google", async (req, res) => {
       await utente.save();
     }
 
-    req.session.user = {
-      id: utente._id,
-      nome: utente.nome,
-      username: utente.username
-    };
+    req.session.user = { id: utente._id, nome: utente.nome, username: utente.username };
     req.session.fingerprint = getFingerprint(req);
-
     res.json({ message: "Login Google effettuato", user: req.session.user });
-  } catch (err) {
-    console.error("Errore login Google:", err);
+  } catch {
     res.status(401).json({ message: "Token non valido" });
   }
 });
@@ -905,8 +867,8 @@ app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
 
 
 
-// Servire la build di React
-const buildPath = path.join(__dirname, 'frontend', 'build');
+// Serve la build di React
+const buildPath = path.join(__dirname, 'build'); // <-- senza 'frontend'
 app.use(express.static(buildPath));
 
 // Qualsiasi route non gestita dal backend va a React
@@ -927,4 +889,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server attivo su porta ${PORT}`);
 });
+
 
