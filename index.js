@@ -543,30 +543,7 @@ app.post('/api/posts', upload.single("image"), async (req, res) => {
 
 
 
-// SCHEMA POST 
-const postSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
-  desc: String,
-  image: {
-    data: Buffer,
-    contentType: String
-  },
-  location: String, // AGGIUNTO CAMPO POSIZIONE
-  createdAt: { type: Date, default: Date.now },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Utente" }],
-  comments: [
-    {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "Utente" },
-      text: String,
-      location: String,
-      createdAt: { type: Date, default: Date.now }
-    }
-  ]
-});
 
-
-
-const Post = mongoose.model("Post", postSchema);
 
 
 app.get("/api/posts", async (req, res) => {
@@ -889,5 +866,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server attivo su porta ${PORT}`);
 });
+
 
 
