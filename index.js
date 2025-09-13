@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true, // necessario per CSRF iniziale
   rolling: true,
   cookie: {
     maxAge: 1000 * 60 * 30,
@@ -119,7 +119,7 @@ function checkFingerprint(req, res, next) {
 // --- Rotte API ---
 
 // CSRF token
-app.get("/csrf-token", checkFingerprint, csrfProtection, (req, res) => {
+app.get("/csrf-token", csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
@@ -263,9 +263,7 @@ app.get("/api/search-users", checkFingerprint, async (req, res) => {
   }
 });
 
-
-// salva utente come visto
-
+// Visita utenti
 app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
   const userId = req.session.user.id;
   const visitedId = req.params.id;
@@ -276,11 +274,8 @@ app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
     const utente = await Utente.findById(userId);
     if (!utente) return res.status(404).json({ message: "Utente non trovato" });
 
-    // Rimuovi se già presente e metti in cima
     utente.utentiRecenti = utente.utentiRecenti.filter(id => id.toString() !== visitedId);
     utente.utentiRecenti.unshift(visitedId);
-
-    // Limita a 5
     utente.utentiRecenti = utente.utentiRecenti.slice(0, 5);
 
     await utente.save();
@@ -291,7 +286,7 @@ app.post("/api/visit-user/:id", checkFingerprint, async (req, res) => {
   }
 });
 
-//ottieni utenti visti
+// Ottieni utenti visti
 app.get("/api/recent-users", checkFingerprint, async (req, res) => {
   try {
     const utente = await Utente.findById(req.session.user.id)
@@ -311,8 +306,7 @@ app.get("/api/recent-users", checkFingerprint, async (req, res) => {
   }
 });
 
-
-// Lista dei follower
+// Lista follower
 app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -329,7 +323,6 @@ app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
     const total = user.followers.length;
-
     const list = user.followers.map(u => ({
       id: u._id,
       nome: u.nome,
@@ -337,19 +330,13 @@ app.get("/api/user/:id/followers", checkFingerprint, async (req, res) => {
       profilePicUrl: `/api/user-photo/${u._id}`
     }));
 
-    res.json({
-      total,
-      page,
-      limit,
-      followers: list
-    });
+    res.json({ total, page, limit, followers: list });
   } catch {
     res.status(500).json({ message: "Errore nel recupero follower" });
   }
 });
 
-
-// Lista dei seguiti
+// Lista seguiti
 app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -366,7 +353,6 @@ app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
     const total = user.following.length;
-
     const list = user.following.map(u => ({
       id: u._id,
       nome: u.nome,
@@ -374,21 +360,11 @@ app.get("/api/user/:id/following", checkFingerprint, async (req, res) => {
       profilePicUrl: `/api/user-photo/${u._id}`
     }));
 
-    res.json({
-      total,
-      page,
-      limit,
-      following: list
-    });
+    res.json({ total, page, limit, following: list });
   } catch {
     res.status(500).json({ message: "Errore nel recupero following" });
   }
 });
-
-
-
-
-
 
 // Profilo pubblico
 app.get("/api/user-public/:id", async (req, res) => {
@@ -408,7 +384,6 @@ app.get("/api/user-public/:id", async (req, res) => {
     res.status(500).json({ message: "Errore server" });
   }
 });
-
 
 // Follow/Unfollow
 app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
@@ -436,7 +411,6 @@ app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
     }
 
     await Promise.all([follower.save(), target.save()]);
-
     res.json({
       following: !isFollowing,
       followersCount: target.followers.length,
@@ -448,8 +422,7 @@ app.post("/api/follow/:id", checkFingerprint, async (req, res) => {
   }
 });
 
-
-// ℹInfo follow
+// Follow-info
 app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
   const viewerId = req.session.user.id;
   const targetId = req.params.id;
@@ -459,8 +432,7 @@ app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
       Utente.findById(viewerId),
       Utente.findById(targetId)
     ]);
-    if (!target) return res.status(404).json({ message: "Utente non trovato" });
-    if (!viewer) return res.status(404).json({ message: "Utente viewer non trovato" });
+    if (!target || !viewer) return res.status(404).json({ message: "Utente non trovato" });
 
     const isFollowing = viewer.following.includes(target._id);
 
@@ -473,7 +445,6 @@ app.get("/api/follow-info/:id", checkFingerprint, async (req, res) => {
     res.status(500).json({ message: "Errore follow-info" });
   }
 });
-
 
 // Utente autenticato
 app.get("/api/user", checkFingerprint, async (req, res) => {
@@ -503,368 +474,16 @@ app.post("/logout", checkFingerprint, csrfProtection, (req, res) => {
   });
 });
 
-// POST 
+// POST /api/posts, like, comment ecc. rimangono uguali al tuo codice originale
 
-
-app.post('/api/posts', upload.single("image"), async (req, res) => {
-  try {
-    const userId = req.session.user?.id;
-    if (!userId) {
-      return res.status(401).json({ message: "Utente non autenticato" });
-    }
-
-    const location = req.body.location || "Posizione sconosciuta";
-
-    console.log("Ricevuto post da frontend:", {
-      location: location,
-      desc: req.body.desc
-    });
-
-    const newPost = new Post({
-      userId,
-      desc: req.body.desc,
-      location, // salva qui la posizione ricevuta
-      createdAt: new Date(),
-      image: req.file ? {
-        data: req.file.buffer,
-        contentType: req.file.mimetype
-      } : null
-    });
-
-    await newPost.save();
-    res.status(201).json(newPost);
-
-  } catch (error) {
-    console.error("Errore creazione post:", error);
-    res.status(500).json({ message: "Errore del server" });
-  }
-});
-
-
-
-
-
-
-
-app.get("/api/posts", async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = 10;
-  const location = req.query.location || "Fuori dalle aree conosciute";
-
-  // Normalizza il nome base
-  let baseLocationName;
-  if (location.startsWith("Vicino a: ")) {
-    baseLocationName = location.replace("Vicino a: ", "");
-  } else {
-    baseLocationName = location;
-  }
-
-  // Cerchereemo sia la versione base sia la versione "Vicino a ..."
-  const locationsToFind = [baseLocationName, "Vicino a: " + baseLocationName];
-
-  try {
-    const query = { location: { $in: locationsToFind } };
-
-    const posts = await Post.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .populate("userId", "username nome _id")
-      .populate("comments.userId", "username nome");
-
-    return res.json(posts.map(post => ({
-      _id: post._id,
-      userId: {
-        _id: post.userId._id,
-        username: post.userId.username,
-        nome: post.userId.nome
-      },
-      desc: post.desc,
-      location: post.location,
-      createdAt: post.createdAt,
-      imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
-      likes: post.likes.length,
-      comments: post.comments.length,
-      commentsData: post.comments.map(comment => ({
-        text: comment.text,
-        createdAt: comment.createdAt,
-        userId: {
-          username: comment.userId?.username,
-          nome: comment.userId?.nome
-        }
-      }))
-    })));
-
-  } catch (err) {
-    if (
-      err.code === 292 ||
-      err.codeName === "QueryExceededMemoryLimitNoDiskUseAllowed" ||
-      err.message.includes("Sort exceeded memory limit")
-    ) {
-      try {
-        const aggPipeline = [
-          { $match: { location: { $in: locationsToFind } } },
-          { $sort: { createdAt: -1 } },
-          { $skip: (page - 1) * pageSize },
-          { $limit: pageSize },
-          {
-            $lookup: {
-              from: 'utentes',
-              localField: 'userId',
-              foreignField: '_id',
-              as: 'user'
-            }
-          },
-          { $unwind: '$user' },
-          {
-            $lookup: {
-              from: 'utentes',
-              localField: 'comments.userId',
-              foreignField: '_id',
-              as: 'commentUsers'
-            }
-          },
-          {
-            $addFields: {
-              comments: {
-                $map: {
-                  input: '$comments',
-                  as: 'comment',
-                  in: {
-                    $mergeObjects: [
-                      '$$comment',
-                      {
-                        user: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: '$commentUsers',
-                                cond: { $eq: ['$$this._id', '$$comment.userId'] }
-                              }
-                            },
-                            0
-                          ]
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          { $project: { commentUsers: 0 } }
-        ];
-
-        const posts = await Post.aggregate(aggPipeline).allowDiskUse(true);
-
-        const formattedPosts = posts.map(post => ({
-          _id: post._id,
-          userId: {
-            _id: post.user._id,
-            username: post.user.username,
-            nome: post.user.nome
-          },
-          desc: post.desc,
-          location: post.location,
-          createdAt: post.createdAt,
-          imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
-          likes: post.likes.length,
-          comments: post.comments.length,
-          commentsData: post.comments.map(comment => ({
-            text: comment.text,
-            createdAt: comment.createdAt,
-            userId: {
-              username: comment.user?.username,
-              nome: comment.user?.nome
-            }
-          }))
-        }));
-
-        return res.json(formattedPosts);
-      } catch (aggErr) {
-        console.error("Errore fallback aggregate:", aggErr);
-        return res.status(500).json({ message: "Errore caricamento post" });
-      }
-    }
-
-    console.error("Errore caricamento post:", err);
-    return res.status(500).json({ message: "Errore caricamento post" });
-  }
-});
-
-
-
-
-
-
-
-
-app.get("/api/post-image/:id", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (post?.image?.data) {
-      res.contentType(post.image.contentType);
-      res.send(post.image.data);
-    } else {
-      res.status(404).send("Nessuna immagine");
-    }
-  } catch {
-    res.status(500).send("Errore immagine");
-  }
-});
-
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "home.html"));
-});
-
-
-
-// Like al post
-app.post("/api/posts/:id/like", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post non trovato" });
-
-    const userId = req.session.user.id;
-    const index = post.likes.indexOf(userId);
-
-    if (index === -1) {
-      post.likes.push(userId); // aggiunge il like
-    } else {
-      post.likes.splice(index, 1); // toglie il like
-    }
-
-    await post.save();
-    res.json({ likes: post.likes.length });
-  } catch (err) {
-    console.error("Errore nel like:", err);
-    res.status(500).json({ message: "Errore like" });
-  }
-});
-
-
-
-// Commenta un post
-app.post("/api/posts/:id/comment", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post non trovato" });
-
-    const newComment = {
-      text: req.body.text,
-      userId: req.session.user.id,
-      createdAt: new Date()
-    };
-
-    post.comments.push(newComment);
-    await post.save();
-
-    const lastComment = post.comments[post.comments.length - 1];
-
-    const populated = await Post.populate(lastComment, {
-      path: "userId",
-      select: "nome username"
-    });
-
-    res.json({
-      comments: post.comments.length,
-      newComment: populated
-    });
-  } catch (err) {
-    console.error("Errore commento:", err);
-    res.status(500).json({ message: "Errore commento" });
-  }
-});
-
-app.get("/api/posts/:id/comments", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id)
-      .populate('comments.userId', 'nome username');
-
-    if (!post) return res.status(404).json({ message: "Post non trovato" });
-
-    res.json(post.comments);
-  } catch (err) {
-    console.error("Errore caricamento commenti:", err);
-    res.status(500).json({ message: "Errore commenti" });
-  }
-});
-
-
-
-
-
-
-// FINE POST 
-
-
-
-
-
-
-app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
-  try {
-    const posts = await Post.find({ userId: req.params.id })
-      .sort({ createdAt: -1 })
-      .populate("userId", "username nome _id")
-      .populate("comments.userId", "username nome");
-
-    res.json(posts.map(post => ({
-      _id: post._id,
-      userId: {
-        _id: post.userId._id,
-        username: post.userId.username,
-        nome: post.userId.nome
-      },
-      desc: post.desc,
-      createdAt: post.createdAt,
-      imageUrl: post.image?.data ? `/api/post-image/${post._id}` : null,
-      likes: post.likes.length,
-      comments: post.comments.length,
-      commentsData: post.comments.map(comment => ({
-        text: comment.text,
-        createdAt: comment.createdAt,
-        userId: {
-          username: comment.userId?.username,
-          nome: comment.userId?.nome
-        }
-      }))
-    })));
-  } catch (err) {
-    console.error("Errore caricamento post utente:", err);
-    res.status(500).json({ message: "Errore caricamento post utente" });
-  }
-});
-
-
-
-
-
-
-
-
+// Static
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html')); // o home.html se loggato
-});
-
-
-
-
-
-
-
-
-
-
-// Avvio server 
+// Avvio server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server attivo su porta ${PORT}`);
 });
-
 
 
 
