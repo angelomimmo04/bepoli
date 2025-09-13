@@ -844,14 +844,12 @@ app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
 
 
 
-// Serve la build di React
-const buildPath = path.join(__dirname, 'build'); // <-- senza 'frontend'
-app.use(express.static(buildPath));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Qualsiasi route non gestita dal backend va a React
-app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html')); // o home.html se loggato
 });
+
 
 
 
@@ -866,6 +864,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server attivo su porta ${PORT}`);
 });
+
 
 
 
