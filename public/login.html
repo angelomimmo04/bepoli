@@ -64,7 +64,8 @@
       const parsedUser = JSON.parse(user);
       if (parsedUser && parsedUser.email) {
         sessionStorage.setItem("playLogoAnimation", "true");
-        window.location.href = "home.html";
+        window.location.href = "/";
+
       }
     } catch (e) {
       console.log("Utente non loggato o sessione malformata");
@@ -210,4 +211,5 @@
 
 </body>
 </html>
+
 
