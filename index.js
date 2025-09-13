@@ -905,6 +905,20 @@ app.get("/api/user/:id/posts", checkFingerprint, async (req, res) => {
 
 
 
+// Servire la build di React
+const buildPath = path.join(__dirname, 'frontend', 'build');
+app.use(express.static(buildPath));
+
+// Qualsiasi route non gestita dal backend va a React
+app.get('*', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+
+
+
+
+
+
 
 
 
@@ -913,3 +927,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server attivo su porta ${PORT}`);
 });
+
